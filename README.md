@@ -100,6 +100,8 @@ This repostitory is public and freeware, and I am open to anyone who want to upg
 
 SNES-IDE is released under the GNU GPL v3 license. This means that if you fork or use this repository, you must adhere to the terms outlined in the LICENSE.txt file. However, any game you create using this engine is entirely yours, and you're free to use it for any purpose.
 
+Relating to extern libraries and tools you have to check their respective licences to make stuffs with them. If you have questions about licences, begin a discussion about it for I can help you.
+
 This IDE is not affliated with, nor authorized, endorsed or licensed in any way by Nintendo Corporation, its affliates or subsidiaries. No Nintendo licenced and original or modified SNES ROMs are included in this repository!
 
 ## Special Thanks
