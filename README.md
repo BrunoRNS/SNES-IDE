@@ -65,10 +65,10 @@ Snes Hardware basic:
 - [retrovgames](https://retrovgames.com/snes-hardware-explained/)
 
 Getting started
-- [SNES basics](.\docs\snes-basic\README.md)
+- [SNES basics](docs/snes-basic/README.md)
 
 Pvsneslib/SNES-IDE tutorial
-- [Intermediary](.\docs\pvsneslib\README.md)
+- [Intermediary](docs/pvsneslib/README.md)
 
 Examples
 - [Hello World template](https://github.com/BrunoRNS/SNES-IDE/tree/main/template)
