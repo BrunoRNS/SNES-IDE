@@ -22,9 +22,13 @@ Developing games for the SNES is a blast! Here’s why:
 To get started with SNES-IDE:
 
 Operating System: Windows (tested on Windows 10 and higher). [How can I see my Windows version](https://support.microsoft.com/en-us/windows/which-version-of-windows-operating-system-am-i-running-628bec99-476a-2c13-5296-9dd081cdd808)
+
 Architecture: x64, x86_64, or amd64 (not compatible with ARM systems).[How can I see if I my PC have this CPU?](https://www.tenforums.com/tutorials/176966-how-check-if-processor-32-bit-64-bit-arm-windows-10-a.html)
+
 Minimum Resources: At least 2 GB RAM and 200 MB free disk space. - Probably your pc will have
+
 Curiosity and Time: Set aside time to read the documentation and explore!
+
 
 ## Getting started
 
