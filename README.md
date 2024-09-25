@@ -1,7 +1,7 @@
 # SNES-IDE: Your Creative Journey into Game Development
 ## What Is SNES-IDE?
 
-SNES-IDE is an open-source and freeware Integrated Development Environment (IDE) designed specifically for creating SNES games on Windows systems. Here’s what you need to know:
+SNES-IDE is an open-source and freeware Integrated Development Environment (IDE) designed specifically for creating SNES games on Windows systems using pvsneslib. Here’s what you need to know:
 
 - Languages: It uses [C](https://en.wikipedia.org/wiki/C_(programming_language)) and a touch of assembly(65816 and spc700) code for development.
 - Compilers: The [816-tcc](https://github.com/alekmaul/tcc) and [wla-dx](https://github.com/vhelin/wla-dx) compilers from [pvsneslib](https://github.com/alekmaul/pvsneslib) are your tools.
