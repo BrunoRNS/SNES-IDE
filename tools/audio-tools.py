@@ -69,7 +69,7 @@ def third():
         else:
             messagebox.showerror("Error", "Input file does not exist")
             return -1
-        subprocess.run([snesbrr, "-e", input_file, input_file.spem() + ".brr"])
+        subprocess.run([snesbrr, "-e", input_file, str(input_file).split('.')[0] + ".brr"])
     except subprocess.CalledProcessError as e:
         messagebox.showerror("Fatal", f"Error while executing {snesbrr}: {e}")
     else:
@@ -91,7 +91,7 @@ def forth():
         else:
             messagebox.showerror("Error", "Input file does not exist")
             return -1
-        subprocess.run([snesbrr, "-d", input_file, input_file.spem() + ".wav"])
+        subprocess.run([snesbrr, "-d", input_file, str(input_file).split('.')[0] + ".wav"])
     except subprocess.CalledProcessError as e:
         messagebox.showerror("Fatal", f"Error while executing {snesbrr}: {e}")
     else:
