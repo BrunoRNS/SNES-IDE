@@ -1,0 +1,49 @@
+# Windows specific files
+Thumbs.db
+ehthumbs.db
+Desktop.ini
+$RECYCLE.BIN/
+
+# Windows thumbnail cache files
+*.stackdump
+
+# Folder config file
+.DS_Store
+
+# Compiled source
+*.o
+*.so
+
+# Temporary files
+*.tmp
+*.bak
+*.swp
+*.swo
+*.old
+*.orig
+
+# Log files
+*.log
+
+# IDE specific files
+.vscode/
+.idea/
+*.code-workspace
+
+# Python files
+__pycache__/
+
+# SNES-IDE-out: output of building from source
+SNES-IDE-out/
+
+# Insallers files
+python/
+vs_build_tools/
+python/*
+vs_build_tools/*
+*.build.*
+
+# Linux files
+.installed
+*.desktop
+*.deb

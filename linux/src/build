@@ -1,0 +1,113 @@
+#!/bin/bash
+
+if [ "$SUDO_USER" ]; then
+
+    USER_HOME=$(eval echo "~$SUDO_USER")
+
+else
+
+    USER_HOME="$HOME"
+
+fi
+
+# Check if wine is installed
+if ! command -v wine &> /dev/null; then
+
+    echo "Wine is not installed. Please install wine first."
+    exit 1
+    
+fi
+
+# Check if wine is configured
+if [ ! -d "$USER_HOME/.wine" ]; then
+
+    echo "Wine is not configured. Initializing wine prefix..."
+    wineboot --init
+
+fi
+
+export WINEPREFIX="$USER_HOME/.wine-snes-ide"
+
+if [ ! -d "$WINEPREFIX" ]; then
+
+    echo "Creating wine prefix for snes-ide..."
+    wineboot --init
+    
+fi
+
+SRC_DIR="$(dirname "$(realpath "$0")")"
+
+cd "$SRC_DIR"
+
+PYTHON_INSTALLER="$(find ../installers/python -type f -name '*' | head -n 1)"
+
+# Check and run Python installer
+if [ -f "$PYTHON_INSTALLER" ]; then
+
+    echo "Running Python installer in wine..."
+    wine "$PYTHON_INSTALLER"
+
+else
+
+    echo "Python installer ($PYTHON_INSTALLER) not found."
+
+fi
+
+# Check if .NET SDK 8 is installed
+if ! dotnet --list-sdks | grep -q '^8\.'; then
+
+    echo ".NET SDK 8 is not installed."
+
+    read -p "Do you want to install .NET SDK 8 now? [y/N]: " yn
+
+    case "$yn" in
+
+        [Yy]* )
+
+            # Try to install .NET SDK 8
+
+            if [ -x "$(command -v apt)" ]; then
+
+                sudo apt install dotnet-sdk-8.0
+
+            elif [ -x "$(command -v dnf)" ]; then
+
+                sudo dnf install -y dotnet-sdk-8.0
+
+            elif [ -x "$(command -v yum)" ]; then
+
+                sudo yum install -y dotnet-sdk-8.0
+
+            else
+
+                echo "Automatic installation not supported on this distribution. Please install .NET SDK 8 manually."
+                exit 1
+
+            fi
+            ;;
+
+        * )
+
+            echo "Please install .NET SDK 8 and rerun this script."
+            exit 1
+
+            ;;
+    esac
+
+else
+
+    echo ".NET SDK 8 is installed."
+
+fi
+
+# Run install.sh in current directory
+if [ -f "./install.sh" ]; then
+
+    echo "Running install.sh..."
+    bash ./install.sh
+
+else
+
+    echo "install.sh not found in current directory."
+
+fi
