@@ -3,74 +3,240 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>SNES-IDE - Develop Your Own SNES Games</title>
-    <style>
-        body {
-            font-family: Arial, sans-serif;
-            margin: 0;
-            padding: 0;
-            background-color: #f0f0f0;
-            color: #333;
-        }
-        header {
-            background-color: #333;
-            color: #fff;
-            padding: 20px 0;
-            text-align: center;
-        }
-        main {
-            padding: 20px;
-            max-width: 800px;
-            margin: auto;
-        }
-        footer {
-            background-color: #333;
-            color: #fff;
-            padding: 10px 0;
-            text-align: center;
-        }
-        h1, h2 {
-            color: #007acc;
-        }
-        a {
-            color: #007acc;
-            text-decoration: none;
-        }
-        a:hover {
-            text-decoration: underline;
-        }
-    </style>
+    <title>SNES-IDE Documentation Portal</title>
+    <link rel="stylesheet" href="./assets/styles/styles.css">
+    <script type="text/javascript" src="./assets/scripts/scripts.js"></script>
+    <link rel="icon" type="image/x-icon" href="./assets/icons/icon.ico">
 </head>
 <body>
     <header>
         <h1>SNES-IDE</h1>
-        <p>Develop Your Own SNES Games with Ease on Windows Systems</p>
+        <p>Your Creative Journey into SNES Game Development</p>
     </header>
+    <nav>
+        <a href="#" data-page="home" class="active">Home</a>
+        <a href="#" data-page="install">Install</a>
+        <a href="#" data-page="usage">Usage</a>
+        <a href="#" data-page="structure">Project Structure</a>
+        <a href="#" data-page="build">Build from Source</a>
+        <a href="#" data-page="faq">FAQ</a>
+        <a href="#" data-page="contrib">Contribute</a>
+        <a href="#" data-page="about">About</a>
+    </nav>
     <main>
-        <section>
-            <h2>Welcome to SNES-IDE</h2>
-            <p>SNES-IDE is a powerful tool designed to simplify the creation of games for the Super Nintendo Entertainment System (SNES) in Windows systems. With this IDE, you can make the most of the pvsneslib library to develop amazing games and relive the golden age of 16-bit gaming.</p>
+        <!-- HOME PAGE -->
+        <section id="home" data-page="home">
+            <div class="toc">
+                <strong>Quick Links</strong>
+                <ul>
+                    <li><a href="#" data-page="install" onclick="showPage('install')">Installation Guide</a></li>
+                    <li><a href="#" data-page="usage" onclick="showPage('usage')">Getting Started</a></li>
+                    <li><a href="#" data-page="build" onclick="showPage('build')">Build from Source</a></li>
+                    <li><a href="#" data-page="faq" onclick="showPage('faq')">FAQ</a></li>
+                    <li><a href="https://github.com/BrunoRNS/SNES-IDE" target="_blank">GitHub Project</a></li>
+                </ul>
+            </div>
+            <section>
+                <h2>What is SNES-IDE?</h2>
+                <p>
+                    <strong>SNES-IDE</strong> is an open-source, cross-platform Integrated Development Environment for creating Super Nintendo (SNES) games using <a href="https://github.com/alekmaul/pvsneslib" target="_blank">pvsneslib</a>. It simplifies the workflow for hobbyists and professionals, providing tools, templates, and automation for building, compiling, and testing SNES ROMs.
+                </p>
+                <ul>
+                    <li><strong>Languages:</strong> C (main), 65816/Spc700 assembly</li>
+                    <li><strong>Compilers:</strong> 816-tcc, wla-dx</li>
+                    <li><strong>Emulator:</strong> bsnes, snes9x</li>
+                    <li><strong>Cross-platform:</strong> Native on Windows, works on Linux (via Wine)</li>
+                    <li><strong>All-in-one:</strong> Project templates, asset converters, build scripts</li>
+                </ul>
+            </section>
+            <section>
+                <h2>Features</h2>
+                <ul>
+                    <li>Integrated toolchain for C and assembly (816-tcc, wla-dx)</li>
+                    <li>Project templates for quick starts</li>
+                    <li>Batch shortcuts for editors, tools, and builds</li>
+                    <li>Cross-platform: Native on Windows, works on Linux via Wine</li>
+                    <li>Emulator integration (bsnes, snes9x)</li>
+                    <li>Audio &amp; graphics tools for SNES assets</li>
+                    <li>Extensible and open-source</li>
+                </ul>
+            </section>
         </section>
-        <section>
-            <h2>What is pvsneslib?</h2>
-            <p><a href="https://github.com/alekmaul/pvsneslib" target="_blank">pvsneslib</a> is a development library for the SNES that simplifies the game creation process. It provides various functions to manipulate graphics, sound, and controller input, making game development more accessible and fun.</p>
+
+        <!-- INSTALL PAGE -->
+        <section id="install" data-page="install" class="hidden">
+            <h2>Installation Guide</h2>
+            <h3>Requirements</h3>
+                <ul>
+                    <li><strong>Operating System:</strong> Windows 10+ or Linux (with Wine 9.0+)</li>
+                    <li><strong>Architecture:</strong> x64, x86_64, or amd64 (not ARM)</li>
+                    <li><strong>Minimum Resources:</strong> 2 GB RAM, 200 MB disk space</li>
+                </ul>
+            <h3>Dependencies</h3>
+                <ul>
+                    <li><strong>Windows:</strong> No dependencies required.</li>
+                    <li><strong>Linux:</strong> Only Wine installed and configured is required.</li>
+                </ul>
+            <h3>Building from Source Dependencies</h3>
+                <ul>
+                    <li><strong>Windows:</strong> Python 3.8+ and .NET SDK 8.0+</li>
+                    <li><strong>Linux:</strong> Wine, Bash, and Linux .NET SDK 8.0+</li>
+                </ul>
+            <h3>Windows Installation</h3>
+                <ol>
+                    <li>Download the latest release from <a href="https://github.com/BrunoRNS/SNES-IDE/releases/latest" target="_blank">GitHub Releases</a>.</li>
+                    <li>Decompress the .zip to a folder of your choice.</li>
+                    <li>Double-click <code>INSTALL.bat</code> to set up SNES-IDE and create shortcuts on your Desktop.</li>
+                </ol>
+            <h3>Linux Installation</h3>
+                <ol>
+                    <li>Download the latest release from <a href="https://github.com/BrunoRNS/SNES-IDE/releases/latest" target="_blank">GitHub Releases</a>.</li>
+                    <li>Decompress the .zip to a folder of your choice.</li>
+                    <li>Install Wine: <code>sudo apt install wine</code></li>
+                    <li>Run the configure script:
+                        <pre><code>cd /path/to/snes-ide/<br>chmod +x ./linux/configure.sh<br>bash ./linux/configure.sh</code></pre>
+                    </li>
+                    <li>Follow the installer steps to generate a desktop icon or just run with <code>./linux/src/start.sh</code>.</li>
+                </ol>
+            <h3>Shortcuts Generated</h3>
+                <ul>
+                    <li><strong>text-editor</strong> – Notepad++</li>
+                    <li><strong>audio-tools</strong> – Convert and manage SNES-compatible audio assets</li>
+                    <li><strong>graphic-tools</strong> – Convert and manage SNES-compatible graphics</li>
+                    <li><strong>other-tools</strong> – Access additional utilities</li>
+                    <li><strong>create-new-project</strong> – Scaffold a new project from a template</li>
+                    <li><strong>compiler</strong> – Compile your project into a SNES ROM</li>
+                    <li><strong>emulator</strong> – Launch your ROM in bsnes</li>
+                    <li><strong>snes-ide</strong> – All-in-one shortcut, the main entry of SNES-IDE</li>
+                </ul>
+            <p>
+                <strong>Note:</strong> Shortcuts are created in <code>Desktop/snes-ide/</code> on Windows, or as a desktop entry on Linux if chosen during installation.
+            </p>
         </section>
-        <section>
-            <h2>Why Develop Games for the SNES?</h2>
-            <p>Developing games for the SNES is not just a nostalgic trip, but also a great opportunity to learn about low-level programming and performance optimization. The SNES, with its unique architecture, offers interesting and rewarding challenges for developers of all levels.</p>
-            <p>Moreover, games developed for the SNES can be easily emulated on various modern platforms, such as PCs, mobile devices, and later-generation consoles, increasing the visibility and accessibility of your games.</p>
+
+        <!-- USAGE PAGE -->
+        <section id="usage" data-page="usage" class="hidden">
+            <h2>Getting Started</h2>
+            <ol>
+                <li>Create a new project using the <strong>create-new-project</strong> shortcut or batch file.</li>
+                <li>Edit your code in Notepad++ or your preferred editor.</li>
+                <li>Add assets using <strong>audio-tools</strong> and <strong>graphic-tools</strong>.</li>
+                <li>Compile your project with the <strong>compiler</strong> shortcut.</li>
+                <li>Test your ROM in an emulator using the <strong>emulator</strong> shortcut.</li>
+                <li>Or use <strong>snes-ide</strong> for an all-in-one experience.</li>
+            </ol>
+            <h3>Shortcuts Generated</h3>
+            <ul>
+                <li><strong>text-editor</strong> – Notepad++ or your preferred editor</li>
+                <li><strong>audio-tools</strong> – Convert and manage SNES-compatible audio assets</li>
+                <li><strong>graphic-tools</strong> – Convert and manage SNES-compatible graphics</li>
+                <li><strong>other-tools</strong> – Access additional utilities</li>
+                <li><strong>create-new-project</strong> – Scaffold a new project from a template</li>
+                <li><strong>compiler</strong> – Compile your project into a SNES ROM</li>
+                <li><strong>emulator</strong> – Launch your ROM in bsnes</li>
+                <li><strong>snes-ide</strong> – All-in-one shortcut, main entry of SNES-IDE</li>
+            </ul>
         </section>
-        <section>
-            <h2>Get Started Now!</h2>
-            <p>If you're excited to start developing your own SNES games, check out the <a href="https://github.com/BrunoRNS/SNES-IDE/" target="_blank">SNES-IDE repository on GitHub</a>. There you'll find all the resources you need, including tutorials, code examples, and documentation to help you get started.</p>
+
+        <!-- PROJECT STRUCTURE PAGE -->
+        <section id="structure" data-page="structure" class="hidden">
+            <h2>Project Structure</h2>
+            <pre>
+SNES-IDE/
+├── libs/
+│   └── notepad++/
+├── tools/
+│   ├── audio-tools.exe
+│   ├── gfx-tools.exe
+│   ├── externTools.exe
+│   ├── create-new-project.exe
+│   └── ...
+├── snes-ide.exe
+├── INSTALL.bat
+├── ...
+            </pre>
+            <p>
+                Shortcuts are created in <code>Desktop/snes-ide/</code> on Windows, or as a desktop entry on Linux.  
+                Source code and assets are managed in your project folder.
+            </p>
         </section>
-        <section>
-            <h2>Contribute to the Project</h2>
-            <p>SNES-IDE is an open-source project, and we are always looking for community contributions. Whether you're an experienced developer or just starting out, your contribution is valuable. Visit our GitHub repository to learn how you can help.</p>
+
+        <!-- BUILD FROM SOURCE PAGE -->
+        <section id="build" data-page="build" class="hidden">
+            <h2>Building from Source</h2>
+            <ol>
+                <li>Clone the repo: <code>git clone https://github.com/BrunoRNS/SNES-IDE.git</code></li>
+                <li>Install dependencies:
+                    <ul>
+                        <li>Windows: Python 3.8+, .NET SDK 8.0+</li>
+                        <li>Linux: Wine, Bash, .NET SDK 8.0+</li>
+                    </ul>
+                </li>
+                <li>Follow the <a href="build/BUILDING_FROM_SOURCE.md">build instructions</a> in the docs.</li>
+                <li>After building, run the installer as described in the <a href="#" data-page="install" onclick="showPage('install')">Installation Guide</a>.</li>
+            </ol>
+            <h3>Verifying the Build</h3>
+            <ul>
+                <li>Use <code>tree</code> to compare the output directory with the expected structure.</li>
+                <li>See <code>treeLinux.txt</code> or <code>treeWindows.txt</code> for reference outputs.</li>
+            </ul>
+        </section>
+
+        <!-- FAQ PAGE -->
+        <section id="faq" data-page="faq" class="hidden">
+            <h2>Frequently Asked Questions</h2>
+            <ul>
+                <li><strong>Can I use my own editor?</strong> Yes! Notepad++ is provided, but you can use any editor.</li>
+                <li><strong>Does it work on Mac?</strong> Not officially, but you may try using Wine or a VM.</li>
+                <li><strong>Where are my ROMs?</strong> Compiled ROMs are usually in your project folder or a <code>Roms/</code> subdirectory.</li>
+                <li><strong>How do I add new tools?</strong> Place them in the <code>tools/</code> directory. They must be a Python or .NET tool.</li>
+                <li><strong>How do I reinstall?</strong> Delete the <code>.installed</code> file and rerun <code>setup.sh</code>.</li>
+                <li><strong>How do I troubleshoot?</strong> Check terminal output for errors, ensure dependencies are installed, and see the <a href="docs/SNES-IDE.docs.md#troubleshooting">Troubleshooting</a> section in the docs.</li>
+            </ul>
+        </section>
+
+        <!-- CONTRIBUTE PAGE -->
+        <section id="contrib" data-page="contrib" class="hidden">
+            <h2>Contributing</h2>
+            <ul>
+                <li>Read <a href="CODE_OF_CONDUCT.md">Code of Conduct</a> and <a href="PULL_REQUEST_RULES.md">Pull Request Guidelines</a>.</li>
+                <li>Fork the repo and create a feature branch.</li>
+                <li>Write clear, modular code with comments.</li>
+                <li>Add or update tests as needed.</li>
+                <li>Submit a pull request with a descriptive title and summary.</li>
+                <li>Open issues or discussions for bugs, ideas, or questions.</li>
+            </ul>
+        </section>
+
+        <!-- ABOUT PAGE -->
+        <section id="about" data-page="about" class="hidden">
+            <h2>About & Credits</h2>
+            <p>
+                SNES-IDE is released under the GNU GPL v3 license.<br>
+                Any game you create with this engine is entirely yours.<br>
+                This IDE is not affiliated with, nor authorized, endorsed or licensed by Nintendo Corporation or its subsidiaries.
+            </p>
+            <h3>Special Thanks</h3>
+            <ul>
+                <li><a href="https://github.com/alekmaul/pvsneslib" target="_blank">@Alekmaul and the pvsneslib team</a></li>
+                <li><a href="https://github.com/bsnes-emu/bsnes" target="_blank">All bsnes team</a></li>
+                <li><a href="https://github.com/notepad-plus-plus/notepad-plus-plus" target="_blank">Notepad++ team</a></li>
+                <li><a href="https://github.com/angelo-wf/SnesJs" target="_blank">@angelo-wf for SnesJs</a></li>
+                <li><a href="https://github.com/schismtracker/schismtracker" target="_blank">schismtracker team</a></li>
+                <li><a href="https://github.com/nesdoug/M8TE" target="_blank">@nesdoug for M8TE</a></li>
+                <li><a href="https://github.com/AlexIII/web-wav-converter" target="_blank">@AlekIII for web-wav-converter</a></li>
+                <li><a href="https://github.com/luizomf" target="_blank">@luizomf for programming mentorship</a></li>
+                <li>Family, friends, and everyone who contributed in any way!</li>
+            </ul>
+            <h3>Contact</h3>
+            <ul>
+                <li><strong>GitHub:</strong> <a href="https://github.com/BrunoRNS/SNES-IDE" target="_blank">BrunoRNS/SNES-IDE</a></li>
+                <li><strong>Issues &amp; Discussions:</strong> Use the GitHub repository to report bugs or ask questions.</li>
+            </ul>
         </section>
     </main>
     <footer>
-        <p>&copy; 2024 SNES-IDE. All rights reserved.</p>
+        <p>&copy; 2024 SNES-IDE. Open Source Project. Licensed under GNU GPL v3.</p>
     </footer>
 </body>
 </html>
