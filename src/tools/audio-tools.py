@@ -99,7 +99,7 @@ class AudioToolsApp:
     def first(self):
         """Convert WAV files to MP3 using the converter."""
 
-        wav2mp3: Path = self.root / "tools" / "soundsnes" / "wav2mp3_converter" / "bin" / "wav2mp3_converter.exe"
+        wav2mp3: Path = self.root / "tools" / "soundsnes" / "wav2mp3_converter" / "wav2mp3_converter.exe"
         
         try:
 
@@ -114,7 +114,7 @@ class AudioToolsApp:
 
             messagebox.showerror("Fatal", f"Error while executing {wav2mp3}: {e}")
             return -1
-
+        
         messagebox.showinfo("SNES-IDE", "Success!")
 
         return 0
@@ -124,6 +124,10 @@ class AudioToolsApp:
         """Convert MP3 files to WAV the converter."""
 
         local: Path = self.root / "tools" / "soundsnes" / "mp3wavlauncher.exe"
+
+        if not local.exists():
+
+            local = local.parent / "mp3wavlauncher.bat"
 
         try:
 
