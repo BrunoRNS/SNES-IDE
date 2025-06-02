@@ -10,7 +10,7 @@ namespace wav2mp3_converter
     /// </summary>
     internal static class Program {
 
-        static void Main() {
+        static void Main(string[] args) {
 
             Console.WriteLine("WAV to MP3 Converter (CLI)");
             Console.Write("Enter the full path to the input WAV file: ");

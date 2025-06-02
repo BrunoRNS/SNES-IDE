@@ -189,7 +189,7 @@ def compile() -> None:
             if out != 0:
 
                 raise Exception(f"ERROR while compiling c# files: -{abs(out)}")
-
+        
         csproj_dirs.add(dirpath.resolve())
 
     sys.stdout.write("Success compiling C# files.\n")
