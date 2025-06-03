@@ -137,6 +137,29 @@ def copy_bat() -> None:
     
     return None
 
+def copy_dlls() -> None:
+    """
+    Copy the dlls from tools dir
+    """
+
+    (SNESIDEOUT / 'tools').mkdir(exist_ok=True)
+
+    for file in (ROOT / 'tools').rglob("*.dll"):
+
+        if file.is_dir():
+
+            continue
+
+        rel_path = file.relative_to(ROOT / 'tools')
+
+        dest_path = SNESIDEOUT / 'tools' / rel_path
+
+        dest_path.parent.mkdir(parents=True, exist_ok=True)
+
+        shutil.copy(file, dest_path)
+    
+    return None
+
 def compile() -> None:
     """
     Compile the project.
@@ -144,63 +167,9 @@ def compile() -> None:
 
     src_dir = ROOT / "src"
 
-    # Track directories containing .csproj to avoid processing their files/subdirs for .cs
-
-    csproj_dirs = set()
-
-    # Compile or copy C# projects
-    for csproj_file in src_dir.rglob("*.csproj"):
-
-        dirpath = csproj_file.parent
-        cs_files = list(dirpath.glob("*.cs"))
-
-        if not cs_files:
-
-            continue  # No .cs file to compile
-
-        cs_file = cs_files[0]  # Assume one main .cs file per project directory
-
-        # Output folder: mirror src path under SNESIDEOUT, e.g. src/tools -> SNES-IDE-out/tools
-        rel_dir = dirpath.relative_to(src_dir)
-        out_dir = SNESIDEOUT / rel_dir
-        out_dir.mkdir(parents=True, exist_ok=True)
-
-        out_exe = out_dir / (cs_file.stem + ".exe")
-
-        if len(sys.argv) > 1 and sys.argv[1] == "linux":
-
-            # On Linux, just copy the .exe from the cs file's directory
-            src_exe = dirpath / (cs_file.stem + ".exe")
-
-            if src_exe.exists():
-
-                shutil.copytree(src_exe.parent, out_exe.parent) # the entire directory of src_exe to out_exe dir
-
-            else:
-
-                print(f"Warning: {src_exe} not found, skipping copy.")
-
-        else:
-
-            from buildModules.buildCSharp import main as mcs
-
-            out: int = mcs(cs_file, out_exe)
-
-            if out != 0:
-
-                raise Exception(f"ERROR while compiling c# files: -{abs(out)}")
-        
-        csproj_dirs.add(dirpath.resolve())
-
-    sys.stdout.write("Success compiling C# files.\n")
-
     # Compile Python files
 
     for file in src_dir.rglob("*.py"):
-
-        # Skip if in a .csproj directory or its subdirs
-        if any(parent in csproj_dirs for parent in file.parents):
-            continue
 
         rel_path = file.relative_to(src_dir)
         out_path = SNESIDEOUT / rel_path.with_suffix(".exe")
@@ -220,6 +189,10 @@ def compile() -> None:
                 bat_file.write(f'@echo off\npython "{Path(py_out).resolve().absolute()}" %*\n')
 
         else:
+
+            if file.name == "wav2mp3_converter.py":
+
+                continue
 
             from buildModules.buildPy import main as mpy
 
@@ -256,8 +229,11 @@ def main() -> int:
         sys.stdout.write("Copying bat files...\n")
         copy_bat()
 
+        sys.stdout.write("Copying dlls...\n")
+        copy_dlls()
+        
 
-        sys.stdout.write("Compiling c# and python files...\n")
+        sys.stdout.write("Compiling python files...\n")
         compile()
 
 
