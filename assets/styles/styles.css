@@ -5,8 +5,8 @@ body {
     margin: 0;
     height: 100%;
 
-    background-color: #f7f9fa;
-    background: #f7f9fa;
+    background-color: #222;
+    background: #fff;
 
     flex-direction: column;
     display: flex;
