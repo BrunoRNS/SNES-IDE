@@ -82,7 +82,7 @@ def main(python_file: str | Path, target_dir: str | Path) -> int:
         return 1
 
     exe_name = python_file.stem + ".exe"
-    icon_path = (Path(__file__).parent.parent.parent / "assets" / "icons" / "icon.ico").absolute()
+    icon_path = (Path(__file__).parent.parent.parent.parent / "assets" / "icons" / "icon.ico").absolute()
 
     print(f"Converting '{python_file}' to '{exe_name}'...")
 
