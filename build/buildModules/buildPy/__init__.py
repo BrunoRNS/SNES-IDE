@@ -49,43 +49,6 @@ def ensure_pip() -> bool:
         sys.stderr.write("**pip is not installed.**\n")
         return False
 
-def ensure_pyinstaller() -> bool:
-    """
-    Ensures that the PyInstaller package is installed and importable.
-    Attempts to import PyInstaller. If it is not installed, tries to install it using pip.
-    If installation is successful, attempts to import PyInstaller again.
-    Returns:
-        bool: True if PyInstaller is successfully imported or installed, False otherwise.
-    Side Effects:
-        Writes error and status messages to sys.stderr.
-        May install PyInstaller using pip if not already installed.
-    """
-
-
-    try:
-
-        import PyInstaller # type: ignore
-        return True
-    
-    except ImportError:
-
-        sys.stderr.write("pyinstaller is not installed. Installing pyinstaller...\n")
-
-        try:
-
-            import pip
-            pip.main(['install', 'pyinstaller'])
-
-            import PyInstaller # type: ignore
-
-            return True
-        
-        except Exception as e:
-
-            sys.stderr.write(f"**Error: Failed to install pyinstaller. {e}**\n")
-
-            return False
-
 def main(python_file: str | Path, target_dir: str | Path) -> int:
     """
     Main function to convert a Python script into a standalone Windows executable (.exe) using PyInstaller.
@@ -118,12 +81,8 @@ def main(python_file: str | Path, target_dir: str | Path) -> int:
 
         return 1
 
-    if not ensure_pyinstaller():
-
-        return 1
-
     exe_name = python_file.stem + ".exe"
-    icon_path = Path(__file__).parent.parent.parent / "assets" / "icons" / "icon.ico"
+    icon_path = (Path(__file__).parent.parent.parent / "assets" / "icons" / "icon.ico").absolute()
 
     print(f"Converting '{python_file}' to '{exe_name}'...")
 
@@ -138,7 +97,18 @@ def main(python_file: str | Path, target_dir: str | Path) -> int:
 
     ]
 
-    result = subprocess.run(cmd)
+    try:
+
+        result = subprocess.run(cmd)
+
+    except Exception as e:
+
+        print(f"Trying to install pyinstaller due to {e}...")
+        
+        import pip
+        pip.main(["install", "PyInstaller"])
+        
+        result = subprocess.run(cmd)
 
     if result.returncode != 0:
 
