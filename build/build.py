@@ -192,9 +192,10 @@ def compile() -> None:
 
             if file.name == "wav2mp3_converter.py":
 
+
                 subprocess.run(["python", "-m", "PyInstaller", "--onefile", "--add-binary", "SDL2.dll;.", "--add-binary", "lame_enc.dll;.", "wav2mp3_converter.py"], cwd=file.parent)
 
-                shutil.copy(file.with_suffix(".exe"), out_path)
+                shutil.copy(file.with_suffix(".exe"), out_path.parent)
 
                 continue
 
