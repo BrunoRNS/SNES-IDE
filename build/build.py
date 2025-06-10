@@ -196,15 +196,15 @@ def compile() -> None:
                 subprocess.run(["python", "-m", "PyInstaller", "--onefile", "--add-binary", "SDL2.dll;.", "--add-binary", "lame_enc.dll;.", "wav2mp3_converter.py"], cwd=file.parent)
 
                 dist_dir = file.parent / "dist"
-                exe_path = dist_dir / file.name
+                exe_path = dist_dir / "wav2mp3_converter.exe"
 
                 try:
 
-                    shutil.move(str(exe_path), str(out_path.parent / file.name.with_suffix(".exe")))
+                    shutil.move(str(exe_path), str(out_path))
 
                 except Exception as e:
 
-                    sys.stderr.write(f"**Error: Failed to move the generated .exe file to '{target_dir}'.**\n")
+                    sys.stderr.write(f"**Error: Failed to move the generated .exe file to '{out_path}'.**\n")
                     print(e)
 
                     return 1
