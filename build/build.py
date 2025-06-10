@@ -194,11 +194,13 @@ def compile() -> None:
 
                 subprocess.run(["python", "-m", "PyInstaller", "--onefile", "--add-binary", "SDL2.dll;.", "--add-binary", "lame_enc.dll;.", "wav2mp3_converter.py"], cwd=file.parent)
 
+                shutil.copy(file.with_suffix(".exe"), out_path)
+
                 continue
 
             from buildModules.buildPy import main as mpy
 
-            out: int = mpy(file, out_path)
+            out: int = mpy(file, out_path.parent)
 
             if out != 0:
                 
