@@ -53,53 +53,6 @@ else
 
 fi
 
-# Check if .NET SDK 8 is installed
-if ! dotnet --list-sdks | grep -q '^8\.'; then
-
-    echo ".NET SDK 8 is not installed."
-
-    read -p "Do you want to install .NET SDK 8 now? [y/N]: " yn
-
-    case "$yn" in
-
-        [Yy]* )
-
-            # Try to install .NET SDK 8
-
-            if [ -x "$(command -v apt)" ]; then
-
-                sudo apt install dotnet-sdk-8.0
-
-            elif [ -x "$(command -v dnf)" ]; then
-
-                sudo dnf install -y dotnet-sdk-8.0
-
-            elif [ -x "$(command -v yum)" ]; then
-
-                sudo yum install -y dotnet-sdk-8.0
-
-            else
-
-                echo "Automatic installation not supported on this distribution. Please install .NET SDK 8 manually."
-                exit 1
-
-            fi
-            ;;
-
-        * )
-
-            echo "Please install .NET SDK 8 and rerun this script."
-            exit 1
-
-            ;;
-    esac
-
-else
-
-    echo ".NET SDK 8 is installed."
-
-fi
-
 # Run install.sh in current directory
 if [ -f "./install.sh" ]; then
 

@@ -34,20 +34,7 @@ mkdir -p "$WINE_TARGET_DIR"
 
 cp -r "$PROJECT_ROOT"/* "$WINE_TARGET_DIR"
 
-# 2. Build all C# projects (.csproj) recursively using .NET 8
-echo "Building all C# projects in $WINE_TARGET_DIR/src..."
-
-find "$WINE_TARGET_DIR/src" -name "*.csproj" | while read -r csproj; do
-
-    proj_dir="$(dirname "$csproj")"
-    echo "Building $(basename "$csproj") in $proj_dir with .NET 8..."
-
-    (cd "$proj_dir" && dotnet publish "$(basename "$csproj")" --output . -c Release -f net8.0 -r win-x64 --self-contained true /p:PublishSingleFile=true /p:PublishTrimmed=false)
-
-done
-
-
-# 3. Run Windows batch build and install scripts via Wine
+# 2. Run Windows batch build and install scripts via Wine
 cd "$WINE_TARGET_DIR"
 
 if [ -f "./build/build.bat" ]; then

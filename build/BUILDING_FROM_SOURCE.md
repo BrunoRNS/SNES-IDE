@@ -6,18 +6,12 @@ This document explains the build process and provides a way to verify if the bui
 
 ## Required Dependencies for building from source
 
-- **.NET Framework 8.0 or newer (newer versions not guaranteed):**  
-  Required for compiling C# projects with .NET libraries.  
-  If you are using Windows, install it from the [official website](<!-- TO IMPLEMENT -->).
-
 - **Python 3.8 or newer:**  
   Required for running Python scripts and tooling.  
   Download and install from the [official Python website](https://www.python.org/downloads/).
 
 - **Linux:**  
   For Linux support, install the following dependencies:
-  - .NET SDK 8.0:  
-    Run `sudo apt install dotnet-sdk-8.0` to install the complete .NET SDK. You do not need the Windows installer for this.
   - Wine 9.0 or newer:  
     Install and configure Wine. Older versions may work, but are not guaranteed.
   - Windows Python:  
