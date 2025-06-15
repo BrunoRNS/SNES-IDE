@@ -190,27 +190,6 @@ def compile() -> None:
 
         else:
 
-            if file.name == "wav2mp3_converter.py":
-
-
-                subprocess.run(["python", "-m", "PyInstaller", "--onefile", "wav2mp3_converter.py", "--add-binary", "SDL2.dll:.", "--add-binary", "lame_enc.dll:."], cwd=file.parent)
-
-                dist_dir = file.parent / "dist"
-                exe_path = dist_dir / "wav2mp3_converter.exe"
-
-                try:
-
-                    shutil.move(str(exe_path), str(out_path))
-
-                except Exception as e:
-
-                    sys.stderr.write(f"**Error: Failed to move the generated .exe file to '{out_path}'.**\n")
-                    print(e)
-
-                    return 1
-
-                continue
-
             from buildModules.buildPy import main as mpy
 
             out: int = mpy(file, out_path.parent)
@@ -221,6 +200,13 @@ def compile() -> None:
             
 
     sys.stdout.write("Success compiling Python files.\n")
+    
+def copyTracker() -> None:
+    
+    src_dir = ROOT / "src" / "tools" / "soundsnes" / "tracker"
+    dest_dir = ROOT / "SNES-IDE-out" / "tools" / "soundsnes" / "tracker"
+    
+    shutil.copytree(src_dir, dest_dir)
 
 
 def main() -> int:
@@ -232,7 +218,6 @@ def main() -> int:
 
         sys.stdout.write("Cleaning SNES-IDE-out...\n")
         clean_all()
-
 
         sys.stdout.write("Copying root files...\n")
         copy_root()
@@ -249,6 +234,8 @@ def main() -> int:
         sys.stdout.write("Copying dlls...\n")
         copy_dlls()
         
+        sys.stdout.write("Copying tracker...\n")
+        copyTracker()
 
         sys.stdout.write("Compiling python files...\n")
         compile()
