@@ -40,20 +40,6 @@ class AudioToolsApp:
     def setup_widgets(self):
         """Set up the widgets for the Audio Tools application."""
 
-        self.var1 = StringVar()
-        self.label1 = tk.Label(self.window, textvariable=self.var1, relief=SOLID)
-        self.button1 = tk.Button(self.window, text="Click to select your wav file", command=self.first)
-        self.var1.set("WAV(uncompressed) to MP3 converter")
-        self.label1.pack()
-        self.button1.pack()
-
-        self.var2 = StringVar()
-        self.label2 = tk.Label(self.window, textvariable=self.var2, relief=SOLID)
-        self.button2 = tk.Button(self.window, text="Click to select your mp3 file", command=self.second)
-        self.var2.set("MP3 to WAV(uncompressed) converter with Hz and channels control")
-        self.label2.pack()
-        self.button2.pack()
-
         self.var3 = StringVar()
         self.label3 = tk.Label(self.window, textvariable=self.var3, relief=SOLID)
         self.button3 = tk.Button(self.window, text="Click to select your wav file", command=self.third)
@@ -96,56 +82,6 @@ class AudioToolsApp:
         self.label8.pack()
         self.button8.pack()
 
-    def first(self):
-        """Convert WAV files to MP3 using the converter."""
-
-        wav2mp3: Path = self.root / "tools" / "soundsnes" / "wav2mp3_converter" / "wav2mp3_converter.exe"
-        
-        try:
-
-            if not wav2mp3.exists():
-
-                messagebox.showerror("Error", f"Executable {wav2mp3} does not exist")
-                return -1
-    
-            subprocess.run([wav2mp3])
-
-        except subprocess.CalledProcessError as e:
-
-            messagebox.showerror("Fatal", f"Error while executing {wav2mp3}: {e}")
-            return -1
-        
-        messagebox.showinfo("SNES-IDE", "Success!")
-
-        return 0
-
-
-    def second(self):
-        """Convert MP3 files to WAV the converter."""
-
-        local: Path = self.root / "tools" / "soundsnes" / "mp3wavlauncher.exe"
-
-        if not local.exists():
-
-            local = local.parent / "mp3wavlauncher.bat"
-
-        try:
-
-            if not local.exists():
-
-                messagebox.showerror("Error", f"Executable {local} does not exist")
-                return -1
-            
-            subprocess.run([local])
-
-        except subprocess.CalledProcessError as e:
-
-            messagebox.showerror("Fatal", f"Error while executing {local}: {e}")
-            return -1
-
-        messagebox.showinfo("SNES-IDE", "Success!")
-
-        return 0
 
     def third(self):
         """Convert WAV files to BRR using snesbrr converter."""
