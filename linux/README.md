@@ -5,10 +5,6 @@
 - **Wine** must be installed and configured.
 - You need permission to run scripts and (optionally) to install a desktop shortcut system-wide.
 
-- **.NET SDK for Linux**  
-  Required for building and running any .NET-based components. Install it using your package manager (for example, `sudo apt install dotnet-sdk-8.0` on Debian).  
-  For more details, visit the [.NET download page](https://dotnet.microsoft.com/download).
-
 - **Configure installers**
   Go to [installers setup guide](./installers/README.md) to see more detailed information.
 
