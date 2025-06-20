@@ -3,8 +3,46 @@ from pathlib import Path
 import tkinter as tk
 import subprocess
 import webbrowser
-import shutil
+import atexit
 import sys
+import os
+
+class shutil:
+    """Reimplementation of class shutil to avoid errors in Wine"""
+
+    @staticmethod
+    def copy(src: str|Path, dst: str|Path) -> None:
+        """Reimplementation of method copy using copy command"""
+
+        src, dst = map(lambda x: Path(x).resolve(), (src, dst))
+
+        subprocess.run(f'copy "{src}" "{dst}"', shell=True, check=True)
+
+    @staticmethod
+    def copytree(src: str|Path, dst: str|Path) -> None:
+        """Reimplementation of method copytree using xcopy"""
+
+        src, dst = map(lambda x: Path(x).resolve(), (src, dst))
+
+        cmd = f'xcopy "{src}" "{dst}" /E /I /Y /Q /H'
+        subprocess.run(cmd, shell=True, check=True)
+
+    @staticmethod
+    def rmtree(path: str|Path) -> None:
+        """Reimplementation of method rmtree using rmdir"""
+
+        path = Path(path).resolve()
+
+        subprocess.run(f'rmdir /S /Q "{path}"', shell=True, check=True)
+
+    @staticmethod
+    def move(src: str|Path, dst: str|Path) -> None:
+        """Reimplementation of method move using move command"""
+
+        src, dst = map(lambda x: Path(x).resolve(), (src, dst))
+
+        subprocess.run(f'move "{src}" "{dst}"', shell=True, check=True)
+
 
 class PathManager:
 
@@ -113,7 +151,7 @@ class Gfx4SnesExecutor:
             "-u,        number of colors to use {4,16,128,[256]} <int>",
         ]
 
-        options = [StringVar()] * len(stroptions)
+        options = [StringVar() for _ in range(len(stroptions))]
 
         entries = dict()
 
@@ -267,8 +305,8 @@ class FontCopier:
                 messagebox.showerror("Fatal", "No directory selected")
                 return -1
             
-            target_path = Path(target_dir) / "font.png"
-            shutil.copyfile(str(self.font_path), str(target_path))
+            target_path = Path(target_dir)
+            shutil.copy(str(self.font_path), str(target_path))
 
         except Exception:
 
@@ -278,6 +316,27 @@ class FontCopier:
 
         messagebox.showinfo("SNES-IDE", "Success!")
         return 0
+    
+
+class HTTPServer:
+    def __init__(self, path, port=8000):
+        self.path = path
+        self.port = port
+        self.process = None
+
+    def run(self):
+        os.chdir(self.path)
+        self.process = subprocess.Popen(["python", "-m", "http.server", str(self.port)])
+        webbrowser.open(f"http://localhost:{self.port}")
+
+    def stop(self):
+        if self.process:
+            self.process.terminate()
+            self.process.wait()
+            print("Server stopped.")
+
+    def __del__(self):
+        self.stop()
 
 class TilesetExtractorOpener:
 
@@ -289,7 +348,11 @@ class TilesetExtractorOpener:
     def run(self):
         """Open the tileset extractor in the default web browser."""
 
-        webbrowser.open("file:///" + str(self.tse_path))
+        # Register cleanup on exit
+        server = HTTPServer(self.tse_path)
+        atexit.register(server.stop)
+
+        server.run()
 
 class GfxToolsApp:
 

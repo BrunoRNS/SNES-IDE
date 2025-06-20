@@ -30,21 +30,17 @@ class DebugModeSelector:
 
         self.debug = self.ask_debug_mode()
 
-    def ask_debug_mode(self):
+    @staticmethod
+    def ask_debug_mode():
 
-        while True:
+        response = input("Debug mode: yes(y) or no(n)?\n")
 
-            response = input("Debug mode: yes(y) or no(n)?\n")
+        match response:
 
-            match response:
+            case 'y': return True;
+            case 'n': return False;
 
-                case 'y': return True
-                case 'n': return False
-
-                case _: print("Not valid response! just y or n, case sensitive!")
-
-# Usage:
-# DEBUG = DebugModeSelector().debug
+            case _: print("Not valid response! just y or n, case sensitive!"); return DebugModeSelector.ask_debug_mode();
 
 class DragDropListbox(tk.Listbox):
 
@@ -90,9 +86,6 @@ class ReorderList:
         self.items: list[str] = items
         self.listbox: DragDropListbox
         self.root: tk.Tk
-
-        self.reorder_list()
-
 
     def check_order(self):
         """Check the order of the listbox items and confirm with the user."""
@@ -275,7 +268,7 @@ class SNESAutomatizer:
 
         return linkfile_path
 
-    def link(self, linkfile_path):
+    def link(self, linkfile_path: Path):
         """Link the object files and libraries to create the final output file."""
 
         if not linkfile_path.exists():
@@ -365,7 +358,7 @@ if __name__ == "__main__":
         src_dir=src_dir, 
         memory_map=memory_map, 
         speed=speed, 
-        debug=DebugModeSelector().ask_debug_mode()
+        debug=DebugModeSelector.ask_debug_mode()
     )
 
     automatizer.run()

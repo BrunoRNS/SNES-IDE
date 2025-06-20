@@ -1,2 +1,2 @@
-docs/** linguist-documentation
+docs/examples/** linguist-vendored
 libs/** linguist-vendored
