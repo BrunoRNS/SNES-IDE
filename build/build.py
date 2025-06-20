@@ -121,13 +121,13 @@ def copy_bat() -> None:
 
     (SNESIDEOUT / 'tools').mkdir(exist_ok=True)
 
-    for file in (ROOT / 'tools').rglob("*.bat"):
+    for file in (ROOT / 'src' / 'tools' ).rglob("*.bat"):
 
         if file.is_dir():
 
             continue
 
-        rel_path = file.relative_to(ROOT / 'tools')
+        rel_path = file.relative_to(ROOT / 'src' / 'tools')
 
         dest_path = SNESIDEOUT / 'tools' / rel_path
 
