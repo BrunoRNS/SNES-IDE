@@ -52,7 +52,7 @@ class ProjectCreator:
         print("Write down the name of your new project:\n")
         self.project_name = input()
 
-        print("Write down the Full path of the folder you want to create a project: \n")
+        print("Write down the Full path of the folder you want to create a project: \n(Use C:\\\\foo\\\\theFolder structure)\n\n")
         self.full_path = input()
 
     

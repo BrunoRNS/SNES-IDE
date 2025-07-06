@@ -7,7 +7,7 @@ It works natively on Windows and is fully supported on Linux via Wine, with scri
 
 - **Languages:** C (main) and some assembly (65816 and spc700).
 - **Compilers:** [816-tcc](https://github.com/alekmaul/tcc) and [wla-dx](https://github.com/vhelin/wla-dx) from pvsneslib.
-- **Main Library:** [pvsneslib](https://github.com/alekmaul/pvsneslib) version 4.4.
+- **Main Library:** [pvsneslib](https://github.com/alekmaul/pvsneslib) version 4.3.
 - **Emulator:** [bsnes](https://github.com/bsnes-emu/bsnes) for testing.
 - **Cross-platform:** Native on Windows, works on Linux (via Wine) with dedicated scripts.
 - **Build from Source:** Full support for building all tools and the IDE itself from source.
@@ -22,19 +22,19 @@ It works natively on Windows and is fully supported on Linux via Wine, with scri
 
 ## Installation Requirements
 
-- **Operating System:** Windows 10+ or Linux (with Wine 9.0+).
-- **Architecture:** x64, x86_64, or amd64 (not ARM).
+- **Operating System:** Windows 10+ or Linux Debian/Ubuntu (with Wine 9.0+).
+- **Architecture:** x64, x86_64, or amd64 (not compatible with ARM).
 - **Minimum Resources:** 2 GB RAM, 200 MB disk space.
 
 ### Dependencies
 
 - **Dependencies:**
-  - **Windows:** For windows no dependencies required.
-  - **Linux:** For linux, only Wine installed and configured is previously required.
+  - **Windows:** OpenGL 3.2+ video driver or Direct3D 9.0.
+  - **Linux:** For linux, only Wine 9.0+ installed and configured is previously required.
 
 - **Building from Source Dependencies:**
-  - **Windows:** Python 3.8 or newer;
-  - **Linux:** Wine, Bash, python 3.8 or newer;
+  - **Windows:** OpenGL 3.2+ video driver or Direct3D 9.0, Python 3.8 or newer, pip and PyInstaller;
+  - **Linux:** Wine 9.0+ and Python 3.8 or newer;
 
 ## Getting Started
 

@@ -87,6 +87,8 @@ class ReorderList:
         self.listbox: DragDropListbox
         self.root: tk.Tk
 
+        self.order: list[str] = items
+
     def check_order(self):
         """Check the order of the listbox items and confirm with the user."""
 
@@ -96,7 +98,7 @@ class ReorderList:
 
             self.root.quit()
 
-            return order
+            self.order = order
         
         else:
 
@@ -122,7 +124,7 @@ class ReorderList:
     
         self.root = tk.Tk()
         self.root.title("Linkfile reoderer")
-        self.root.geometry("300x700")
+        self.root.geometry("400x700")
 
         self.label = tk.Label(self.root, text="Move the linkfile elements to change it order:")
         self.label.pack(pady=10)
@@ -141,10 +143,18 @@ class ReorderList:
     
         self.button = tk.Button(self.root, text="Confirm Order", command=self.check_order)
         self.button.pack(pady=10)
-
+        
         self.root.mainloop()
 
-        return list(self.listbox.get(0, tk.END))
+        try:
+
+            self.root.destroy()
+
+        except:
+
+            print("Window already destroyed skipping...")
+
+        return list(self.order)
 
 
 class SNESAutomatizer:
@@ -262,6 +272,8 @@ class SNESAutomatizer:
 
         linkfile_path = self.src_dir / 'linkfile'
 
+        print("Creating Linkfile...")
+
         with open(linkfile_path, 'w') as f:
 
             f.write('\n'.join(linkfile))
@@ -277,7 +289,7 @@ class SNESAutomatizer:
         print("Linking files...")
 
         subprocess.run([
-            self.linker, '-d', '-s', '-c', '-v', '-A', '-L', self.lib_dir,
+            self.linker, '-d', '-s', '-c', '-v', '-A', '-L' + str(self.lib_dir),
             linkfile_path, self.src_dir / 'output.sfc'
         ])
 
