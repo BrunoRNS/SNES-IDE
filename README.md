@@ -34,7 +34,7 @@ It works natively on Windows and is fully supported on Linux via Wine, with scri
 
 - **Building from Source Dependencies:**
   - **Windows:** OpenGL 3.2+ video driver or Direct3D 9.0, Python 3.8 or newer, pip and PyInstaller;
-  - **Linux:** Wine 9.0+ and Python 3.8 or newer;
+  - **Linux:** Bash, Wine 9.0+ and Python 3.8 or newer;
 
 ## Getting Started
 
@@ -45,26 +45,20 @@ It works natively on Windows and is fully supported on Linux via Wine, with scri
   2. Decompress the .zip to a folder of your choice.
   3. Double-click `INSTALL.bat` to set up SNES-IDE and create shortcuts on your Desktop.
 
-> NOTE: For windows the latest version is still the 3.4 LTS, and still will be until I compile the new version 4.4, if you want the newest features, build by your own from source.
-
 - **Linux:**
-  1. Download the latest release from [GitHub Releases](https://github.com/BrunoRNS/SNES-IDE/releases/latest).
+  1. Download the .deb package from the latest release: [GitHub Releases](https://github.com/BrunoRNS/SNES-IDE/releases/latest).
 
-  2. Decompress the .zip to a folder of your choice.
-
-  3. Install Wine:  
+  2. Install Wine:  
 
      `sudo apt install wine`
 
-  4. Run configure shell file:
+  3. Install SNES-IDE:
 
      ```sh
-     cd /path/to/snes-ide/
-     chmod +x ./linux/configure.sh
-     bash ./linux/configure.sh
+     sudo apt install snes-ide_xyz.deb
      ```
 
-  5. Follow the installer steps to generate a desktop icon or just run with `./linux/src/start.sh`.
+  4. Execute `snes-ide` in the terminal.
 
 ### 2. Building from Source
 
