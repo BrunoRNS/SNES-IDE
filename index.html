@@ -79,7 +79,7 @@
                 </ul>
             <h3>Building from Source Dependencies</h3>
                 <ul>
-                    <li><strong>Windows:</strong> Python 3.8+</li>
+                    <li><strong>Windows:</strong>Python 3.8+</li>
                     <li><strong>Linux:</strong> Wine, Bash, and Python 3.8 or newer</li>
                 </ul>
             <h3>Windows Installation</h3>
@@ -90,13 +90,12 @@
                 </ol>
             <h3>Linux Installation</h3>
                 <ol>
-                    <li>Download the latest release from <a href="https://github.com/BrunoRNS/SNES-IDE/releases/latest" target="_blank">GitHub Releases</a>.</li>
-                    <li>Decompress the .zip to a folder of your choice.</li>
+                    <li>Download the .deb package from the latest release: <a href="https://github.com/BrunoRNS/SNES-IDE/releases/latest" target="_blank">GitHub Releases</a>.</li>
                     <li>Install Wine: <code>sudo apt install wine</code></li>
-                    <li>Run the configure script:
-                        <pre><code>cd /path/to/snes-ide/<br>chmod +x ./linux/configure.sh<br>bash ./linux/configure.sh</code></pre>
+                    <li>Install package:
+                        <pre><code>sudo apt install snes-ide_xyz.deb</code></pre>
                     </li>
-                    <li>Follow the installer steps to generate a desktop icon or just run with <code>./linux/src/start.sh</code>.</li>
+                    <li>Run using <code>snes-ide</code> command in terminal</li>
                 </ol>
             <h3>Shortcuts Generated</h3>
                 <ul>
@@ -110,7 +109,7 @@
                     <li><strong>snes-ide</strong> – All-in-one shortcut, the main entry of SNES-IDE</li>
                 </ul>
             <p>
-                <strong>Note:</strong> Shortcuts are created in <code>Desktop/snes-ide/</code> on Windows, or as a desktop entry on Linux if chosen during installation.
+                <strong>Note:</strong> Shortcuts are created in <code>Desktop/snes-ide/</code> on Windows, and as a command in /usr/local/bin in linux.
             </p>
         </section>
 
