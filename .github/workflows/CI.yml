@@ -11,8 +11,89 @@ jobs:
   build-windows:
     name: Build Windows
     runs-on: windows-latest
+    timeout-minutes: 120
 
     steps:
     - uses: actions/checkout@v4
-    - name: Run INSTALL.bat
-      run: .\INSTALL.bat
+
+    - name: Setup Python
+      uses: actions/setup-python@v4
+      with:
+        python-version: '3.10'
+        cache: 'pip'
+
+    - name: Install build dependencies
+      run: |
+        python -m pip install --upgrade pip wheel
+        python -m pip install PyInstaller
+
+    - name: Run Windows build script
+      shell: cmd
+      run: .\build\build.bat
+
+    - name: Verify build output
+      run: |
+        echo "Listing SNES-IDE-out contents"
+        dir /b /s SNES-IDE-out || echo "SNES-IDE-out not found"
+
+    - name: Compress SNES-IDE-out
+      shell: pwsh
+      run: |
+        if (Test-Path -Path 'SNES-IDE-out') {
+          Remove-Item -Path 'SNES-IDE-out.zip' -ErrorAction SilentlyContinue
+          Compress-Archive -Path 'SNES-IDE-out/*' -DestinationPath 'SNES-IDE-out.zip' -Force
+          Write-Host "Created SNES-IDE-out.zip"
+        } else {
+          Write-Error "SNES-IDE-out directory missing"
+        }
+
+    - name: Upload build artifact
+      uses: actions/upload-artifact@v4
+      with:
+        name: sneside-out
+        path: SNES-IDE-out.zip
+        retention-days: 7
+
+  test-windows:
+    name: Test Windows build
+    needs: build-windows
+    runs-on: windows-latest
+    timeout-minutes: 60
+
+    steps:
+    - uses: actions/checkout@v4
+
+    - name: Setup Python for tests
+      uses: actions/setup-python@v4
+      with:
+        python-version: '3.10'
+        cache: 'pip'
+
+    - name: Download build artifact
+      uses: actions/download-artifact@v5
+      with:
+        name: sneside-out
+        path: .
+
+    - name: Extract build artifact
+      shell: pwsh
+      run: |
+        $zip = Get-ChildItem -Path . -Filter '*.zip' -Recurse | Select-Object -First 1
+        if ($null -eq $zip) { Write-Error "No zip artifact found"; exit 1 }
+        Write-Host "Extracting $($zip.FullName)"
+        Expand-Archive -LiteralPath $zip.FullName -DestinationPath './SNES-IDE-out' -Force
+
+    - name: Run test script (runs INSTALL.bat if present)
+      shell: pwsh
+      run: |
+        python -u tests/test.py > tests.log 2>&1 || $LASTEXITCODE = $LASTEXITCODE
+        Write-Host "Test run finished with exit code $LASTEXITCODE"
+        if ($LASTEXITCODE -ne 0) { Write-Host 'Tests failed' ; exit $LASTEXITCODE }
+
+    - name: Upload test logs (on failure or success)
+      if: always()
+      uses: actions/upload-artifact@v4
+      with:
+        name: test-logs
+        path: tests.log
+        retention-days: 7
