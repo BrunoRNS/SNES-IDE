@@ -107,7 +107,7 @@ jobs:
             "tools\create-new-project.exe",
             "tools\externTools.exe",
             "tools\gfx-tools.exe",
-            "tools\soundsnes\tracker\schismtracker.exe",
+            "tools\soundsnes\tracker\schismtracker.exe"
           )
           $missing = @()
           foreach ($exe in $expected) {
