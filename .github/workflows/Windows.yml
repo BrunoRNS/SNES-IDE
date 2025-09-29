@@ -19,16 +19,13 @@ jobs:
       - name: Set up Python
         uses: actions/setup-python@v5
         with:
-          python-version: "3.11"
+          python-version: "3.13"
 
-      # ------------------------------------------------------------------
-      # 3️⃣ (Optional) Install any additional Windows tools you may need.
-      # ------------------------------------------------------------------
-      # Example: if you rely on a specific .NET SDK or other utilities,
-      # add the appropriate `choco install` or `winget` commands here.
-      # - name: Install extra tools
-      #   run: |
-      #     choco install -y <tool-name>
+      - name: Install extra build tools and venv
+        run: |
+          python -m venv .venv
+          .venv\Scripts\activate
+          pip install pyinstaller
 
       - name: Build
         run: |
