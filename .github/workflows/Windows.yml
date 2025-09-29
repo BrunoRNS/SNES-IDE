@@ -1,7 +1,4 @@
-name: Windows (Green-Light Build and Test)
-# This workflow builds and tests SNES-IDE on Windows using GitHub Actions.
-# It uses the Green-Light phase of TDD. Nothing should fail. For new features,
-# use the "Windows (Red-Light)" workflow to write failing tests before implementation.
+name: Windows (Build and Test)
 
 # Trigger the workflow on pushes and pull‑requests to the default branch
 on:
@@ -13,6 +10,10 @@ on:
 
 jobs:
   windows-build:
+  # This section builds and tests SNES-IDE on Windows using GitHub Actions.
+  # It uses the Green-Light phase of TDD. Nothing should fail. For new features,
+  # use the "Build (Red-Light) and Test (Red-Light)" section to write failing
+  # tests before implementation.
     name: Build (Green-Light)
     runs-on: windows-2025 # `windows-latest` is being replaced with windows-2025, pre-empt future deprecations
     steps:
@@ -132,4 +133,25 @@ jobs:
         run: |
           $ErrorActionPreference = "Stop"
           Start-Process -FilePath "sneside-windows\INSTALL.bat" -NoNewWindow -Wait
+        shell: pwsh
+
+  windows-tests-redlight:
+    name: Tests (Red-Light)
+    runs-on: windows-2025
+    needs: windows-build
+    steps:
+      - name: Download build artifact
+        uses: actions/download-artifact@v4
+        with:
+          name: sneside-windows
+      
+      - name: Extract sneside-windows.zip
+        run: |
+          powershell Expand-Archive -Path sneside-windows.zip -DestinationPath sneside-windows -Force
+        shell: pwsh
+      
+      - name: Deliberately failing example test
+        run: |
+          $ErrorActionPreference = "Stop"
+          Write-Error "This is a deliberate failure for Red-Light testing."
         shell: pwsh
