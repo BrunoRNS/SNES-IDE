@@ -21,15 +21,13 @@ jobs:
         with:
           python-version: "3.13"
 
-      - name: Install extra build tools and venv
+      - name: Install PyInstaller
         run: |
-          python -m venv .venv
-          .venv\Scripts\activate
-          pip install -r build-requirements.txt
+          pip install pyinstaller
+        shell: cmd
 
       - name: Build
         run: |
-          .venv\Scripts\activate
           python build\build.py
         shell: cmd
 
