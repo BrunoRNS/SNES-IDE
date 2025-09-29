@@ -1,0 +1,57 @@
+name: Build (Windows)
+
+# Trigger the workflow on pushes and pull‑requests to the default branch
+on:
+  push:
+    branches: [ windows/** ]
+    tags: [ 'v*' ]
+  pull_request:
+    branches: [ main, devel ]
+
+jobs:
+  windows-build:
+    name: Build on Windows
+    runs-on: windows-latest
+
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.8"
+
+      # ------------------------------------------------------------------
+      # 3️⃣ (Optional) Install any additional Windows tools you may need.
+      # ------------------------------------------------------------------
+      # Example: if you rely on a specific .NET SDK or other utilities,
+      # add the appropriate `choco install` or `winget` commands here.
+      # - name: Install extra tools
+      #   run: |
+      #     choco install -y <tool-name>
+
+      - name: Build
+        run: |
+          cd "${{ github.workspace }}"
+          cmd /c build\build.bat
+        shell: cmd
+
+      - name: Verify
+        run: |
+          if not exist "SNES-IDE-out" (
+            echo "Build artifact not found!"
+            exit 1
+          )
+        shell: cmd
+
+      - name: Compress
+        run: |
+          powershell Compress-Archive -Path SNES-IDE-out\* -DestinationPath SNES-IDE-out.zip -Force
+        shell: pwsh
+
+      - name: Upload
+        uses: actions/upload-artifact@v4
+        with:
+          name: sneside-out
+          path: SNES-IDE-out.zip
+          retention-days: 7
