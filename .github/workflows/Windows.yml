@@ -141,6 +141,7 @@ jobs:
   # features are added, write failing tests here first, then implement the
   # feature until passing. Move the passing test to "Test (Green-Light)"
   # section above.
+    if: github.ref_name == 'windows/red'
     name: Tests (Red-Light)
     runs-on: windows-2025
     needs: windows-build
