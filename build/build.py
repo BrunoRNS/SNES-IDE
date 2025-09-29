@@ -6,6 +6,36 @@ import sys
 import shutil as pyshutil
 import os
 
+# This is just to make the CI prettier
+try:
+    from colorama import init, Fore, Style
+    init(autoreset=True)
+    COLOR_OK = Fore.GREEN + Style.BRIGHT
+    COLOR_FAIL = Fore.RED + Style.BRIGHT
+    COLOR_STEP = Fore.CYAN + Style.BRIGHT
+    COLOR_RESET = Style.RESET_ALL
+except ImportError:
+    COLOR_OK = COLOR_FAIL = COLOR_STEP = COLOR_RESET = ""
+
+def print_step(msg):
+    print(f"{COLOR_STEP}==> {msg}{COLOR_RESET}")
+
+def print_ok(msg):
+    print(f"{COLOR_OK}✔ {msg}{COLOR_RESET}")
+
+def print_fail(msg):
+    print(f"{COLOR_FAIL}✖ {msg}{COLOR_RESET}")
+
+def print_summary(success, failed_steps):
+    print("\n" + "="*40)
+    if success:
+        print_ok("BUILD SUCCESSFUL")
+    else:
+        print_fail("BUILD FAILED")
+        print_fail(f"Failed steps: {', '.join(failed_steps)}")
+    print("="*40 + "\n")
+
+
 class shutil:
     """Reimplementation of class shutil to avoid errors in Wine"""
 
@@ -196,6 +226,17 @@ def copyTracker() -> None:
     
     shutil.copytree(src_dir, dest_dir)
 
+# Pretty formatting for CI logs
+def run_step(step_name, func):
+    print_step(f"{step_name}...")
+    try:
+        func()
+        print_ok(f"{step_name} completed.")
+        return True
+    except Exception as e:
+        print_fail(f"{step_name} failed: {e}")
+        traceback.print_exception(e)
+        return False
 
 def main() -> int:
     """
