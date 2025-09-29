@@ -25,16 +25,16 @@ jobs:
         run: |
           python -m venv .venv
           .venv\Scripts\activate
-          pip install pyinstaller
+          pip install -r build-requirements.txt
 
       - name: Build
         run: |
-          cd "${{ github.workspace }}"
           cmd /c build\build.bat
         shell: cmd
 
       - name: Verify
         run: |
+          cd "${{ github.workspace }}"
           if not exist "SNES-IDE-out" (
             echo "Build artifact not found!"
             exit 1
@@ -43,12 +43,13 @@ jobs:
 
       - name: Compress
         run: |
-          powershell Compress-Archive -Path SNES-IDE-out\* -DestinationPath SNES-IDE-out.zip -Force
+          cd "${{ github.workspace }}"
+          powershell Compress-Archive -Path SNES-IDE-out\* -DestinationPath sneside-windows.zip -Force
         shell: pwsh
 
       - name: Upload
         uses: actions/upload-artifact@v4
         with:
-          name: sneside-out
-          path: SNES-IDE-out.zip
+          name: sneside-windows
+          path: sneside-windows.zip
           retention-days: 7
