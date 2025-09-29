@@ -6,7 +6,7 @@ on:
     branches: [ windows/** ]
     tags: [ 'v*' ]
   pull_request:
-    branches: [ main, devel ]
+    branches: [ main, develop ]
 
 jobs:
   windows-build:
