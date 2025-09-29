@@ -1,4 +1,4 @@
-name: Build (Windows)
+name: Windows
 
 # Trigger the workflow on pushes and pull‑requests to the default branch
 on:
@@ -10,7 +10,7 @@ on:
 
 jobs:
   windows-build:
-    name: Build on Windows
+    name: Build (Windows)
     runs-on: windows-2025 # `windows-latest` is being replaced with windows-2025, pre-empt future deprecations
     steps:
       - name: Checkout repository
@@ -102,6 +102,7 @@ jobs:
         run: |
           $ErrorActionPreference = "Stop"
           $expected = @(
+            "INSTALL.bat",
             "snes-ide.exe",
             "tools\audio-tools.exe",
             "tools\create-new-project.exe",
@@ -122,4 +123,10 @@ jobs:
           } else {
             Write-Host "All expected .exe files found."
           }
+        shell: pwsh
+
+      - name: Run INSTALL.bat
+        run: |
+          $ErrorActionPreference = "Stop"
+          Start-Process -FilePath "sneside-windows\INSTALL.bat" -NoNewWindow -Wait
         shell: pwsh
