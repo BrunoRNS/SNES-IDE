@@ -242,60 +242,25 @@ def main() -> int:
     """
     Main function to run the build process.
     """
-
-    try:
-
-        sys.stdout.write("Cleaning SNES-IDE-out...\n")
-        clean_all()
-
-        sys.stdout.write("Copying root files...\n")
-        copy_root()
-
-        sys.stdout.write("Copying libs...\n")
-        copy_lib()
-
-        sys.stdout.write("Copying docs...\n")
-        copy_docs()
-
-        sys.stdout.write("Copying bat files...\n")
-        copy_bat()
-
-        sys.stdout.write("Copying dlls...\n")
-        copy_dlls()
-        
-        sys.stdout.write("Copying tracker...\n")
-        copyTracker()
-
-        sys.stdout.write("Compiling python files...\n")
-        compile()
-
-
-    except subprocess.CalledProcessError as e:
-
-        print("Error while executing command: ", e.__str__(), e.__repr__(), sep="\n\n")
-
-        if e.stdout:
-
-            print("STDOUT:", e.stdout.decode())
-
-        if e.stderr:
-
-            print("STDERR:", e.stderr.decode())
-
-        traceback.print_exception(e)
-        return -1
-    
-
-    except Exception as e:
-
-        traceback.print_exception(e)
-        return -1
-    
-    return 0
+    steps = [
+        ("Cleaning SNES-IDE-out", clean_all),
+        ("Copying root files", copy_root),
+        ("Copying libs", copy_lib),
+        ("Copying docs", copy_docs),
+        ("Copying bat files", copy_bat),
+        ("Copying dlls", copy_dlls),
+        ("Copying tracker", copyTracker),
+        ("Compiling python files", compile),
+    ]
+    failed_steps = []
+    for name, func in steps:
+        if not run_step(name, func):
+            failed_steps.append(name)
+    print_summary(len(failed_steps) == 0, failed_steps)
+    return 0 if not failed_steps else -1
 
 if __name__ == "__main__":
     """
     Run the main function.
     """
-
     sys.exit(main())
