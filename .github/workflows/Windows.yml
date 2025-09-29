@@ -68,14 +68,46 @@ jobs:
           powershell Expand-Archive -Path sneside-windows.zip -DestinationPath sneside-windows -Force
         shell: pwsh
 
-      - name: Check expected .exe files
+      - name: Check expected `\libs` folders
         run: |
           $ErrorActionPreference = "Stop"
           $expected = @(
-            "SNES-IDE.exe",
-            "tools\assembler.exe",
-            "tools\tracker.exe",
-            "tools\soundconv.exe"
+            "bsnes",
+            "font",
+            "include",
+            "libs",
+            "M8TE",
+            "notepad++",
+            "pvsneslib\devkitsnes",
+            "pvsneslib\lib",
+            "pvsneslib\tools",
+            "template"
+          )
+          $missing = @()
+          foreach ($lib in $expected) {
+            if (-not (Test-Path "sneside-windows\libs\$lib")) {
+              Write-Host "Missing: $lib"
+              $missing += $lib
+            }
+          }
+          if ($missing.Count -gt 0) {
+            Write-Error "Missing expected lib files: $($missing -join ', ')"
+            exit 1
+          } else {
+            Write-Host "All expected lib files found."
+          }
+        shell: pwsh
+
+      - name: Check expected `\tools` files
+        run: |
+          $ErrorActionPreference = "Stop"
+          $expected = @(
+            "snes-ide.exe",
+            "tools\audio-tools.exe",
+            "tools\create-new-project.exe",
+            "tools\externTools.exe",
+            "tools\gfx-tools.exe",
+            "tools\soundsnes\tracker\schismtracker.exe",
           )
           $missing = @()
           foreach ($exe in $expected) {
