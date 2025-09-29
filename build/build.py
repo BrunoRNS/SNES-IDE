@@ -5,6 +5,7 @@ import traceback
 import sys
 import shutil as pyshutil
 import os
+import locale
 
 # This is just to make the CI prettier
 try:
@@ -17,14 +18,31 @@ try:
 except ImportError:
     COLOR_OK = COLOR_FAIL = COLOR_STEP = COLOR_RESET = ""
 
+def _supports_unicode():
+    encoding = getattr(sys.stdout, "encoding", None)
+    if not encoding:
+        encoding = locale.getpreferredencoding(False)
+    try:
+        "✔".encode(encoding)
+        "✖".encode(encoding)
+        return True
+    except Exception:
+        return False
+
+USE_UNICODE = _supports_unicode()
+
+OK_SYMBOL = "✔" if USE_UNICODE else "[OK]"
+FAIL_SYMBOL = "✖" if USE_UNICODE else "[FAIL]"
+STEP_SYMBOL = "==>"  # Always ASCII
+
 def print_step(msg):
-    print(f"{COLOR_STEP}==> {msg}{COLOR_RESET}")
+    print(f"{COLOR_STEP}{STEP_SYMBOL} {msg}{COLOR_RESET}")
 
 def print_ok(msg):
-    print(f"{COLOR_OK}✔ {msg}{COLOR_RESET}")
+    print(f"{COLOR_OK}{OK_SYMBOL} {msg}{COLOR_RESET}")
 
 def print_fail(msg):
-    print(f"{COLOR_FAIL}✖ {msg}{COLOR_RESET}")
+    print(f"{COLOR_FAIL}{FAIL_SYMBOL} {msg}{COLOR_RESET}")
 
 def print_summary(success, failed_steps):
     print("\n" + "="*40)
