@@ -30,7 +30,7 @@ jobs:
       - name: Build
         run: |
           .venv\Scripts\activate
-          cmd /c build\build.bat
+          python build\build.py
         shell: cmd
 
       - name: Verify
