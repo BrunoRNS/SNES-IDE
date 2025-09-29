@@ -11,7 +11,7 @@ on:
 jobs:
   windows-build:
     name: Build on Windows
-    runs-on: windows-latest
+    runs-on: windows-2025 # `windows-latest` is being replaced with windows-2025, pre-empt future deprecations
     steps:
       - name: Checkout repository
         uses: actions/checkout@v4
