@@ -29,6 +29,7 @@ jobs:
 
       - name: Build
         run: |
+          .venv\Scripts\activate
           cmd /c build\build.bat
         shell: cmd
 
