@@ -52,3 +52,42 @@ jobs:
           name: sneside-windows
           path: sneside-windows.zip
           retention-days: 7
+    
+  windows-test:
+    name: Test (Windows)
+    runs-on: windows-2025
+    needs: windows-build
+    steps:
+      - name: Download build artifact
+        uses: actions/download-artifact@v4
+        with:
+          name: sneside-windows
+      
+      - name: Extract sneside-windows.zip
+        run: |
+          powershell Expand-Archive -Path sneside-windows.zip -DestinationPath sneside-windows -Force
+        shell: pwsh
+
+      - name: Check expected .exe files
+        run: |
+          $ErrorActionPreference = "Stop"
+          $expected = @(
+            "SNES-IDE.exe",
+            "tools\assembler.exe",
+            "tools\tracker.exe",
+            "tools\soundconv.exe"
+          )
+          $missing = @()
+          foreach ($exe in $expected) {
+            if (-not (Test-Path "sneside-windows\$exe")) {
+              Write-Host "Missing: $exe"
+              $missing += $exe
+            }
+          }
+          if ($missing.Count -gt 0) {
+            Write-Error "Missing expected .exe files: $($missing -join ', ')"
+            exit 1
+          } else {
+            Write-Host "All expected .exe files found."
+          }
+        shell: pwsh
