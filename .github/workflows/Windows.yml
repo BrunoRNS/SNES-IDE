@@ -11,9 +11,9 @@ on:
 jobs:
   windows-build:
   # This section builds and tests SNES-IDE on Windows using GitHub Actions.
-  # It uses the Green-Light phase of TDD. Nothing should fail. For new features,
-  # use the "Build (Red-Light) and Test (Red-Light)" section to write failing
-  # tests before implementation.
+  # It uses the Green-Light phase of TDD. Nothing should fail. For new 
+  # features, use the "Test (Red-Light)" section to write failing tests before
+  # implementation.
     name: Build (Green-Light)
     runs-on: windows-2025 # `windows-latest` is being replaced with windows-2025, pre-empt future deprecations
     steps:
@@ -136,6 +136,11 @@ jobs:
         shell: pwsh
 
   windows-tests-redlight:
+  # This section builds and tests SNES-IDE on Windows using GitHub Actions.
+  # It uses the Red-Light phase of TDD. Nothing should pass. When new
+  # features are added, write failing tests here first, then implement the
+  # feature until passing. Move the passing test to "Test (Green-Light)"
+  # section above.
     name: Tests (Red-Light)
     runs-on: windows-2025
     needs: windows-build
