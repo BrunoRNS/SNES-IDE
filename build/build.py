@@ -1,45 +1,81 @@
 # This script is used to build the project.
 
 from pathlib import Path
-import subprocess
 import traceback
 import sys
+import shutil as pyshutil
+import os
+import locale
+
+# This is just to make the CI prettier
+try:
+    from colorama import init, Fore, Style
+    init(autoreset=True)
+    COLOR_OK = Fore.GREEN + Style.BRIGHT
+    COLOR_FAIL = Fore.RED + Style.BRIGHT
+    COLOR_STEP = Fore.CYAN + Style.BRIGHT
+    COLOR_RESET = Style.RESET_ALL
+except ImportError:
+    COLOR_OK = COLOR_FAIL = COLOR_STEP = COLOR_RESET = ""
+
+def _supports_unicode():
+    encoding = getattr(sys.stdout, "encoding", None)
+    if not encoding:
+        encoding = locale.getpreferredencoding(False)
+    try:
+        "✔".encode(encoding)
+        "✖".encode(encoding)
+        return True
+    except Exception:
+        return False
+
+USE_UNICODE = _supports_unicode()
+
+OK_SYMBOL = "✔" if USE_UNICODE else "[OK]"
+FAIL_SYMBOL = "✖" if USE_UNICODE else "[FAIL]"
+STEP_SYMBOL = "==>"  # Always ASCII
+
+def print_step(msg):
+    print(f"{COLOR_STEP}{STEP_SYMBOL} {msg}{COLOR_RESET}")
+
+def print_ok(msg):
+    print(f"{COLOR_OK}{OK_SYMBOL} {msg}{COLOR_RESET}")
+
+def print_fail(msg):
+    print(f"{COLOR_FAIL}{FAIL_SYMBOL} {msg}{COLOR_RESET}")
+
+def print_summary(success, failed_steps):
+    print("\n" + "="*40)
+    if success:
+        print_ok("BUILD SUCCESSFUL")
+    else:
+        print_fail("BUILD FAILED")
+        print_fail(f"Failed steps: {', '.join(failed_steps)}")
+    print("="*40 + "\n")
+
 
 class shutil:
     """Reimplementation of class shutil to avoid errors in Wine"""
 
     @staticmethod
     def copy(src: str|Path, dst: str|Path) -> None:
-        """Reimplementation of method copy using copy command"""
-
         src, dst = map(lambda x: Path(x).resolve(), (src, dst))
-
-        subprocess.run(f'copy "{src}" "{dst}"', shell=True, check=True)
+        pyshutil.copy2(src, dst)
 
     @staticmethod
     def copytree(src: str|Path, dst: str|Path) -> None:
-        """Reimplementation of method copytree using xcopy"""
-
         src, dst = map(lambda x: Path(x).resolve(), (src, dst))
-
-        cmd = f'xcopy "{src}" "{dst}" /E /I /Y /Q /H'
-        subprocess.run(cmd, shell=True, check=True)
+        pyshutil.copytree(src, dst, dirs_exist_ok=True)
 
     @staticmethod
     def rmtree(path: str|Path) -> None:
-        """Reimplementation of method rmtree using rmdir"""
-
         path = Path(path).resolve()
-
-        subprocess.run(f'rmdir /S /Q "{path}"', shell=True, check=True)
+        pyshutil.rmtree(path)
 
     @staticmethod
     def move(src: str|Path, dst: str|Path) -> None:
-        """Reimplementation of method move using move command"""
-
         src, dst = map(lambda x: Path(x).resolve(), (src, dst))
-
-        subprocess.run(f'move "{src}" "{dst}"', shell=True, check=True)
+        pyshutil.move(src, dst)
 
 # Copy all files from root to the SNES-IDE-out directory
 
@@ -208,65 +244,41 @@ def copyTracker() -> None:
     
     shutil.copytree(src_dir, dest_dir)
 
+# Pretty formatting for CI logs
+def run_step(step_name, func):
+    print_step(f"{step_name}...")
+    try:
+        func()
+        print_ok(f"{step_name} completed.")
+        return True
+    except Exception as e:
+        print_fail(f"{step_name} failed: {e}")
+        traceback.print_exception(e)
+        return False
 
 def main() -> int:
     """
     Main function to run the build process.
     """
-
-    try:
-
-        sys.stdout.write("Cleaning SNES-IDE-out...\n")
-        clean_all()
-
-        sys.stdout.write("Copying root files...\n")
-        copy_root()
-
-        sys.stdout.write("Copying libs...\n")
-        copy_lib()
-
-        sys.stdout.write("Copying docs...\n")
-        copy_docs()
-
-        sys.stdout.write("Copying bat files...\n")
-        copy_bat()
-
-        sys.stdout.write("Copying dlls...\n")
-        copy_dlls()
-        
-        sys.stdout.write("Copying tracker...\n")
-        copyTracker()
-
-        sys.stdout.write("Compiling python files...\n")
-        compile()
-
-
-    except subprocess.CalledProcessError as e:
-
-        print("Error while executing command: ", e.__str__(), e.__repr__(), sep="\n\n")
-
-        if e.stdout:
-
-            print("STDOUT:", e.stdout.decode())
-
-        if e.stderr:
-
-            print("STDERR:", e.stderr.decode())
-
-        traceback.print_exception(e)
-        return -1
-    
-
-    except Exception as e:
-
-        traceback.print_exception(e)
-        return -1
-    
-    return 0
+    steps = [
+        ("Cleaning SNES-IDE-out", clean_all),
+        ("Copying root files", copy_root),
+        ("Copying libs", copy_lib),
+        ("Copying docs", copy_docs),
+        ("Copying bat files", copy_bat),
+        ("Copying dlls", copy_dlls),
+        ("Copying tracker", copyTracker),
+        ("Compiling python files", compile),
+    ]
+    failed_steps = []
+    for name, func in steps:
+        if not run_step(name, func):
+            failed_steps.append(name)
+    print_summary(len(failed_steps) == 0, failed_steps)
+    return 0 if not failed_steps else -1
 
 if __name__ == "__main__":
     """
     Run the main function.
     """
-
     sys.exit(main())

@@ -1,0 +1,163 @@
+name: Windows (Build and Test)
+
+# Trigger the workflow on pushes and pull‑requests to the default branch
+on:
+  push:
+    branches: [ windows/** ]
+    tags: [ 'v*' ]
+  pull_request:
+    branches: [ main, develop ]
+
+jobs:
+  windows-build:
+  # This section builds and tests SNES-IDE on Windows using GitHub Actions.
+  # It uses the Green-Light phase of TDD. Nothing should fail. For new 
+  # features, use the "Test (Red-Light)" section to write failing tests before
+  # implementation.
+    name: Build (Green-Light)
+    runs-on: windows-2025 # `windows-latest` is being replaced with windows-2025, pre-empt future deprecations
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.13"
+
+      - name: Install PyInstaller
+        run: |
+          pip install pyinstaller
+        shell: cmd
+
+      - name: Build
+        run: |
+          python build\build.py
+        shell: cmd
+
+      - name: Verify
+        run: |
+          cd "${{ github.workspace }}"
+          if not exist "SNES-IDE-out" (
+            echo "Build artifact not found!"
+            exit 1
+          )
+        shell: cmd
+
+      - name: Compress
+        run: |
+          cd "${{ github.workspace }}"
+          powershell Compress-Archive -Path SNES-IDE-out\* -DestinationPath sneside-windows.zip -Force
+        shell: pwsh
+
+      - name: Upload
+        uses: actions/upload-artifact@v4
+        with:
+          name: sneside-windows
+          path: sneside-windows.zip
+          retention-days: 7
+    
+  windows-tests-greenlight:
+    name: Tests (Green-Light)
+    runs-on: windows-2025
+    needs: windows-build
+    steps:
+      - name: Download build artifact
+        uses: actions/download-artifact@v4
+        with:
+          name: sneside-windows
+      
+      - name: Extract sneside-windows.zip
+        run: |
+          powershell Expand-Archive -Path sneside-windows.zip -DestinationPath sneside-windows -Force
+        shell: pwsh
+
+      - name: Check expected `\libs` folders
+        run: |
+          $ErrorActionPreference = "Stop"
+          $expected = @(
+            "bsnes",
+            "font",
+            "include",
+            "libs",
+            "M8TE",
+            "notepad++",
+            "pvsneslib\devkitsnes",
+            "pvsneslib\lib",
+            "pvsneslib\tools",
+            "template"
+          )
+          $missing = @()
+          foreach ($lib in $expected) {
+            if (-not (Test-Path "sneside-windows\libs\$lib")) {
+              Write-Host "Missing: $lib"
+              $missing += $lib
+            }
+          }
+          if ($missing.Count -gt 0) {
+            Write-Error "Missing expected lib files: $($missing -join ', ')"
+            exit 1
+          } else {
+            Write-Host "All expected lib files found."
+          }
+        shell: pwsh
+
+      - name: Check expected `\tools` files
+        run: |
+          $ErrorActionPreference = "Stop"
+          $expected = @(
+            "INSTALL.bat",
+            "snes-ide.exe",
+            "tools\audio-tools.exe",
+            "tools\create-new-project.exe",
+            "tools\externTools.exe",
+            "tools\gfx-tools.exe",
+            "tools\soundsnes\tracker\schismtracker.exe"
+          )
+          $missing = @()
+          foreach ($exe in $expected) {
+            if (-not (Test-Path "sneside-windows\$exe")) {
+              Write-Host "Missing: $exe"
+              $missing += $exe
+            }
+          }
+          if ($missing.Count -gt 0) {
+            Write-Error "Missing expected .exe files: $($missing -join ', ')"
+            exit 1
+          } else {
+            Write-Host "All expected .exe files found."
+          }
+        shell: pwsh
+
+      - name: Run INSTALL.bat
+        run: |
+          $ErrorActionPreference = "Stop"
+          Start-Process -FilePath "sneside-windows\INSTALL.bat" -NoNewWindow -Wait
+        shell: pwsh
+
+  windows-tests-redlight:
+  # This section builds and tests SNES-IDE on Windows using GitHub Actions.
+  # It uses the Red-Light phase of TDD. Nothing should pass. When new
+  # features are added, write failing tests here first, then implement the
+  # feature until passing. Move the passing test to "Test (Green-Light)"
+  # section above.
+    if: github.ref_name == 'windows/red'
+    name: Tests (Red-Light)
+    runs-on: windows-2025
+    needs: windows-build
+    steps:
+      - name: Download build artifact
+        uses: actions/download-artifact@v4
+        with:
+          name: sneside-windows
+      
+      - name: Extract sneside-windows.zip
+        run: |
+          powershell Expand-Archive -Path sneside-windows.zip -DestinationPath sneside-windows -Force
+        shell: pwsh
+      
+      - name: Deliberately failing example test
+        run: |
+          $ErrorActionPreference = "Stop"
+          Write-Error "This is a deliberate failure for Red-Light testing."
+        shell: pwsh
