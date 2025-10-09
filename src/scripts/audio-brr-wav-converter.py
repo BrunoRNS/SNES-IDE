@@ -1,0 +1,67 @@
+from subprocess import run, CalledProcessError
+from pathlib import Path
+import sys
+import os
+
+def get_executable_path():
+    """Get the path of the executable or script based on whether the script is frozen 
+    (PyInstaller) or not."""
+
+    if getattr(sys, 'frozen', False):
+        # PyInstaller executable
+        print("executable path mode chosen")
+
+        return str(Path(sys.executable).parent)
+        
+    else:
+        # Normal script
+        print("Python script path mode chosen")
+
+        return str(Path(__file__).absolute().parent)
+
+
+def get_home_path() -> str:
+    """Get snes-ide home directory, can raise subprocess.CalledProcessError"""
+
+    command: list[str] = ["get-snes-ide-home.exe" if os.name == "nt" else "get-snes-ide-home"]
+    cwd: str = get_executable_path()
+
+    return run(command, cwd=cwd, capture_output=True, text=True, check=True)
+
+def convert():
+    """Convert BRR files to WAV using snesbrr converter."""
+
+    snesbrr: Path
+
+    if os.name == "nt":
+        snesbrr = Path(get_home_path()) / "bin" / "pvsneslib" / "tools" / "snesbrr.exe"
+    
+    elif os.name == "posix":
+        snesbrr = Path(get_home_path()) / "bin" / "pvsneslib" / "tools" / "snesbrr"
+
+    try:
+
+        if not snesbrr.exists():
+            print("snesbrr does not exist")
+            return -1
+
+        input_file = Path(sys.argv[1])
+
+        if not input_file or not input_file.exists() or not str(input_file).endswith(".brr"):
+
+            print("Input file does not exist or is not a brr file")
+            return -1
+            
+        run([snesbrr, "-d", input_file, str(input_file).split('.')[0] + ".wav"])
+
+    except CalledProcessError as e:
+
+        print(f"Error while executing snesbrr to convert your wav file: {e}")
+        return -1
+        
+    print("Success!")
+    return 0
+
+if __name__ == "__main__":
+
+    exit(convert())

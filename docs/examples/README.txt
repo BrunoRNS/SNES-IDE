@@ -1,1 +1,0 @@
-The examples are compiled in libs/bsnes/Roms

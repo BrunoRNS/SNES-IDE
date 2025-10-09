@@ -4,45 +4,9 @@ import tkinter as tk
 import subprocess
 import webbrowser
 import atexit
+import shutil
 import sys
 import os
-
-class shutil:
-    """Reimplementation of class shutil to avoid errors in Wine"""
-
-    @staticmethod
-    def copy(src: str|Path, dst: str|Path) -> None:
-        """Reimplementation of method copy using copy command"""
-
-        src, dst = map(lambda x: Path(x).resolve(), (src, dst))
-
-        subprocess.run(f'copy "{src}" "{dst}"', shell=True, check=True)
-
-    @staticmethod
-    def copytree(src: str|Path, dst: str|Path) -> None:
-        """Reimplementation of method copytree using xcopy"""
-
-        src, dst = map(lambda x: Path(x).resolve(), (src, dst))
-
-        cmd = f'xcopy "{src}" "{dst}" /E /I /Y /Q /H'
-        subprocess.run(cmd, shell=True, check=True)
-
-    @staticmethod
-    def rmtree(path: str|Path) -> None:
-        """Reimplementation of method rmtree using rmdir"""
-
-        path = Path(path).resolve()
-
-        subprocess.run(f'rmdir /S /Q "{path}"', shell=True, check=True)
-
-    @staticmethod
-    def move(src: str|Path, dst: str|Path) -> None:
-        """Reimplementation of method move using move command"""
-
-        src, dst = map(lambda x: Path(x).resolve(), (src, dst))
-
-        subprocess.run(f'move "{src}" "{dst}"', shell=True, check=True)
-
 
 class PathManager:
 

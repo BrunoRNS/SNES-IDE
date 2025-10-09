@@ -46,5 +46,4 @@ vs_build_tools/*
 
 # Linux files
 .installed
-*.desktop
 *.deb
