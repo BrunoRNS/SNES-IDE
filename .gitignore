@@ -47,3 +47,7 @@ vs_build_tools/*
 # Linux files
 .installed
 *.deb
+
+# Construct 2 backup files
+*.autosave
+*.backup*
