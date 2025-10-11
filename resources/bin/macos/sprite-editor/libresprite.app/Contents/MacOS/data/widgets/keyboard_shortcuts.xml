@@ -1,0 +1,44 @@
+<!-- LibreSprite -->
+<!-- Copyright (C) 2001-2015 by David Capello -->
+<gui>
+  <window id="keyboard_shortcuts" text="Keyboard Shortcuts">
+    <vbox>
+      <hbox expansive="true">
+        <vbox>
+          <search id="search" magnet="true" />
+          <view width="80" expansive="true">
+            <listbox id="section" expansive="true" />
+          </view>
+          <separator horizontal="true" />
+          <button text="&amp;Import" id="import_button" />
+          <button text="&amp;Export" id="export_button" />
+          <button text="&amp;Reset" id="reset_button" />
+        </vbox>
+        <vbox expansive="true">
+          <view id="search_view" expansive="true">
+            <listbox id="search_list" />
+          </view>
+          <view id="menus_view" expansive="true">
+            <listbox id="menus" />
+          </view>
+          <view id="commands_view" expansive="true">
+            <listbox id="commands" />
+          </view>
+          <view id="tools_view" expansive="true">
+            <listbox id="tools" />
+          </view>
+          <view id="actions_view" expansive="true">
+            <listbox id="actions" />
+          </view>
+        </vbox>
+      </hbox>
+      <hbox>
+        <boxfiller />
+        <hbox homogeneous="true">
+          <button text="&amp;OK" closewindow="true" id="ok" magnet="true" width="60" />
+          <button text="&amp;Cancel" closewindow="true" />
+        </hbox>
+      </hbox>
+    </vbox>
+  </window>
+</gui>

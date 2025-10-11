@@ -1,7 +1,7 @@
 from pathlib import Path
 import sys
 
-def get_executable_path():
+def get_executable_path() -> Path:
         """Get the path of the executable or script based on whether the script is frozen 
         (PyInstaller) or not."""
 
@@ -19,6 +19,6 @@ def get_executable_path():
 
 if __name__ == "__main__":
 
-    snes_ide_home = get_executable_path().parent
+    snes_ide_home: Path = get_executable_path().parent
 
     print(snes_ide_home)

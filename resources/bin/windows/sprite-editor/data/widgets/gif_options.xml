@@ -1,0 +1,21 @@
+<!-- LibreSprite -->
+<!-- Copyright (C) 2014, 2015 by David Capello -->
+<gui>
+<window text="GIF Options" id="gif_options">
+  <vbox>
+    <separator text="General Options:" left="true" horizontal="true" />
+    <check text="&amp;Interlaced" id="interlaced" />
+    <check text="Animation &amp;Loop" id="loop" />
+
+    <separator horizontal="true" />
+
+    <hbox>
+      <boxfiller />
+      <hbox homogeneous="true">
+        <button text="&amp;OK" closewindow="true" id="ok" magnet="true" minwidth="60" />
+        <button text="&amp;Cancel" closewindow="true" />
+      </hbox>
+    </hbox>
+  </vbox>
+</window>
+</gui>

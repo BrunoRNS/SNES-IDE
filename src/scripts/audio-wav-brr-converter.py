@@ -1,9 +1,10 @@
 from subprocess import run, CalledProcessError
+from typing_extensions import Literal
 from pathlib import Path
 import sys
 import os
 
-def get_executable_path():
+def get_executable_path() -> str:
     """Get the path of the executable or script based on whether the script is frozen 
     (PyInstaller) or not."""
 
@@ -26,9 +27,9 @@ def get_home_path() -> str:
     command: list[str] = ["get-snes-ide-home.exe" if os.name == "nt" else "get-snes-ide-home"]
     cwd: str = get_executable_path()
 
-    return run(command, cwd=cwd, capture_output=True, text=True, check=True)
+    return run(command, cwd=cwd, capture_output=True, text=True, check=True).stdout
 
-def convert():
+def convert() -> Literal[-1, 0]:
     """Convert WAV files to BRR using snesbrr converter."""
 
     snesbrr: Path
@@ -45,7 +46,7 @@ def convert():
             print("snesbrr does not exist")
             return -1
 
-        input_file = Path(sys.argv[1])
+        input_file: Path = Path(sys.argv[1])
 
         if not input_file or not input_file.exists() or not str(input_file).endswith(".wav"):
 

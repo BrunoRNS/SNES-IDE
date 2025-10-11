@@ -1,25 +1,29 @@
 from PySide6.QtWidgets import QApplication, QMainWindow, QVBoxLayout, QWidget, QMessageBox
+from PySide6.QtCore import Qt, QUrl, QThread, QCoreApplication
 from PySide6.QtWebEngineWidgets import QWebEngineView
-from PySide6.QtCore import Qt, QUrl, QThread
 
 from http.server import HTTPServer, SimpleHTTPRequestHandler
-import websockets
+from websockets.server import serve
+from websockets import exceptions
+from asyncio import Task
 import threading
 import asyncio
-import urllib
 
 from zipfile import ZipInfo, ZipFile
 import zipfile
-import tarfile
 import lzma
 
-from typing import Optional, Tuple, Dict, List
+from typing import Optional, Callable, Tuple, Dict, List, Type, Any
+from subprocess import CompletedProcess
+from typing_extensions import Literal
+
 from pathlib import Path
 import subprocess
 import platform
 import tempfile
 import shutil
 import psutil
+import ctypes
 import time
 import stat
 import sys
@@ -55,8 +59,8 @@ class LZMAZipExtractor:
     
     def __init__(self) -> None:
 
-        self.supported_compression = [zipfile.ZIP_DEFLATED, zipfile.ZIP_LZMA]
-        self.extracted_path = None
+        self.supported_compression: list[int] = [zipfile.ZIP_DEFLATED, zipfile.ZIP_LZMA]
+        self.extracted_path: "None|str|Path" = None
     
     def extract_zip(self, zip_path: "str|Path", extract_to: "str|Path", create_subdir:bool=True) -> str:
         """
@@ -78,28 +82,28 @@ class LZMAZipExtractor:
                 If there's LZMA decompression error
         """
 
-        zip_path = Path(zip_path)
+        zip_path_path: Path = Path(zip_path)
 
-        if not zip_path.exists():
+        if not zip_path_path.exists():
 
-            raise ValueError(f"ZIP file not found: {zip_path}")
+            raise ValueError(f"ZIP file not found: {zip_path_path}")
 
         if not extract_to or not os.path.exists(extract_to):
 
             raise ValueError(f"There's no extract_to path or it doesn't exist: {extract_to}")
         
-        extract_to = Path(extract_to)
+        extract_to_path: Path = Path(extract_to)
         final_extract_path: Path
         zip_name: str
 
         if create_subdir:
 
-            zip_name = zip_path.stem
-            final_extract_path = extract_to / zip_name
+            zip_name = zip_path_path.stem
+            final_extract_path = extract_to_path / zip_name
 
         else:
 
-            final_extract_path = extract_to
+            final_extract_path = extract_to_path
         
         final_extract_path.mkdir(parents=True, exist_ok=True)
         
@@ -107,7 +111,7 @@ class LZMAZipExtractor:
 
             with zipfile.ZipFile(zip_path, 'r') as zip_ref:
 
-                zip_info: list[ZipInfo] = zip_ref.infolist()
+                zip_info: List[ZipInfo] = zip_ref.infolist()
                 
                 for file_info in zip_info:
 
@@ -154,9 +158,9 @@ class LZMAZipExtractor:
 
             with zip_ref.open(file_info, 'r') as compressed_file:
 
-                compressed_data = compressed_file.read()
+                compressed_data: bytes = compressed_file.read()
             
-            decompressed_data = lzma.decompress(compressed_data)
+            decompressed_data: bytes = lzma.decompress(compressed_data)
             
             with open(target_path, 'wb') as output_file:
 
@@ -170,7 +174,7 @@ class LZMAZipExtractor:
 
             raise RuntimeError(f"LZMA error decompressing {file_info.filename}: {e}")
     
-    def get_extracted_path(self) -> "str|None":
+    def get_extracted_path(self) -> "str|Path|None":
         """
         Returns the path of the last extraction.
         
@@ -224,22 +228,22 @@ class LZMAZipExtractor:
 class StaticFileServer(QThread):
     """Static file server running in separate thread"""
     
-    def __init__(self, folder_path: str, port: int = 8000):
+    def __init__(self, folder_path: str, port: int = 8000) -> None:
         """Init StaticFileServer data"""
 
         super().__init__()
 
-        self.folder_path = folder_path
-        self.port = port
+        self.folder_path: str = folder_path
+        self.port: int = port
 
         self.server: Optional[HTTPServer] = None
         
-    def run(self):
+    def run(self) -> None:
         """Start static file server"""
 
         os.chdir(self.folder_path)
 
-        handler = SimpleHTTPRequestHandler
+        handler: Type[SimpleHTTPRequestHandler] = SimpleHTTPRequestHandler
         self.server = HTTPServer(('localhost', self.port), handler)
 
         print(f"Serving files from: {self.folder_path}")
@@ -247,7 +251,7 @@ class StaticFileServer(QThread):
 
         self.server.serve_forever()
         
-    def stop(self):
+    def stop(self) -> None:
         """Stop the server"""
 
         if self.server:
@@ -255,24 +259,24 @@ class StaticFileServer(QThread):
             self.server.shutdown()
             self.server.server_close()
 
-
 class WebSocketManager:
     """
     WebSocket manager that runs in background
     and allows sending messages from main thread
     """
     
-    def __init__(self, port: int = 8080):
+    def __init__(self, port: int = 8080) -> None:
         """Init WebSocketManager with default and given values, port is set to 8080, where the
         front-end is trying to connect, don't change here without changing front-end connection."""
 
-        self.port = port
-        self.connections: "set[websockets.WebSocketServerProtocol]" = set()
+        self.port: int = port
+        self.connections: set[Any] = set()
         self.server_thread: Optional[threading.Thread] = None
-        self.running = False
+        self.running: bool = False
         self.loop: Optional[asyncio.AbstractEventLoop] = None
+        self.server: Optional[Any] = None
         
-    async def _handler(self, websocket, path: str):
+    async def _handler(self, websocket: Any) -> None:
         """Handle WebSocket connections"""
 
         self.connections.add(websocket)
@@ -282,19 +286,20 @@ class WebSocketManager:
             await websocket.wait_closed()
 
         finally:
-
             self.connections.remove(websocket)
             print(f"WebSocket disconnected: {websocket.remote_address}")
     
-    async def _run_server(self):
+    async def _run_server(self) -> None:
         """Run WebSocket server"""
 
         try:
+            self.server = await serve(self._handler, "localhost", self.port)
+            print(f"WebSocket server: ws://localhost:{self.port}")
 
-            async with websockets.serve(self._handler, "localhost", self.port):
+            await asyncio.Future()  # Run forever
 
-                print(f"WebSocket server: ws://localhost:{self.port}")
-                await asyncio.Future()
+        except exceptions.ConnectionClosed:
+            pass
 
         except Exception as e:
             print(f"WebSocket error: {e}")
@@ -302,7 +307,7 @@ class WebSocketManager:
         finally:
             self.running = False
     
-    def _run_in_thread(self):
+    def _run_in_thread(self) -> None:
         """Run asyncio loop in separate thread"""
 
         self.loop = asyncio.new_event_loop()
@@ -312,13 +317,11 @@ class WebSocketManager:
             self.loop.run_until_complete(self._run_server())
 
         finally:
-
             if self.loop.is_running():
                 self.loop.stop()
-
             self.loop.close()
     
-    def start(self):
+    def start(self) -> None:
         """Start WebSocket server"""
 
         if self.running:
@@ -333,36 +336,79 @@ class WebSocketManager:
 
         print("WebSocket running in background...")
     
-    def stop(self):
+    def stop(self) -> None:
         """Stop WebSocket server"""
 
         if self.running and self.loop:
-
             self.running = False
             self.loop.call_soon_threadsafe(self.loop.stop)
     
-    def send_message(self, message: str):
+    def stop_with_error(self, reason: str = "Unknown installation error") -> None:
+        """Stop WebSocket server with code 1101, error"""
+
+        if self.running and self.loop:
+            self.running = False
+            
+            asyncio.run_coroutine_threadsafe(
+                self._close_all_with_error(reason), 
+                self.loop
+            )
+            
+            print(f"WebSocket server stopped with error: {reason}")
+
+    async def _close_all_with_error(self, reason: str) -> None:
+        """Close all connections with error code 1101"""
+
+        if self.connections:
+
+            error_message: str = f"ERROR: {reason}"
+            send_tasks: list[Task[Any]] = [
+                asyncio.create_task(conn.send(error_message))
+                for conn in self.connections.copy()
+            ]
+            
+            if send_tasks:
+                await asyncio.wait(send_tasks, timeout=2.0)
+            
+            close_tasks: list[Task[Any]] = [
+                asyncio.create_task(conn.close(code=1101, reason=reason))
+                for conn in self.connections.copy()
+            ]
+            
+            if close_tasks:
+                await asyncio.wait(close_tasks, timeout=2.0)
+            
+            self.connections.clear()
+        
+        if self.server:
+            self.server.close()
+            await self.server.wait_closed()
+        
+        if self.loop and self.loop.is_running():
+            self.loop.stop()
+    
+    def send_message(self, message: str) -> None:
         """Send message to all connected clients (callable from main thread)"""
 
         if not self.running or not self.loop:
-
             print("WebSocket is not running")
             return
             
         if not self.connections:
-
             print("No WebSocket clients connected")
             return
             
         asyncio.run_coroutine_threadsafe(self._send_to_all(message), self.loop)
         print(f"Message sent to {len(self.connections)} client(s): {message}")
     
-    async def _send_to_all(self, message: str):
+    async def _send_to_all(self, message: str) -> None:
         """Send message to all clients (async)"""
 
         if self.connections:
 
-            await asyncio.wait([conn.send(message) for conn in self.connections])
+            await asyncio.wait(
+                [asyncio.create_task(conn.send(message)) for conn in self.connections],
+            )
     
     def get_connection_count(self) -> int:
         """Return number of active connections"""
@@ -378,21 +424,21 @@ class PyQtWebApp:
     
     def __init__(
         self, web_folder: str, window_title: str = "PySide6 WebApp", 
-        window_size: tuple = (1200, 800), http_port: int = 8000
-    ):
+        window_size: Tuple[int, int] = (1200, 800), http_port: int = 8000
+    ) -> None:
         """Init PyQtWebApp with some data"""
 
-        self.web_folder = os.path.abspath(web_folder)
-        self.window_title = window_title
-        self.window_size = window_size
-        self.http_port = http_port
+        self.web_folder: str = os.path.abspath(web_folder)
+        self.window_title: str = window_title
+        self.window_size: Tuple[int, int] = window_size
+        self.http_port: int = http_port
         
         self.app: Optional[QApplication] = None
         self.window: Optional[QMainWindow] = None
         self.web_view: Optional[QWebEngineView] = None
         self.file_server: Optional[StaticFileServer] = None
         
-    def start(self):
+    def start(self) -> None:
         """Start PySide6 application and file server"""
 
         self.file_server = StaticFileServer(self.web_folder, self.http_port)
@@ -407,13 +453,13 @@ class PyQtWebApp:
         self.window.resize(*self.window_size)
         
         # Setup central widget
-        central_widget = QWidget()
-        layout = QVBoxLayout(central_widget)
+        central_widget: QWidget = QWidget()
+        layout: QVBoxLayout = QVBoxLayout(central_widget)
         layout.setContentsMargins(0, 0, 0, 0)
         
         # Create web view
         self.web_view = QWebEngineView()
-        url = QUrl(f"http://localhost:{self.http_port}")
+        url: QUrl = QUrl(f"http://localhost:{self.http_port}")
         self.web_view.load(url)
         
         layout.addWidget(self.web_view)
@@ -421,13 +467,13 @@ class PyQtWebApp:
         
         print(f"PySide6 application started - loading: {url.toString()}")
     
-    def show(self):
+    def show(self) -> None:
         """Show the window"""
 
         if self.window:
             self.window.show()
     
-    def close(self):
+    def close(self) -> None:
         """Close application and servers"""
 
         if self.file_server:
@@ -446,15 +492,17 @@ class SystemRequirementsChecker:
     Verifies disk space, OS, architecture, RAM, and package managers.
     """
     
-    def __init__(self):
+    def __init__(self) -> None:
         """Init SystemRequirementsChecker"""
-        self.system_info = self._get_system_info()
-        self.requirements_met = False
+
+        self.system_info: Dict[str, str] = self._get_system_info()
+        self.requirements_met: bool = False
         self.check_results: Dict[str, Tuple[bool, str]] = {}
         self.error_messages: List[str] = []
     
     def _get_system_info(self) -> Dict[str, str]:
         """Get comprehensive system information"""
+
         return {
             'os': platform.system(),
             'os_version': platform.version(),
@@ -466,12 +514,13 @@ class SystemRequirementsChecker:
     
     def _get_system_drive(self) -> str:
         """Get the system drive path based on OS"""
-        system = self.system_info['os']
 
-        if system == "Windows":
+        system: str = self.system_info['os']
+
+        if system.lower() == "windows":
             return os.path.splitdrive(os.environ.get('PROGRAMFILES', 'C:'))[0] + '\\'
 
-        elif system == "Darwin":  # macOS
+        elif system.lower() == "darwin":  # macOS
             return "/Applications/"
 
         else:  # Linux/Unix
@@ -487,18 +536,21 @@ class SystemRequirementsChecker:
         Returns:
             Tuple of (success, message)
         """
+
         try:
-            drive = self._get_system_drive()
-            disk_usage = psutil.disk_usage(drive)
-            free_gb = disk_usage.free / (1024 ** 3)  # Convert to GB
+
+            drive: str = self._get_system_drive()
+            disk_usage: Any = psutil.disk_usage(drive)
+            free_gb: float = disk_usage.free / (1024 ** 3)  # Convert to GB
             # required_bytes = required_gb * (1024 ** 3)
             
-            success = free_gb >= required_gb
-            message = f"Disk space: {free_gb:.1f}GB free of {required_gb}GB required on {drive}"
+            success: bool = free_gb >= required_gb
+            message: str = f"Disk space: {free_gb:.1f}GB free of {required_gb}GB required on {drive}"
 
             return success, message
             
         except Exception as e:
+
             return False, f"Disk space check failed: {str(e)}"
     
     def check_operating_system(self) -> Tuple[bool, str]:
@@ -508,19 +560,20 @@ class SystemRequirementsChecker:
         Required:
         - Windows 10+ x86_64
         - macOS BigSur+ arm64
-        - Linux Debian/Ubuntu/RHEL amd64
+        - Linux Ubuntu amd64
         
         Returns:
             Tuple of (success, message)
         """
-        system = self.system_info['os']
-        arch = self.system_info['architecture']
-        release = self.system_info['os_release']
+        system: str = self.system_info['os']
+        arch: str = self.system_info['architecture']
+        release: str = self.system_info['os_release']
         
-        if system == "Windows":
+        if system.lower() == "windows":
             # Check Windows version (10+)
             try:
-                major_version = int(release.split('.')[0])
+
+                major_version: int = int(release.split('.')[0])
 
                 if major_version >= 10 and arch in ['x86_64', 'AMD64']:
                     return True, f"Windows {release} {arch} - compatible"
@@ -529,12 +582,15 @@ class SystemRequirementsChecker:
                     return False, f"Windows {release} {arch} - requires Windows 10+ x86_64"
 
             except (ValueError, IndexError):
+
                 return False, f"Windows version check failed"
                 
         elif system == "Darwin":  # macOS
             # Check macOS version (BigSur+ = 11.0+)
+
             try:
-                version_str = platform.mac_ver()[0]
+
+                version_str: str = platform.mac_ver()[0]
                 major_version = int(version_str.split('.')[0]) if version_str else 0
 
                 if major_version >= 11 and arch in ['arm64']:
@@ -548,23 +604,23 @@ class SystemRequirementsChecker:
                 
         elif system == "Linux":
             # Check Linux distribution and architecture
-            distro_info = self._get_linux_distro()
-            distro_name = distro_info['name'].lower() if distro_info else "unknown"
-            distro_like = distro_info['id_like'].lower() if distro_info else "unknown"
+            distro_info: "Dict[str, str] | None" = self._get_linux_distro()
+            distro_name: str = distro_info['name'].lower() if distro_info else "unknown"
+            distro_like: str = distro_info['id_like'].lower() if distro_info else "unknown"
             
-            # Check if it's Debian/Ubuntu or RHEL based
-            is_debian_based = any(name in distro_name + distro_like for name in ['debian', 'ubuntu', 'mint', 'elementary', 'kali', 'tails'])
-            is_rhel_based = any(name in distro_name + distro_like for name in ['redhat', 'rhel', 'centos', 'mandriva', 'fedora', 'rocky', 'alma'])
+            # Check if it's Ubuntu based
+            is_ubuntu_based: bool = any(name in distro_name + distro_like for name in ['ubuntu', 'mint', 'elementary'])
             
-            if (is_debian_based or is_rhel_based) and arch in ['x86_64', 'AMD64']:
+            if (is_ubuntu_based) and arch.lower() in ['x86_64', 'amd64']:
 
-                distro_msg = distro_info['name'] if distro_info else "Linux"
+                distro_msg: str = distro_info['name'] if distro_info else "Linux"
                 return True, f"{distro_msg} {arch} - compatible"
 
             else:
-                return False, f"Linux {distro_name} {arch} - requires Debian/Ubuntu or RHEL-based amd64"
+                return False, f"Linux {distro_name} {arch} - requires Ubuntu amd64"
                 
         else:
+
             return False, f"Unsupported operating system: {system}"
     
     @staticmethod
@@ -573,13 +629,14 @@ class SystemRequirementsChecker:
         try:
             # Try to read /etc/os-release
             with open('/etc/os-release', 'r') as f:
-                lines = f.readlines()
+                lines: List[str] = f.readlines()
             
-            distro_info = {}
+            distro_info: Dict[str, str] = {}
 
             for line in lines:
                 if '=' in line:
-                    key, value = line.strip().split('=', 1)
+                    key: str = line.strip().split('=', 1)[0]
+                    value: str = line.strip().split('=', 1)[1]
                     distro_info[key] = value.strip('"')
             
             return {
@@ -604,11 +661,12 @@ class SystemRequirementsChecker:
         Returns:
             Tuple of (success, message)
         """
+
         try:
-            memory = psutil.virtual_memory()
-            total_gb = memory.total / (1024 ** 3)
-            success = total_gb >= required_gb
-            message = f"RAM: {total_gb:.1f}GB of {required_gb}GB required"
+            memory: Any = psutil.virtual_memory()
+            total_gb: int = memory.total / (1024 ** 3)
+            success: bool = total_gb >= required_gb
+            message: str = f"RAM: {total_gb:.1f}GB of {required_gb}GB required"
 
             return success, message
 
@@ -623,7 +681,7 @@ class SystemRequirementsChecker:
             Tuple of (success, message)
         """
 
-        system = self.system_info['os']
+        system: str = self.system_info['os']
         
         if system == "Windows":
             return self._check_chocolatey()
@@ -643,7 +701,7 @@ class SystemRequirementsChecker:
 
         try:
             # Check if Chocolatey is installed
-            result = subprocess.run(['choco', '--version'], 
+            result: CompletedProcess[str] = subprocess.run(['choco', '--version'], 
                                   capture_output=True, text=True, shell=True)
 
             if result.returncode == 0:
@@ -651,7 +709,7 @@ class SystemRequirementsChecker:
             
             # Install Chocolatey
             print("Installing Chocolatey...")
-            install_script = (
+            install_script: str = (
                 "Set-ExecutionPolicy Bypass -Scope Process -Force; "
                 "[System.Net.ServicePointManager]::SecurityProtocol = [System.Net.ServicePointManager]::SecurityProtocol -bor 3072; "
                 "iex ((New-Object System.Net.WebClient).DownloadString('https://community.chocolatey.org/install.ps1'))"
@@ -661,12 +719,15 @@ class SystemRequirementsChecker:
                                   capture_output=True, text=True, shell=True)
             
             if result.returncode == 0:
+
                 return True, "Chocolatey installed successfully"
 
             else:
+
                 return False, f"Chocolatey installation failed: {result.stderr}"
                 
         except Exception as e:
+
             return False, f"Chocolatey check failed: {str(e)}"
     
     @staticmethod
@@ -675,15 +736,18 @@ class SystemRequirementsChecker:
 
         try:
             # Check if Homebrew is installed
-            result = subprocess.run(['brew', '--version'], 
+            result: CompletedProcess[str] = subprocess.run(['brew', '--version'], 
                                   capture_output=True, text=True)
 
             if result.returncode == 0:
                 return True, "Homebrew is installed"
             
+            print("Installing x-code...")
+            xcode: CompletedProcess[str] = subprocess.run(["xcode-select", "--install"], shell=True, capture_output=True, text=True)
+
             # Install Homebrew
             print("Installing Homebrew...")
-            install_script = (
+            install_script: str = (
                 '/bin/bash -c "$(curl -fsSL https://raw.githubusercontent.com/'
                 'Homebrew/install/HEAD/install.sh)"'
             )
@@ -691,7 +755,7 @@ class SystemRequirementsChecker:
             result = subprocess.run(install_script, shell=True,
                                   capture_output=True, text=True)
             
-            if result.returncode == 0:
+            if result.returncode == 0 and xcode.returncode == 0:
                 return True, "Homebrew installed successfully"
 
             else:
@@ -702,24 +766,16 @@ class SystemRequirementsChecker:
     
     @staticmethod
     def _check_linux_package_manager() -> Tuple[bool, str]:
-        """Check for apt or rpm on Linux"""
+        """Check for apt on Linux"""
         try:
-            # Check for apt (Debian/Ubuntu)
+            # Check for apt (Ubuntu)
             if shutil.which('apt'):
-                result = subprocess.run(['apt', '--version'], 
+                result: CompletedProcess[str] = subprocess.run(['apt', '--version'], 
                                       capture_output=True, text=True)
                 if result.returncode == 0:
                     return True, "APT package manager is available"
             
-            # Check for rpm/dnf/yum (RHEL-based)
-            if shutil.which('dnf'):
-                return True, "DNF package manager is available"
-            elif shutil.which('yum'):
-                return True, "YUM package manager is available"
-            elif shutil.which('rpm'):
-                return True, "RPM package manager is available"
-            
-            return False, "No supported package manager found (apt/dnf/yum/rpm)"
+            return False, "No supported package manager found apt"
             
         except Exception as e:
             return False, f"Linux package manager check failed: {str(e)}"
@@ -737,19 +793,19 @@ class SystemRequirementsChecker:
         print()
         
         # Perform all checks
-        checks = [
-            ("Disk Space", self.check_disk_space(5)),
+        checks: List[Tuple[str, Tuple[bool, str]]] = [
+            ("Disk Space", self.check_disk_space(required_gb=10)),
             ("Operating System", self.check_operating_system()),
             ("RAM", self.check_ram(1)),
             ("Package Manager", self.check_package_manager())
         ]
         
         # Store results
-        all_passed = True
+        all_passed: bool = True
 
         for check_name, (passed, message) in checks:
 
-            status = "PASS" if passed else "FAIL"
+            status: Literal['PASS', 'FAIL'] = "PASS" if passed else "FAIL"
             self.check_results[check_name] = (passed, message)
 
             print(f"{status} {check_name}: {message}")
@@ -772,7 +828,7 @@ class SystemRequirementsChecker:
     def get_detailed_report(self) -> str:
         """Generate a detailed requirements report"""
 
-        report = []
+        report: List[str] = []
         report.append("System Requirements Check Report")
         report.append("=" * 40)
         report.append(f"Operating System: {self.system_info['os']}")
@@ -782,7 +838,7 @@ class SystemRequirementsChecker:
         
         for check_name, (passed, message) in self.check_results.items():
 
-            status = "PASS" if passed else "FAIL"
+            status: Literal['PASS', 'FAIL'] = "PASS" if passed else "FAIL"
             report.append(f"{check_name}: {status}")
             report.append(f"  {message}")
             report.append("")
@@ -793,10 +849,13 @@ class SystemRequirementsChecker:
     def is_compatible(self) -> bool:
         """Check if system is compatible (OS and architecture only)"""
 
+        os_check: bool
+        _: str
+
         os_check, _ = self.check_operating_system()
         return os_check
 
-    def show_error_dialog(self):
+    def show_error_dialog(self) -> None:
         """
         Display a PySide6 error message dialog with system requirement issues.
         
@@ -816,27 +875,27 @@ class SystemRequirementsChecker:
         try:
             
             # Get or create QApplication instance
-            app = QApplication.instance()
+            app: "QCoreApplication | None" = QApplication.instance() # type: ignore
             if not app:
                 raise Exception("Failed to recognize application")
             
             # Create error message
-            error_text = "System requirements check failed:\n\n"
+            error_text: str = "System requirements check failed:\n\n"
             error_text += "\n".join(self.error_messages)
             
             # Add resolution guidance
             error_text += "\n\nPlease resolve these issues and restart the application."
             
             # Create and show message box
-            msg_box = QMessageBox()
+            msg_box: QMessageBox = QMessageBox()
             msg_box.setWindowTitle("System Requirements Not Met")
-            msg_box.setIcon(QMessageBox.Critical)
+            msg_box.setIcon(QMessageBox.Icon.Critical)
             msg_box.setText("Your system does not meet the minimum requirements")
             msg_box.setDetailedText(error_text)
-            msg_box.setStandardButtons(QMessageBox.Ok)
+            msg_box.setStandardButtons(QMessageBox.StandardButton.Ok)
             
             # Set window properties
-            msg_box.setWindowFlags(msg_box.windowFlags() | Qt.WindowStaysOnTopHint)
+            msg_box.setWindowFlags(msg_box.windowFlags() | Qt.WindowType.WindowStaysOnTopHint)
             msg_box.resize(600, 400)
             
             print("Displaying system requirements error dialog...")
@@ -849,11 +908,6 @@ class SystemRequirementsChecker:
             for error in self.error_messages:
                 print(f"\t{error}")
 
-"""
-==================================================================================
-TO CHECK:
-==================================================================================
-"""
 
 class ApplicationInstaller:
     """
@@ -861,20 +915,31 @@ class ApplicationInstaller:
     and application setup across Windows, macOS, and Linux.
     """
     
-    def __init__(self, app_name: str = "MyApp", app_version: str = "1.0.0"):
-        self.app_name = app_name
-        self.app_version = app_version
-        self.system_info = self._get_system_info()
-        self.app_dir = self._get_app_directory()
-        self.temp_dir = self._get_temp_directory()
-        self.desktop_dir = self._get_desktop_directory()
+    def __init__(
+        self, 
+        app_version: str,
+        local_dir: Path,
+        zip_extractor: LZMAZipExtractor,
+        app_name: str = "SNES-IDE",
+    ) -> None:
+        """Init class ApplicationInstaller"""
+
+        self.app_name: str = app_name
+        self.app_version: str = app_version
+        self.system_info: Dict[str, str] = self._get_system_info()
+        self.app_dir: Path = self._get_app_directory()
+        self.temp_dir: Path = self._get_temp_directory()
+        self.desktop_dir: Path = self._get_desktop_directory()
+        self.local_dir: Path = local_dir
+        self.zip_extractor: LZMAZipExtractor = zip_extractor
         
         # Create necessary directories
         os.makedirs(self.app_dir, exist_ok=True)
         os.makedirs(self.temp_dir, exist_ok=True)
     
-    def _get_system_info(self) -> dict:
+    def _get_system_info(self) -> Dict[str, str]:
         """Get detailed system information"""
+
         return {
             'os': platform.system(),
             'os_version': platform.version(),
@@ -885,29 +950,29 @@ class ApplicationInstaller:
     
     def _get_app_directory(self) -> Path:
         """Get application installation directory based on OS"""
-        system = self.system_info['os']
+
+        system: str = self.system_info['os']
+
         if system == "Windows":
             return Path(os.environ.get('PROGRAMFILES', 'C:\\Program Files')) / self.app_name
+
         elif system == "Darwin":
             return Path("/Applications") / f"{self.app_name}.app"
+
         else:  # Linux
             return Path("/opt") / self.app_name
     
     def _get_temp_directory(self) -> Path:
         """Get temporary directory for downloads"""
-        temp_base = Path(os.environ.get('TEMP', '/tmp'))
+
+        temp_base: Path = Path(os.environ.get('TEMP', tempfile.gettempdir()))
         return temp_base / f"{self.app_name}_install"
     
     def _get_desktop_directory(self) -> Path:
         """Get desktop directory for shortcuts"""
-        system = self.system_info['os']
-        if system == "Windows":
-            return Path(os.path.expanduser("~")) / "Desktop"
-        elif system == "Darwin":
-            return Path.home() / "Desktop"
-        else:  # Linux
-            return Path.home() / "Desktop"
-    
+
+        return Path.home().absolute() / 'Desktop'
+        
     def _run_command(self, command: List[str], shell: bool = False) -> Tuple[bool, str]:
         """
         Run a system command and return success status and output.
@@ -919,78 +984,30 @@ class ApplicationInstaller:
         Returns:
             Tuple of (success, output)
         """
+
         try:
-            if shell and isinstance(command, list):
-                command = " ".join(command)
+
+
+            command_str: str = " ".join(command)
             
-            result = subprocess.run(
-                command,
+            result: CompletedProcess[str] = subprocess.run(
+                [command_str],
                 shell=shell,
                 capture_output=True,
                 text=True,
-                timeout=300  # 5 minute timeout
+                timeout=600  # 10 minute timeout
             )
             
-            success = result.returncode == 0
-            output = result.stdout if success else result.stderr
+            success: bool = result.returncode == 0
+            output: str = result.stdout if success else result.stderr
             
             return success, output
             
         except subprocess.TimeoutExpired:
-            return False, "Command timed out after 5 minutes"
+            return False, "Command timed out after 10 minutes"
+
         except Exception as e:
             return False, f"Command execution failed: {str(e)}"
-    
-    def _download_file(self, url: str, destination: Path) -> bool:
-        """
-        Download a file from URL to destination.
-        
-        Args:
-            url: URL to download from
-            destination: Local path to save file
-            
-        Returns:
-            bool: True if download successful
-        """
-        try:
-            print(f"📥 Downloading: {url}")
-            urllib.request.urlretrieve(url, destination)
-            print(f"✅ Downloaded: {destination.name}")
-            return True
-        except Exception as e:
-            print(f"❌ Download failed: {str(e)}")
-            return False
-    
-    def _extract_archive(self, archive_path: Path, extract_to: Path) -> bool:
-        """
-        Extract archive file (zip, tar.gz, etc.)
-        
-        Args:
-            archive_path: Path to archive file
-            extract_to: Directory to extract to
-            
-        Returns:
-            bool: True if extraction successful
-        """
-        try:
-            print(f"📦 Extracting: {archive_path.name}")
-            
-            if archive_path.suffix == '.zip':
-                with zipfile.ZipFile(archive_path, 'r') as zip_ref:
-                    zip_ref.extractall(extract_to)
-            elif archive_path.suffix in ['.tar', '.gz', '.bz2', '.xz']:
-                with tarfile.open(archive_path, 'r:*') as tar_ref:
-                    tar_ref.extractall(extract_to)
-            else:
-                print(f"❌ Unsupported archive format: {archive_path.suffix}")
-                return False
-            
-            print(f"✅ Extracted to: {extract_to}")
-            return True
-            
-        except Exception as e:
-            print(f"❌ Extraction failed: {str(e)}")
-            return False
     
     def _make_executable(self, file_path: Path) -> bool:
         """
@@ -1002,53 +1019,70 @@ class ApplicationInstaller:
         Returns:
             bool: True if successful
         """
+
         try:
+
             if self.system_info['os'] != "Windows":
                 file_path.chmod(file_path.stat().st_mode | stat.S_IEXEC)
+
             return True
+
         except Exception as e:
-            print(f"❌ Failed to make executable: {str(e)}")
+
+            print(f"Failed to make executable: {str(e)}")
             return False
     
-    def install_make(self) -> bool:
+    def install_make_cmake_gpp(self) -> bool:
         """
         Install make (gmake for macOS)
         
         Returns:
             bool: True if installation successful
         """
-        system = self.system_info['os']
-        print("🔧 Installing make...")
+        system: str = self.system_info['os']
+        print("Installing make...")
+
+        success: bool
+        output: str
         
         if system == "Windows":
             # Install make using Chocolatey
             success, output = self._run_command(['choco', 'install', 'make', '-y'])
+
             if success:
-                print("✅ make installed via Chocolatey")
+                print(f"make installed via Chocolatey: {output}")
+            
+            success, output = self._run_command(['choco', 'install', 'cmake', "--installargs 'ADD_CMAKE_TO_PATH=System'", '-y'])
+
+            if success:
+                print(f"cmake installed via Chocolatey: {output}")
+
+            success, output = self._run_command(['choco', 'install', 'visualstudio2022buildtools', '-y'])
+
+            if success:
+                print(f"C++ installed via Chocolatey: {output}")
+
             return success
             
         elif system == "Darwin":
             # Install gmake using Homebrew
-            success, output = self._run_command(['brew', 'install', 'make'])
+            success, output = self._run_command(['brew', 'install', 'make', 'cmake', 'gcc'])
             if success:
-                print("✅ gmake installed via Homebrew")
+                print("gmake installed via Homebrew")
             return success
             
         else:  # Linux
             # Install make using package manager
             if shutil.which('apt'):
                 success, output = self._run_command(['sudo', 'apt', 'update'])
-                success, output = self._run_command(['sudo', 'apt', 'install', '-y', 'make'])
-            elif shutil.which('dnf'):
-                success, output = self._run_command(['sudo', 'dnf', 'install', '-y', 'make'])
-            elif shutil.which('yum'):
-                success, output = self._run_command(['sudo', 'yum', 'install', '-y', 'make'])
+                success, output = self._run_command(['sudo', 'apt', 'install', '-y', 'make', 'cmake', 'g++'])
             else:
-                print("❌ No supported package manager found for make installation")
+                print("No supported package manager found for make installation")
                 return False
             
             if success:
-                print("✅ make installed via package manager")
+                print("make installed via package manager")
+
             return success
     
     def install_dotnet_sdk_8(self) -> bool:
@@ -1058,50 +1092,53 @@ class ApplicationInstaller:
         Returns:
             bool: True if installation successful
         """
-        system = self.system_info['os']
-        print("🔧 Installing .NET SDK 8...")
+        system: str = self.system_info['os']
+        print("Installing .NET SDK 8...")
+
+        success: bool
+        output: str
         
+        commands: List[List[str]]
+
         if system == "Windows":
             # Install using Chocolatey
             success, output = self._run_command(['choco', 'install', 'dotnet-8.0-sdk', '-y'])
+
             if success:
-                print("✅ .NET SDK 8 installed via Chocolatey")
+                print(".NET SDK 8 installed via Chocolatey")
+
             return success
             
         elif system == "Darwin":
             # Install using Homebrew
             success, output = self._run_command(['brew', 'install', '--cask', 'dotnet-sdk'])
+
             if success:
-                print("✅ .NET SDK 8 installed via Homebrew")
+                print(".NET SDK 8 installed via Homebrew")
+
             return success
             
         else:  # Linux
             # Install using package manager or Microsoft's script
             if shutil.which('apt'):
-                # Ubuntu/Debian
+                # Ubuntu
                 commands = [
                     ['wget', 'https://packages.microsoft.com/config/ubuntu/22.04/packages-microsoft-prod.deb', '-O', '/tmp/packages-microsoft-prod.deb'],
                     ['sudo', 'dpkg', '-i', '/tmp/packages-microsoft-prod.deb'],
                     ['sudo', 'apt', 'update'],
-                    ['sudo', 'apt', 'install', '-y', 'dotnet-sdk-8.0']
-                ]
-            elif shutil.which('dnf'):
-                # RHEL/Fedora
-                commands = [
-                    ['sudo', 'rpm', '-Uvh', 'https://packages.microsoft.com/config/rhel/8/packages-microsoft-prod.rpm'],
-                    ['sudo', 'dnf', 'install', '-y', 'dotnet-sdk-8.0']
+                    ['sudo', 'apt', 'install', '-y', 'dotnet-sdk-8.0'],
                 ]
             else:
-                print("❌ Unsupported Linux distribution for .NET SDK installation")
+                print("Unsupported Linux distribution for .NET SDK installation")
                 return False
             
             for cmd in commands:
                 success, output = self._run_command(cmd)
                 if not success:
-                    print(f"❌ .NET SDK installation failed: {output}")
+                    print(f".NET SDK installation failed: {output}")
                     return False
             
-            print("✅ .NET SDK 8 installed")
+            print(".NET SDK 8 installed")
             return True
     
     def move_executables_to_app_dir(self) -> bool:
@@ -1111,26 +1148,31 @@ class ApplicationInstaller:
         Returns:
             bool: True if successful
         """
-        print("📁 Moving executables to app directory...")
+        print("Moving executables to app directory...")
         
-        # This would depend on your specific application structure
-        # Example: move from temp directory to app directory
-        source_dir = self.temp_dir / "bin"
-        dest_dir = self.app_dir / "bin"
+        source_dir: Path = get_executable_path() / "SNES-IDE"
+        dest_dir: Path = self.app_dir
         
         try:
             if source_dir.exists():
+
                 if dest_dir.exists():
                     shutil.rmtree(dest_dir)
+
+                os.makedirs(dest_dir.parent, exist_ok=True)
                 shutil.copytree(source_dir, dest_dir)
-                print(f"✅ Executables moved to: {dest_dir}")
+                print(f"Executables moved to: {dest_dir}")
+
                 return True
+
             else:
-                print("⚠️ No executables found to move")
+
+                print("No executables found to move")
                 return True
                 
         except Exception as e:
-            print(f"❌ Failed to move executables: {str(e)}")
+
+            print(f"Failed to move executables: {str(e)}")
             return False
     
     def install_jdk_8_with_fx(self) -> bool:
@@ -1140,40 +1182,22 @@ class ApplicationInstaller:
         Returns:
             bool: True if installation successful
         """
-        print("☕ Installing JDK 8 with JavaFX...")
+
+        print("Installing JDK 8 with JavaFX...")
         
-        # URLs for JDK 8 with JavaFX (these are examples - replace with actual URLs)
-        jdk_urls = {
-            "Windows": "https://example.com/jdk8-windows-fx.zip",
-            "Darwin": "https://example.com/jdk8-macos-fx.tar.gz", 
-            "Linux": "https://example.com/jdk8-linux-fx.tar.gz"
-        }
-        
-        system = self.system_info['os']
-        url = jdk_urls.get(system)
-        
-        if not url:
-            print(f"❌ No JDK URL available for {system}")
-            return False
-        
-        # Download JDK
-        archive_path = self.temp_dir / f"jdk8-fx.{'zip' if system == 'Windows' else 'tar.gz'}"
-        if not self._download_file(url, archive_path):
-            return False
-        
-        # Extract to app directory
-        jdk_dir = self.app_dir / "jdk"
-        if not self._extract_archive(archive_path, jdk_dir):
-            return False
-        
-        # Set JAVA_HOME environment variable (optional)
-        if system != "Windows":
-            # For Unix-like systems, we can create a symlink or set environment
-            java_home = jdk_dir / "Contents/Home" if system == "Darwin" else jdk_dir
-            print(f"✅ JDK installed. JAVA_HOME would be: {java_home}")
-        else:
-            print("✅ JDK installed for Windows")
-        
+        self.zip_extractor: LZMAZipExtractor
+
+        jdk_path: Path = Path(
+            self.app_dir / "bin" / "jdk8" / "jdk8.zip"
+        )
+
+        self.zip_extractor.extract_zip(
+            zip_path=jdk_path,
+            extract_to=jdk_path.parent,
+            create_subdir=False
+        )
+
+        os.unlink(jdk_path)
         return True
     
     def run_install_scripts(self) -> bool:
@@ -1183,33 +1207,18 @@ class ApplicationInstaller:
         Returns:
             bool: True if all scripts successful
         """
-        print("📜 Running installation scripts...")
+
+        print("Running installation scripts...")
         
-        scripts_dir = self.temp_dir / "scripts"
-        if not scripts_dir.exists():
-            print("⚠️ No scripts directory found")
-            return True
-        
-        system = self.system_info['os']
-        
-        for script_file in scripts_dir.iterdir():
-            if system == "Windows" and script_file.suffix == '.bat':
-                success, output = self._run_command([str(script_file)], shell=True)
-            elif system != "Windows" and script_file.suffix == '.sh':
-                self._make_executable(script_file)
-                success, output = self._run_command([str(script_file)])
-            else:
-                continue
+        if self.system_info['os'].lower() == 'linux':
+
+            schism_installer_path: Path = self.app_dir / "bin" / "schismtracker" / "install.sh"
             
-            if not success:
-                print(f"❌ Script failed: {script_file.name} - {output}")
+            if not self._run_command([str(schism_installer_path)], shell=True)[0]:
                 return False
-            else:
-                print(f"✅ Script executed: {script_file.name}")
-        
-        print("✅ All installation scripts completed")
+
         return True
-    
+
     def create_shortcut(self) -> bool:
         """
         Create desktop shortcut (Windows) or .desktop file (Linux) or symlink (macOS)
@@ -1217,57 +1226,66 @@ class ApplicationInstaller:
         Returns:
             bool: True if shortcut creation successful
         """
-        print("🔗 Creating shortcut...")
+        print("Creating shortcut...")
         
-        system = self.system_info['os']
-        main_executable = self.app_dir / "bin" / f"{self.app_name.lower()}.exe" if system == "Windows" else self.app_dir / "bin" / self.app_name.lower()
+        system: str = self.system_info['os']
+        main_executable: Path = self.app_dir / f"{self.app_name.lower()}.exe" if system == "Windows" else self.app_dir / "bin" / self.app_name.lower()
         
+        success: bool
+        _: str
+
         if not main_executable.exists():
-            print(f"⚠️ Main executable not found: {main_executable}")
+            print(f"Main executable not found: {main_executable}")
             return False
         
-        if system == "Windows":
+        if system.lower() == "windows":
             # Create .lnk shortcut on Windows
-            shortcut_path = self.desktop_dir / f"{self.app_name}.lnk"
+            shortcut_path: Path = self.desktop_dir / f"{self.app_name}.lnk"
             
             # Using PowerShell to create shortcut
-            ps_script = f"""
+            ps_script: str = f"""
             $WshShell = New-Object -comObject WScript.Shell
             $Shortcut = $WshShell.CreateShortcut("{shortcut_path}")
             $Shortcut.TargetPath = "{main_executable}"
             $Shortcut.WorkingDirectory = "{self.app_dir}"
+            $Shortcut.IconLocation = "{self.app_dir / "icon.ico"}"
+            $Shortcut.Description = "{self.app_name} Application"
             $Shortcut.Save()
             """
             
-            success, output = self._run_command(['powershell', '-Command', ps_script])
+            success, _ = self._run_command(['powershell', '-Command', ps_script])
             if success:
-                print(f"✅ Windows shortcut created: {shortcut_path}")
+                print(f"Windows shortcut created: {shortcut_path}")
             return success
             
-        elif system == "Darwin":
+        elif system.lower() == "darwin":
             # Create .app bundle or symlink
             # For simplicity, creating a symlink in Applications
-            apps_dir = Path("/Applications")
-            app_link = apps_dir / f"{self.app_name}.app"
+            apps_dir: Path = Path("/Applications")
+            app_link: Path = apps_dir / f"{self.app_name}.app"
             
             try:
+
                 if app_link.exists():
                     app_link.unlink()
                 
                 # Create actual .app bundle structure would be more complex
                 # For now, creating a simple symlink
                 app_link.symlink_to(self.app_dir)
-                print(f"✅ macOS application link created: {app_link}")
+                print(f"macOS application link created: {app_link}")
+
                 return True
+
             except Exception as e:
-                print(f"❌ Failed to create macOS shortcut: {str(e)}")
+
+                print(f"Failed to create macOS shortcut: {str(e)}")
                 return False
                 
         else:  # Linux
             # Create .desktop file
-            desktop_file = self.desktop_dir / f"{self.app_name}.desktop"
-            desktop_content = f"""[Desktop Entry]
-Version=1.0
+            desktop_file: Path = self.desktop_dir / f"{self.app_name}.desktop"
+            desktop_content: str = f"""[Desktop Entry]
+Version={self.app_version}
 Type=Application
 Name={self.app_name}
 Comment={self.app_name} Application
@@ -1277,7 +1295,7 @@ Terminal=false
 StartupWMClass={self.app_name}
 Categories=Utility;
 """
-            
+
             try:
                 with open(desktop_file, 'w') as f:
                     f.write(desktop_content)
@@ -1286,16 +1304,18 @@ Categories=Utility;
                 desktop_file.chmod(desktop_file.stat().st_mode | stat.S_IEXEC)
                 
                 # Also create symlink in /usr/local/bin for command line access
-                bin_link = Path("/usr/local/bin") / self.app_name.lower()
+                bin_link: Path = Path("/usr/local/bin") / self.app_name.lower()
+
                 if bin_link.exists():
                     bin_link.unlink()
+
                 bin_link.symlink_to(main_executable)
                 
-                print(f"✅ Linux .desktop file created: {desktop_file}")
+                print(f"Linux .desktop file created: {desktop_file}")
                 return True
                 
             except Exception as e:
-                print(f"❌ Failed to create Linux shortcut: {str(e)}")
+                print(f"Failed to create Linux shortcut: {str(e)}")
                 return False
     
     def verify_installation(self) -> bool:
@@ -1305,16 +1325,18 @@ Categories=Utility;
         Returns:
             bool: True if verification passed
         """
-        print("🔍 Verifying installation...")
+        print("Verifying installation...")
         
-        checks = []
+        checks: List[Tuple[str,bool]] = []
+        success: bool
+        output: str
         
         # Check if app directory exists and has content
         checks.append(("App directory", self.app_dir.exists() and any(self.app_dir.iterdir())))
         
         # Check if main executable exists
-        system = self.system_info['os']
-        main_executable = self.app_dir / "bin" / f"{self.app_name.lower()}.exe" if system == "Windows" else self.app_dir / "bin" / self.app_name.lower()
+        system: str = self.system_info['os']
+        main_executable: Path = self.app_dir / f"{self.app_name.lower()}.exe" if system == "Windows" else self.app_dir / "bin" / self.app_name.lower()
         checks.append(("Main executable", main_executable.exists()))
         
         # Check if .NET is available
@@ -1322,14 +1344,16 @@ Categories=Utility;
         checks.append((".NET SDK", success and '8.' in output))
         
         # Check if make is available
-        make_cmd = 'gmake' if system == "Darwin" else 'make'
+        make_cmd: "Literal['gmake']|Literal['make']" = 'gmake' if system == "Darwin" else 'make'
         success, output = self._run_command([make_cmd, '--version'])
         checks.append(("Make tool", success))
         
         # Check if Java is available (if JDK was installed)
-        jdk_dir = self.app_dir / "jdk"
+        jdk_dir: Path = self.app_dir / "bin" / "jdk8"
+
         if jdk_dir.exists():
-            java_exec = jdk_dir / "bin" / "java"
+            java_exec: Path = jdk_dir / "bin" / "java"
+
             if system == "Darwin":
                 java_exec = jdk_dir / "Contents/Home/bin/java"
             
@@ -1337,17 +1361,18 @@ Categories=Utility;
             checks.append(("Java Runtime", success))
         
         # Print results
-        all_passed = True
+        all_passed: bool = True
         for check_name, passed in checks:
-            status = "✅ PASS" if passed else "❌ FAIL"
+            status: Literal['PASS', 'FAIL'] = "PASS" if passed else "FAIL"
             print(f"  {status} {check_name}")
             if not passed:
                 all_passed = False
         
         if all_passed:
-            print("🎉 Installation verification successful!")
+            print("Installation verification successful!")
+
         else:
-            print("⚠️ Some installation checks failed")
+            print("Some installation checks failed")
         
         return all_passed
     
@@ -1358,63 +1383,37 @@ Categories=Utility;
         Returns:
             bool: True if cleanup successful
         """
-        print("🧹 Cleaning up temporary files...")
+        print("Cleaning up temporary files...")
         
         try:
             if self.temp_dir.exists():
                 shutil.rmtree(self.temp_dir)
-            print("✅ Temporary files cleaned up")
+
+            print("Temporary files cleaned up")
             return True
+
         except Exception as e:
-            print(f"⚠️ Failed to clean up temp files: {str(e)}")
+            print(f"Failed to clean up temp files: {str(e)}")
             return False
+
+
+def check_if_admin() -> bool:
+    """Check if the script is being executed by an admin user."""
+
+    if os.name == "posix": # If UNIX, root user should be UID 0 
+        return os.getuid() == 0
     
-    def install_all(self) -> bool:
-        """
-        Execute all installation steps
-        
-        Returns:
-            bool: True if all steps successful
-        """
-        print(f"🚀 Starting {self.app_name} installation...")
-        print(f"📁 Install directory: {self.app_dir}")
-        print(f"💻 Platform: {self.system_info['os']} {self.system_info['architecture']}")
-        print()
-        
-        installation_steps = [
-            ("Installing make", self.install_make),
-            ("Installing .NET SDK 8", self.install_dotnet_sdk_8),
-            ("Moving executables", self.move_executables_to_app_dir),
-            ("Installing JDK 8 with JavaFX", self.install_jdk_8_with_fx),
-            ("Running install scripts", self.run_install_scripts),
-            ("Creating shortcut", self.create_shortcut),
-            ("Verifying installation", self.verify_installation),
-            ("Cleaning up", self.cleanup_temp_files),
-        ]
-        
-        for step_name, step_function in installation_steps:
-            print(f"\n{'='*50}")
-            print(f"Step: {step_name}")
-            print(f"{'='*50}")
-            
-            if not step_function():
-                print(f"❌ Installation failed at: {step_name}")
-                return False
-        
-        print(f"\n{'='*50}")
-        print(f"🎉 {self.app_name} installation completed successfully!")
-        print(f"📁 Location: {self.app_dir}")
-        print(f"{'='*50}")
-        
-        return True
+    else: # Windows, using ctypes.windll.shell32.IsUserAnAdmin, should work in windows XP or later
 
-"""
-==================================================================================
+        try:
+            return ctypes.windll.shell32.IsUserAnAdmin()
 
-==================================================================================
-"""
+        except Exception as e:
+            print(f"Error while checking if user is admin: {e}")
+            return False
 
-def get_executable_path():
+
+def get_executable_path() -> Path:
     """Get the path of the executable or script based on whether the script is frozen 
     (PyInstaller) or not."""
 
@@ -1431,49 +1430,81 @@ def get_executable_path():
         return Path(__file__).absolute().parent
 
 
-def install(ws: WebSocketManager, zip_extractor: LZMAZipExtractor, local_dir: Path):
-    """Make all nine install steps"""
-    
-    steps = [
-        # Install make(gmake for macOS)
-        ...,
-        # Install .net-sdk-8
-        ...,
-        # Move Executables to App dir
-        ...,
-        # Uncompress JDK-8 + FX to App dir
-        ...,
-        # Run required install scripts
-        ...,
-        # Move shortcut executable to Desktop(or /usr/local/bin and create .desktop file)
-        ...,
-        # Verify instalation
-        ...,
+def install(
+    ws: WebSocketManager, zip_extractor: LZMAZipExtractor, local_dir: Path
+) -> "Literal[True]|Tuple[Literal[False], str]":
+    """
+    Execute all installation steps
+        
+    Returns:
+        bool: True if all steps successful
+    """
+
+    installer: ApplicationInstaller = ApplicationInstaller(
+        app_version="5.0.0", local_dir=local_dir, zip_extractor=zip_extractor,
+        app_name="SNES-IDE"
+    )
+
+    print(f"Starting {installer.app_name} installation...")
+    print(f"Install directory: {installer.app_dir}")
+    print(f"Platform: {installer.system_info['os']} {installer.system_info['architecture']}")
+    print()
+        
+    installation_steps: List[Tuple[str, Callable[..., bool]]] = [
+        ("Installing make", installer.install_make_cmake_gpp),
+        ("Installing .NET SDK 8", installer.install_dotnet_sdk_8),
+        ("Moving executables", installer.move_executables_to_app_dir),
+        ("Installing JDK 8 with JavaFX", installer.install_jdk_8_with_fx),
+        ("Running install scripts", installer.run_install_scripts),
+        ("Creating shortcut", installer.create_shortcut),
+        ("Verifying installation", installer.verify_installation),
+        ("Cleaning up", installer.cleanup_temp_files),
     ]
+        
+    for step_name, step_function in installation_steps:
+        print(f"\n{'='*50}")
+        print(f"Step: {step_name}")
+        print(f"{'='*50}")
+        ws.send_message(step_name)
+            
+        if not step_function():
+            return False, f"Instalation of SNES-IDE failed in step: {step_name}"
+            
+    print(f"\n{'='*50}")
+    print(f"{installer.app_name} installation completed successfully!")
+    print(f"Location: {installer.app_dir}")
+    print(f"{'='*50}")
+        
+    return True
 
-def main():
+
+def main() -> None:
     """Main Logic of the INSTALL application"""
+    app: "None|PyQtWebApp" = None
 
-    checker = SystemRequirementsChecker()
+    if not check_if_admin():
+        exit(-1)
+
+    checker: SystemRequirementsChecker = SystemRequirementsChecker()
     print("System Requirements Checker")
     print("=" * 30)
 
-    requirements_met = checker.check_all_requirements()
+    requirements_met: bool = checker.check_all_requirements()
 
-    zip_extractor = LZMAZipExtractor()
-    ws = WebSocketManager()
+    zip_extractor: LZMAZipExtractor = LZMAZipExtractor()
+    ws: WebSocketManager = WebSocketManager()
     
     try:
         ws.start()
 
         with tempfile.TemporaryDirectory() as temp_dir:
 
-            web_path = zip_extractor.extract_zip(
+            web_path: str = zip_extractor.extract_zip(
                 get_executable_path() / "gui" / "installer-gui.zip", temp_dir, create_subdir=True
             )
 
             app = PyQtWebApp(
-                web_path, window_title="SNES-IDE Installer"
+                str(Path(web_path) / "installer-gui"), window_title="SNES-IDE Installer"
             )
 
             app.start()
@@ -1491,15 +1522,24 @@ def main():
                 if ws.get_connection_count() > 0:
                     break
             
-            install(ws, zip_extractor, get_executable_path())
+            return_install: "Tuple[Literal[False], str] | Literal[True]"
+            return_install = install(ws, zip_extractor, get_executable_path())
+            
+            if return_install != True:
+                ws.stop_with_error(return_install[1])
 
     except Exception as e:
 
         print(f"Error while executing installer: {e}")
     
     finally:
-        app.close()
-        ws.stop()
+
+        if app is None:
+            ws.stop()
+
+        else:
+            app.close()
+            ws.stop()
 
 if __name__ == "__main__":
     main()

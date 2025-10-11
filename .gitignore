@@ -51,3 +51,43 @@ vs_build_tools/*
 # Construct 2 backup files
 *.autosave
 *.backup*
+
+# Environment files
+.env
+.venv/
+
+# Python cache files
+*.pyc
+*.pyo
+*.pyd
+__pycache__/
+
+# Installation files
+.installed
+
+# Distribution files
+dist/
+build/
+*.egg-info/
+*.whl
+
+# Test files
+.coverage
+nosetests.xml
+*.cover
+*.tox/
+
+# Julia build files
+.julia/
+
+# VsCode files
+.vscode/
+
+# JSON configuration files
+*.json
+
+# META-INF files
+META-INF/
+
+# Configuration files
+*.cfg

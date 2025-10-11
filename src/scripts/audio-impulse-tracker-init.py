@@ -1,10 +1,11 @@
 from subprocess import run, CalledProcessError
+from typing_extensions import Literal
 from pathlib import Path
 import platform
 import sys
 import os
 
-def get_executable_path():
+def get_executable_path() -> str:
     """Get the path of the executable or script based on whether the script is frozen 
     (PyInstaller) or not."""
 
@@ -27,10 +28,10 @@ def get_home_path() -> str:
     command: list[str] = ["get-snes-ide-home.exe" if os.name == "nt" else "get-snes-ide-home"]
     cwd: str = get_executable_path()
 
-    return run(command, cwd=cwd, capture_output=True, text=True, check=True)
+    return run(command, cwd=cwd, capture_output=True, text=True, check=True).stdout
 
 
-def convert() -> int:
+def convert() -> Literal[-1, 0]:
     """Convert Impulse Tracker files to HiROM SNES' soundbank using smconv."""
 
     schism: "Path|str"
