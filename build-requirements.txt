@@ -1,1 +1,6 @@
 pyinstaller
+pyside6
+psutil
+asyncio
+platform
+websockets

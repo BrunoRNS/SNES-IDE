@@ -1191,13 +1191,18 @@ class ApplicationInstaller:
             self.app_dir / "bin" / "jdk8" / "jdk8.zip"
         )
 
-        self.zip_extractor.extract_zip(
+        out_path: str = self.zip_extractor.extract_zip(
             zip_path=jdk_path,
             extract_to=jdk_path.parent,
             create_subdir=False
         )
 
         os.unlink(jdk_path)
+        
+        if self.system_info['os'].lower() == 'linux':
+            
+            self._run_command(["chmod", "-R", "+x", out_path])
+        
         return True
     
     def run_install_scripts(self) -> bool:
