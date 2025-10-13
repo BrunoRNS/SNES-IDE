@@ -450,7 +450,7 @@ class NoteManager(QMainWindow):
         for note_data in selected_notes:
 
             source_file: Path = (
-                Path(self.get_home_path()) / "libs" / "SampleGenerator" / "wave-samples" /
+                Path(self.get_home_path()) / "libs" / "SampleLibrary" / "wave-samples" /
                 f"{note_data['name']}_{note_data['type']}.wav"
             )
 

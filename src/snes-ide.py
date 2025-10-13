@@ -15,6 +15,8 @@ from PySide6.QtWebChannel import QWebChannel
 from PySide6.QtCore import QUrl, QObject, Slot, QDir
 from PySide6.QtGui import QIcon
 
+from typing_extensions import NoReturn
+
 
 class Backend(QObject):
     """
@@ -239,7 +241,7 @@ class Backend(QObject):
         
         return script_path
     
-    def _show_message(self, title, message):
+    def _show_message(self, title, message) -> None:
         """
         Shows a message dialog
         Args:
@@ -292,7 +294,7 @@ class MainWindow(QMainWindow):
         
         layout.addWidget(self.web_view)
     
-    def _get_fallback_html(self):
+    def _get_fallback_html(self) -> str:
         """Returns fallback HTML if index.html is not found"""
         return """
         <!DOCTYPE html>
@@ -323,17 +325,17 @@ class MainWindow(QMainWindow):
         """
 
 
-def main():
+def main() -> NoReturn:
     """
     Main application entry point
     """
     # Create application instance
-    app = QApplication(sys.argv)
+    app: QApplication = QApplication(sys.argv)
     app.setApplicationName("SNES-IDE")
     app.setApplicationVersion("5.0.0")
     
     # Create and show main window
-    window = MainWindow()
+    window: MainWindow = MainWindow()
     window.show()
     
     # Start event loop
