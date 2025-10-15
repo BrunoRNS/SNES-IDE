@@ -3,844 +3,222 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>SNES-IDE - Super Nintendo Development Environment</title>
+    <title>SNES IDE - Super Nintendo Development Environment</title>
+    <link rel="stylesheet" href="styles.css">
     <script src="qrc:///qtwebchannel/qwebchannel.js"></script>
-    <style>
-        /* Modern CSS with Purple SNES theme */
-        :root {
-            --primary: #8B5CF6;
-            --primary-dark: #7C3AED;
-            --primary-light: #A78BFA;
-            --success: #10B981;
-            --success-dark: #059669;
-            --warning: #F59E0B;
-            --warning-dark: #D97706;
-            --danger: #EF4444;
-            --dark-bg: #1F1F2F;
-            --dark-bg-light: #2D2D44;
-            --dark-bg-lighter: #3F3F5F;
-            --text-light: #F7F7F7;
-            --text-muted: #D1D5DB;
-            --accent-purple: #8B5CF6;
-            --accent-pink: #EC4899;
-        }
-        
-        * {
-            margin: 0;
-            padding: 0;
-            box-sizing: border-box;
-        }
-        
-        body {
-            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-            background: linear-gradient(135deg, var(--dark-bg), #151522);
-            color: var(--text-light);
-            min-height: 100vh;
-            line-height: 1.6;
-        }
-        
-        .container {
-            max-width: 1200px;
-            margin: 0 auto;
-            padding: 20px;
-        }
-        
-        /* Header Styles */
-        .header {
-            text-align: center;
-            padding: 50px 20px;
-            background: linear-gradient(135deg, var(--accent-purple), var(--accent-pink));
-            margin-bottom: 30px;
-            border-radius: 15px;
-            box-shadow: 0 15px 35px rgba(139, 92, 246, 0.3);
-            position: relative;
-            overflow: hidden;
-        }
-        
-        .header::before {
-            content: '';
-            position: absolute;
-            top: 0;
-            left: 0;
-            right: 0;
-            bottom: 0;
-            background: url('data:image/svg+xml,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100"><defs><pattern id="grid" width="10" height="10" patternUnits="userSpaceOnUse"><path d="M 10 0 L 0 0 0 10" fill="none" stroke="rgba(255,255,255,0.1)" stroke-width="1"/></pattern></defs><rect width="100" height="100" fill="url(%23grid)"/></svg>');
-            opacity: 0.3;
-        }
-        
-        .main-title {
-            font-size: 4rem;
-            font-weight: bold;
-            margin-bottom: 15px;
-            text-shadow: 3px 3px 6px rgba(0,0,0,0.5);
-            background: linear-gradient(45deg, #FFFFFF, #E0E7FF);
-            -webkit-background-clip: text;
-            -webkit-text-fill-color: transparent;
-            background-clip: text;
-            position: relative;
-        }
-        
-        .subtitle {
-            font-size: 1.4rem;
-            color: var(--text-light);
-            font-style: italic;
-            opacity: 0.9;
-            text-shadow: 1px 1px 2px rgba(0,0,0,0.3);
-        }
-        
-        /* Section Styles */
-        .section {
-            background: var(--dark-bg-light);
-            border-radius: 12px;
-            padding: 25px;
-            margin-bottom: 25px;
-            box-shadow: 0 8px 25px rgba(0,0,0,0.3);
-            border: 1px solid rgba(139, 92, 246, 0.2);
-            transition: transform 0.2s ease, box-shadow 0.2s ease;
-        }
-        
-        .section:hover {
-            transform: translateY(-2px);
-            box-shadow: 0 12px 30px rgba(139, 92, 246, 0.2);
-        }
-        
-        .section-title {
-            font-size: 1.8rem;
-            margin-bottom: 20px;
-            color: var(--text-light);
-            border-bottom: 2px solid var(--accent-purple);
-            padding-bottom: 10px;
-            position: relative;
-        }
-        
-        .section-title::after {
-            content: '';
-            position: absolute;
-            bottom: -2px;
-            left: 0;
-            width: 50px;
-            height: 2px;
-            background: var(--accent-pink);
-        }
-        
-        /* Button Styles */
-        .button-container {
-            display: flex;
-            gap: 20px;
-            flex-wrap: wrap;
-            justify-content: center;
-        }
-        
-        .btn {
-            padding: 14px 28px;
-            border: none;
-            border-radius: 10px;
-            font-weight: bold;
-            font-size: 1rem;
-            cursor: pointer;
-            transition: all 0.3s ease;
-            box-shadow: 0 6px 12px rgba(0,0,0,0.2);
-            position: relative;
-            overflow: hidden;
-        }
-        
-        .btn::before {
-            content: '';
-            position: absolute;
-            top: 0;
-            left: -100%;
-            width: 100%;
-            height: 100%;
-            background: linear-gradient(90deg, transparent, rgba(255,255,255,0.2), transparent);
-            transition: left 0.5s;
-        }
-        
-        .btn:hover::before {
-            left: 100%;
-        }
-        
-        .btn:hover {
-            transform: translateY(-3px);
-            box-shadow: 0 10px 20px rgba(0,0,0,0.3);
-        }
-        
-        .btn:active {
-            transform: translateY(-1px);
-        }
-        
-        .btn-project {
-            background: linear-gradient(135deg, var(--accent-purple), var(--accent-pink));
-            color: white;
-            min-width: 220px;
-        }
-        
-        .btn-build {
-            background: linear-gradient(135deg, var(--warning), var(--warning-dark));
-            color: white;
-            min-width: 220px;
-        }
-        
-        .btn-tool {
-            background: linear-gradient(135deg, var(--primary), var(--primary-dark));
-            color: white;
-            min-width: 200px;
-        }
-        
-        /* Collapsible Sections */
-        .collapsible {
-            margin-bottom: 15px;
-            border-radius: 8px;
-            overflow: hidden;
-        }
-        
-        .collapsible-header {
-            background: linear-gradient(135deg, var(--dark-bg-lighter), var(--dark-bg-light));
-            padding: 18px 20px;
-            border-radius: 8px;
-            cursor: pointer;
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            font-weight: bold;
-            transition: all 0.3s ease;
-            border-left: 4px solid var(--accent-purple);
-        }
-        
-        .collapsible-header:hover {
-            background: linear-gradient(135deg, var(--dark-bg-light), var(--dark-bg-lighter));
-            transform: translateX(5px);
-        }
-        
-        .collapsible-content {
-            padding: 0;
-            max-height: 0;
-            overflow: hidden;
-            transition: max-height 0.3s ease, padding 0.3s ease;
-            background: rgba(0,0,0,0.1);
-        }
-        
-        .collapsible.active .collapsible-content {
-            max-height: 2000px;
-            padding: 20px;
-        }
-        
-        .collapsible.active .collapsible-header {
-            border-radius: 8px 8px 0 0;
-        }
-        
-        .subsection {
-            margin: 15px 0;
-            padding: 20px;
-            background: rgba(0,0,0,0.15);
-            border-radius: 8px;
-            border-left: 3px solid var(--accent-purple);
-        }
-        
-        .subsection-title {
-            font-size: 1.3rem;
-            margin-bottom: 15px;
-            color: var(--text-light);
-            display: flex;
-            align-items: center;
-            gap: 10px;
-        }
-        
-        .subsection-title::before {
-            content: '▶';
-            font-size: 0.8rem;
-            color: var(--accent-purple);
-        }
-        
-        /* Options Grid */
-        .options-grid {
-            display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
-            gap: 20px;
-            margin: 20px 0;
-        }
-        
-        .option-group {
-            display: flex;
-            flex-direction: column;
-            gap: 8px;
-        }
-        
-        label {
-            font-weight: bold;
-            margin-bottom: 5px;
-            color: var(--text-muted);
-        }
-        
-        input, select {
-            padding: 10px;
-            border: 1px solid var(--accent-purple);
-            border-radius: 6px;
-            background: var(--dark-bg);
-            color: var(--text-light);
-            transition: all 0.3s ease;
-        }
-        
-        input:focus, select:focus {
-            outline: none;
-            border-color: var(--accent-pink);
-            box-shadow: 0 0 0 3px rgba(139, 92, 246, 0.1);
-        }
-        
-        .checkbox-group {
-            display: flex;
-            align-items: center;
-            gap: 10px;
-            padding: 8px 0;
-        }
-        
-        .checkbox-group input[type="checkbox"] {
-            width: 18px;
-            height: 18px;
-            accent-color: var(--accent-purple);
-        }
-        
-        /* Status and Loading */
-        .status {
-            padding: 12px 20px;
-            border-radius: 8px;
-            margin: 15px 0;
-            text-align: center;
-            display: none;
-            font-weight: bold;
-        }
-        
-        .status.success {
-            background: linear-gradient(135deg, var(--success), var(--success-dark));
-            display: block;
-        }
-        
-        .status.error {
-            background: linear-gradient(135deg, var(--danger), #DC2626);
-            display: block;
-        }
-        
-        /* Modal Styles */
-        .modal {
-            display: none;
-            position: fixed;
-            top: 0;
-            left: 0;
-            width: 100%;
-            height: 100%;
-            background: rgba(0,0,0,0.8);
-            z-index: 1000;
-            justify-content: center;
-            align-items: center;
-            backdrop-filter: blur(5px);
-        }
-        
-        .modal-content {
-            background: var(--dark-bg-light);
-            padding: 30px;
-            border-radius: 15px;
-            max-width: 900px;
-            width: 95%;
-            max-height: 90vh;
-            overflow-y: auto;
-            border: 1px solid var(--accent-purple);
-            box-shadow: 0 20px 60px rgba(0,0,0,0.5);
-        }
-        
-        .modal h2 {
-            margin-bottom: 20px;
-            color: var(--text-light);
-            border-bottom: 2px solid var(--accent-purple);
-            padding-bottom: 10px;
-        }
-        
-        /* Responsive Design */
-        @media (max-width: 768px) {
-            .button-container {
-                flex-direction: column;
-                align-items: center;
-            }
-            
-            .btn {
-                width: 100%;
-                max-width: 300px;
-            }
-            
-            .main-title {
-                font-size: 2.8rem;
-            }
-            
-            .options-grid {
-                grid-template-columns: 1fr;
-            }
-            
-            .modal-content {
-                padding: 20px;
-                margin: 10px;
-            }
-        }
-        
-        /* Scrollbar Styling */
-        ::-webkit-scrollbar {
-            width: 8px;
-        }
-        
-        ::-webkit-scrollbar-track {
-            background: var(--dark-bg);
-        }
-        
-        ::-webkit-scrollbar-thumb {
-            background: var(--accent-purple);
-            border-radius: 4px;
-        }
-        
-        ::-webkit-scrollbar-thumb:hover {
-            background: var(--accent-pink);
-        }
-    </style>
 </head>
 <body>
     <div class="container">
         <!-- Header Section -->
         <header class="header">
-            <h1 class="main-title">SNES-IDE</h1>
-            <p class="subtitle">Modern Super Nintendo Development Environment</p>
+            <h1 class="main-title">SNES IDE</h1>
+            <p class="subtitle">Super Nintendo Development Environment</p>
         </header>
-        
-        <!-- Create New Game Section -->
-        <section class="section">
-            <h2 class="section-title">Create a New Game</h2>
-            <div class="button-container">
-                <button class="btn btn-project" onclick="createProject('create-javasnes-proj', 'Select Directory for JavaSNES Project')">
-                    🎮 JDK 8 - javasnes project
-                </button>
-                <button class="btn btn-project" onclick="createProject('create-pvsneslib-proj', 'Select Directory for PVSNESlib Project')">
-                    🕹️ C90 - pvsneslib project
-                </button>
-                <button class="btn btn-project" onclick="createProject('create-dotnetsnes-proj', 'Select Directory for DotNetSNES Project')">
-                    👾 C# - dotnetsnes project
-                </button>
-            </div>
-        </section>
-        
-        <!-- Build Your Game Section -->
-        <section class="section">
-            <h2 class="section-title">Build Your Game</h2>
-            <div class="button-container">
-                <button class="btn btn-build" onclick="buildProject('compile-javasnes-proj', 'Select JavaSNES Project Directory')">
-                    🔨 Compile javasnes project
-                </button>
-                <button class="btn btn-build" onclick="buildProject('compile-pvsneslib-proj', 'Select PVSNESlib Project Directory')">
-                    🔧 Compile pvsneslib project
-                </button>
-                <button class="btn btn-build" onclick="buildProject('compile-dotnetsnes-proj', 'Select DotNetSNES Project Directory')">
-                    ⚙️ Compile dotnetsnes project
-                </button>
-            </div>
-        </section>
-        
-        <!-- Development Tools Section -->
-        <section class="section">
-            <h2 class="section-title">Development Tools</h2>
-            
-            <!-- Graphic Tools -->
-            <div class="collapsible active" id="graphic-tools">
-                <div class="collapsible-header" onclick="toggleCollapsible('graphic-tools')">
-                    🎨 Graphic Tools
-                    <span>▼</span>
+
+        <!-- Main Content Grid -->
+        <div class="category-grid">
+
+            <!-- Project Creation -->
+            <div class="category-card">
+                <div class="category-header">
+                    <div class="category-icon">🚀</div>
+                    <h2 class="category-title">Project Creation</h2>
                 </div>
-                <div class="collapsible-content">
-                    
-                    <!-- Image Compiler -->
-                    <div class="collapsible" id="image-compiler">
-                        <div class="collapsible-header" onclick="toggleCollapsible('image-compiler')">
-                            📐 Image Compiler
-                            <span>▼</span>
+                <div class="script-list">
+                    <button class="script-btn" onclick="runScript('create-dotnetsnes-proj.py')">
+                        <div>
+                            <div class="script-name">.NET Snes Project</div>
+                            <div class="script-desc">Create new .NET Snes project</div>
                         </div>
-                        <div class="collapsible-content">
-                            <div class="subsection">
-                                <h3 class="subsection-title">Image to SNES Converter</h3>
-                                <button class="btn btn-tool" onclick="openImageConverter()">
-                                    🖼️ Convert Image to SNES Format
-                                </button>
-                            </div>
-                            <div class="subsection">
-                                <h3 class="subsection-title">TMX to TMJ Converter</h3>
-                                <button class="btn btn-tool" onclick="convertTmxToTmj()">
-                                    🔄 Convert TMX to TMJ
-                                </button>
-                            </div>
+                        <span class="run-icon">▶️</span>
+                    </button>
+                    <button class="script-btn" onclick="runScript('create-javasnes-proj.py')">
+                        <div>
+                            <div class="script-name">Java Snes Project</div>
+                            <div class="script-desc">Create new Java Snes project</div>
                         </div>
-                    </div>
-                    
-                    <!-- Image Creator -->
-                    <div class="collapsible" id="image-creator">
-                        <div class="collapsible-header" onclick="toggleCollapsible('image-creator')">
-                            🎨 Image Creator
-                            <span>▼</span>
+                        <span class="run-icon">▶️</span>
+                    </button>
+                    <button class="script-btn" onclick="runScript('create-pvsneslib-proj.py')">
+                        <div>
+                            <div class="script-name">PVSnesLib Project</div>
+                            <div class="script-desc">Create new PVSnesLib project</div>
                         </div>
-                        <div class="collapsible-content">
-                            <button class="btn btn-tool" onclick="runTool('gfx-tmx-editor')">
-                                🗺️ Open TMX Editor (Tiled)
-                            </button>
-                            <button class="btn btn-tool" onclick="runTool('gfx-png-bmp-editor')">
-                                👾 Open Sprite Editor (LibreSprite)
-                            </button>
-                        </div>
-                    </div>
+                        <span class="run-icon">▶️</span>
+                    </button>
                 </div>
             </div>
-            
-            <!-- Audio Tools -->
-            <div class="collapsible active" id="audio-tools">
-                <div class="collapsible-header" onclick="toggleCollapsible('audio-tools')">
-                    🔊 Audio Tools
-                    <span>▼</span>
+
+            <!-- Compilation Tools -->
+            <div class="category-card">
+                <div class="category-header">
+                    <div class="category-icon">⚙️</div>
+                    <h2 class="category-title">Compilation</h2>
                 </div>
-                <div class="collapsible-content">
-                    
-                    <!-- BRR Samples -->
-                    <div class="collapsible" id="brr-samples">
-                        <div class="collapsible-header" onclick="toggleCollapsible('brr-samples')">
-                            🎵 BRR Samples
-                            <span>▼</span>
+                <div class="script-list">
+                    <button class="script-btn" onclick="runScript('compile-dotnetsnes-proj.py')">
+                        <div>
+                            <div class="script-name">.NET Snes Compile</div>
+                            <div class="script-desc">Compile .NET Snes projects</div>
                         </div>
-                        <div class="collapsible-content">
-                            <button class="btn btn-tool" onclick="convertAudio('audio-wav-brr-converter', 'Select WAV File for BRR Encoding', 'WAV Files (*.wav)')">
-                                🔊 BRR Encoder
-                            </button>
-                            <button class="btn btn-tool" onclick="convertAudio('audio-brr-wav-converter', 'Select BRR File for Decoding', 'BRR Files (*.brr)')">
-                                🎧 BRR Decoder
-                            </button>
+                        <span class="run-icon">▶️</span>
+                    </button>
+                    <button class="script-btn" onclick="runScript('compile-javasnes-proj.py')">
+                        <div>
+                            <div class="script-name">Java Snes Compile</div>
+                            <div class="script-desc">Compile Java Snes projects</div>
                         </div>
-                    </div>
-                    
-                    <!-- Impulse Tracker -->
-                    <div class="collapsible" id="impulse-tracker">
-                        <div class="collapsible-header" onclick="toggleCollapsible('impulse-tracker')">
-                            🎼 Impulse Tracker
-                            <span>▼</span>
+                        <span class="run-icon">▶️</span>
+                    </button>
+                    <button class="script-btn" onclick="runScript('compile-pvsneslib-proj.py')">
+                        <div>
+                            <div class="script-name">PVSnesLib Compile</div>
+                            <div class="script-desc">Compile PVSnesLib projects</div>
                         </div>
-                        <div class="collapsible-content">
-                            <button class="btn btn-tool" onclick="runTool('audio-impulse-tracker-init')">
-                                🎹 Init Schism Tracker
-                            </button>
-                        </div>
-                    </div>
-                    
-                    <!-- Wave Samples -->
-                    <div class="collapsible" id="wave-samples">
-                        <div class="collapsible-header" onclick="toggleCollapsible('wave-samples')">
-                            🌊 Wave Samples
-                            <span>▼</span>
-                        </div>
-                        <div class="collapsible-content">
-                            <button class="btn btn-tool" onclick="runTool('audio-sample-generator')">
-                                🎚️ Get WAV Samples from Sample Generator
-                            </button>
-                        </div>
-                    </div>
+                        <span class="run-icon">▶️</span>
+                    </button>
                 </div>
             </div>
-        </section>
-        
-        <!-- Status Messages -->
-        <div id="status" class="status"></div>
+
+            <!-- Graphics Tools -->
+            <div class="category-card">
+                <div class="category-header">
+                    <div class="category-icon">🎨</div>
+                    <h2 class="category-title">Graphics Tools</h2>
+                </div>
+                <div class="script-list">
+                    <button class="script-btn" onclick="runScript('gfx-png-bmp-editor.py')">
+                        <div>
+                            <div class="script-name">PNG/BMP Editor</div>
+                            <div class="script-desc">Edit PNG and BMP graphics files</div>
+                        </div>
+                        <span class="run-icon">▶️</span>
+                    </button>
+                    <button class="script-btn" onclick="runScript('gfx-png-bmp-snes-converter.py')">
+                        <div>
+                            <div class="script-name">SNES Graphics Converter</div>
+                            <div class="script-desc">Convert PNG/BMP to SNES format</div>
+                        </div>
+                        <span class="run-icon">▶️</span>
+                    </button>
+                    <button class="script-btn" onclick="runScript('gfx-tmx-editor.py')">
+                        <div>
+                            <div class="script-name">TMX Editor</div>
+                            <div class="script-desc">Edit Tiled Map Editor files</div>
+                        </div>
+                        <span class="run-icon">▶️</span>
+                    </button>
+                    <button class="script-btn" onclick="runScript('gfx-tmx-tmj-converter.py')">
+                        <div>
+                            <div class="script-name">TMX/TMJ Converter</div>
+                            <div class="script-desc">Convert between TMX and TMJ formats</div>
+                        </div>
+                        <span class="run-icon">▶️</span>
+                    </button>
+                </div>
+            </div>
+
+            <!-- Audio Tools Category -->
+            <div class="category-card">
+                <div class="category-header">
+                    <div class="category-icon">🎵</div>
+                    <h2 class="category-title">Audio Tools</h2>
+                </div>
+                <div class="script-list">
+                    <button class="script-btn" onclick="runScript('audio-brr-wav-converter.py')">
+                        <div>
+                            <div class="script-name">BRR ↔ WAV Converter</div>
+                            <div class="script-desc">Convert between BRR and WAV audio formats</div>
+                        </div>
+                        <span class="run-icon">▶️</span>
+                    </button>
+                    <button class="script-btn" onclick="runScript('audio-impulse-tracker-init.py')">
+                        <div>
+                            <div class="script-name">Impulse Tracker Init</div>
+                            <div class="script-desc">Initialize Impulse Tracker modules</div>
+                        </div>
+                        <span class="run-icon">▶️</span>
+                    </button>
+                    <button class="script-btn" onclick="runScript('audio-sample-generator.py')">
+                        <div>
+                            <div class="script-name">Sample Generator</div>
+                            <div class="script-desc">Generate audio samples for SNES</div>
+                        </div>
+                        <span class="run-icon">▶️</span>
+                    </button>
+                    <button class="script-btn" onclick="runScript('audio-wav-brr-converter.py')">
+                        <div>
+                            <div class="script-name">WAV to BRR Converter</div>
+                            <div class="script-desc">Convert WAV files to BRR format</div>
+                        </div>
+                        <span class="run-icon">▶️</span>
+                    </button>
+                </div>
+            </div>
+
+            <!-- Utilities -->
+            <div class="category-card">
+                <div class="category-header">
+                    <div class="category-icon">🔧</div>
+                    <h2 class="category-title">Utilities</h2>
+                </div>
+                <div class="script-list">
+                    <button class="script-btn" onclick="runScript('open-emulator.py')">
+                        <div>
+                            <div class="script-name">Open Emulator</div>
+                            <div class="script-desc">Launch SNES emulator</div>
+                        </div>
+                        <span class="run-icon">▶️</span>
+                    </button>
+                </div>
+            </div>
+
+        </div>
     </div>
-    
-    <!-- Image Converter Modal -->
-    <div id="image-converter-modal" class="modal">
-        <div class="modal-content">
-            <h2>🎨 Image to SNES Converter Options</h2>
-            
-            <div class="options-grid" id="converter-options">
-                <!-- Options will be populated by JavaScript -->
-            </div>
-            
-            <div style="display: flex; gap: 15px; justify-content: flex-end; margin-top: 25px; padding-top: 20px; border-top: 1px solid var(--accent-purple);">
-                <button class="btn btn-tool" onclick="closeImageConverter()">❌ Cancel</button>
-                <button class="btn btn-project" onclick="executeImageConversion()">🚀 Convert</button>
-            </div>
+
+    <!-- Status Bar -->
+    <div class="status-bar">
+        <div class="status-message" id="statusMessage">Ready to develop SNES games!</div>
+        <div class="status-indicator">
+            <div class="indicator idle" id="statusIndicator"></div>
+            <span>SNES IDE</span>
         </div>
     </div>
 
     <script>
-        // Backend connection
-        let backend = null;
-        
-        // Initialize QWebChannel
+        // Initialize Qt WebChannel
+        var scriptRunner = null;
         new QWebChannel(qt.webChannelTransport, function(channel) {
-            backend = channel.objects.backend;
-            console.log('Backend connected successfully');
+            scriptRunner = channel.objects.scriptRunner;
+            
+            // Connect to the scriptExecuted signal
+            scriptRunner.scriptExecuted.connect(function(scriptName, result) {
+                updateStatus(`Completed: ${scriptName} - ${result}`);
+                setIndicator('idle');
+            });
         });
-        
-        // Utility Functions
-        function showStatus(message, type) {
-            const status = document.getElementById('status');
-            status.textContent = message;
-            status.className = `status ${type}`;
-            setTimeout(() => {
-                status.style.display = 'none';
-            }, 5000);
-        }
-        
-        function toggleCollapsible(id) {
-            const element = document.getElementById(id);
-            const wasActive = element.classList.contains('active');
-            
-            // Update arrow
-            const header = element.querySelector('.collapsible-header');
-            const arrow = header.querySelector('span');
-            
-            if (wasActive) {
-                element.classList.remove('active');
-                arrow.textContent = '▼';
+
+        // Function to run scripts
+        function runScript(scriptName) {
+            if (scriptRunner) {
+                updateStatus(`Running: ${scriptName}...`);
+                setIndicator('running');
+                scriptRunner.runScript(scriptName);
             } else {
-                element.classList.add('active');
-                arrow.textContent = '▲';
-            }
-            
-            // Stop event propagation to prevent parent sections from closing
-            event.stopPropagation();
-        }
-        
-        // Project Creation
-        async function createProject(scriptName, dialogTitle) {
-            if (!backend) {
-                showStatus('Backend not connected', 'error');
-                return;
-            }
-            
-            try {
-                const directory = await backend.select_directory(dialogTitle);
-                if (directory) {
-                    const success = await backend.run_script_with_directory(scriptName, directory);
-                    if (success) {
-                        showStatus('🎉 Project created successfully!', 'success');
-                    }
-                }
-            } catch (error) {
-                showStatus('❌ Error creating project: ' + error, 'error');
+                updateStatus('Error: Script runner not available');
             }
         }
-        
-        // Project Building
-        async function buildProject(scriptName, dialogTitle) {
-            if (!backend) {
-                showStatus('Backend not connected', 'error');
-                return;
-            }
-            
-            try {
-                const directory = await backend.select_directory(dialogTitle);
-                if (directory) {
-                    const success = await backend.run_script_with_directory(scriptName, directory);
-                    if (success) {
-                        showStatus('🔨 Project built successfully!', 'success');
-                    }
-                }
-            } catch (error) {
-                showStatus('❌ Error building project: ' + error, 'error');
-            }
+
+        // Update status message
+        function updateStatus(message) {
+            document.getElementById('statusMessage').textContent = message;
         }
-        
-        // Audio Conversion
-        async function convertAudio(scriptName, dialogTitle, fileTypes) {
-            if (!backend) {
-                showStatus('Backend not connected', 'error');
-                return;
-            }
-            
-            try {
-                const filePath = await backend.select_file(dialogTitle, fileTypes);
-                if (filePath) {
-                    const success = await backend.run_script_with_file(scriptName, filePath);
-                    if (success) {
-                        showStatus('🎵 Audio conversion completed!', 'success');
-                    }
-                }
-            } catch (error) {
-                showStatus('❌ Error converting audio: ' + error, 'error');
-            }
+
+        // Set status indicator
+        function setIndicator(state) {
+            const indicator = document.getElementById('statusIndicator');
+            indicator.className = 'indicator ' + state;
         }
-        
-        // Tool Execution
-        async function runTool(scriptName) {
-            if (!backend) {
-                showStatus('Backend not connected', 'error');
-                return;
-            }
-            
-            try {
-                const success = await backend.run_script(scriptName);
-                if (success) {
-                    showStatus('🛠️ Tool executed successfully!', 'success');
-                }
-            } catch (error) {
-                showStatus('❌ Error running tool: ' + error, 'error');
-            }
-        }
-        
-        // TMX to TMJ Conversion
-        async function convertTmxToTmj() {
-            if (!backend) {
-                showStatus('Backend not connected', 'error');
-                return;
-            }
-            
-            try {
-                const filePath = await backend.select_file('Select TMX File', 'TMX Files (*.tmx)');
-                if (filePath) {
-                    const success = await backend.run_script_with_file('gfx-tmx-tmj-converter', filePath);
-                    if (success) {
-                        showStatus('🔄 TMX to TMJ conversion completed!', 'success');
-                    }
-                }
-            } catch (error) {
-                showStatus('❌ Error converting TMX: ' + error, 'error');
-            }
-        }
-        
-        // Image Converter Functions
-        let selectedImagePath = '';
-        let conversionOptions = {};
-        
-        const imageConverterOptions = [
-            { id: 'blank-tile', type: 'checkbox', label: 'Add blank tile management', option: '-b' },
-            { id: 'block-size', type: 'select', label: 'Block size in pixels', option: '-s', 
-              values: [8, 16, 32, 64], default: 8 },
-            { id: 'packed-pixel', type: 'checkbox', label: 'Output in packed pixel format', option: '-k' },
-            { id: 'blank-tile-mgmt', type: 'checkbox', label: 'Add blank tile management (multiple BGs)', option: '-z' },
-            { id: 'block-width', type: 'number', label: 'Block width in pixels', option: '-W', min: 1, max: 1024 },
-            { id: 'block-height', type: 'number', label: 'Block height in pixels', option: '-H', min: 1, max: 1024 },
-            { id: 'tile-offset', type: 'number', label: 'Tile number offset (0-2047)', option: '-f', min: 0, max: 2047 },
-            { id: 'include-map', type: 'checkbox', label: 'Include map for output', option: '-m' },
-            { id: 'high-priority', type: 'checkbox', label: 'Include high priority bit in map', option: '-g' },
-            { id: 'paged-map', type: 'checkbox', label: 'Generate map in pages of 32x32', option: '-y' },
-            { id: 'no-tile-reduction', type: 'checkbox', label: 'No tile reduction (not advised)', option: '-R' },
-            { id: 'mode', type: 'select', label: 'Mode format', option: '-M', 
-              values: [1, 5, 6, 7], default: 1 },
-            { id: 'rearrange-palette', type: 'checkbox', label: 'Rearrange palette and preserve numbers', option: '-a' },
-            { id: 'palette-rounding', type: 'checkbox', label: 'Palette rounding (max 63)', option: '-d' },
-            { id: 'palette-entry', type: 'number', label: 'Palette entry to add to map (0-7)', option: '-e', min: 0, max: 7 },
-            { id: 'colors-output', type: 'number', label: 'Number of colors to output (0-256)', option: '-o', min: 0, max: 256 },
-            { id: 'include-palette', type: 'checkbox', label: 'Include palette for output', option: '-p' },
-            { id: 'colors-used', type: 'select', label: 'Number of colors to use', option: '-u', 
-              values: [4, 16, 128, 256], default: 256 }
-        ];
-        
-        function openImageConverter() {
-            if (!backend) {
-                showStatus('Backend not connected', 'error');
-                return;
-            }
-            
-            // First select the image file
-            backend.select_file('Select Image File (PNG/BMP)', 'Image Files (*.png *.bmp)').then(filePath => {
-                if (filePath) {
-                    selectedImagePath = filePath;
-                    
-                    // Populate options
-                    const optionsContainer = document.getElementById('converter-options');
-                    optionsContainer.innerHTML = '';
-                    
-                    imageConverterOptions.forEach(opt => {
-                        const optionGroup = document.createElement('div');
-                        optionGroup.className = 'option-group';
-                        
-                        if (opt.type === 'checkbox') {
-                            optionGroup.innerHTML = `
-                                <div class="checkbox-group">
-                                    <input type="checkbox" id="${opt.id}" data-option="${opt.option}">
-                                    <label for="${opt.id}">${opt.label}</label>
-                                </div>
-                            `;
-                        } else if (opt.type === 'select') {
-                            optionGroup.innerHTML = `
-                                <label for="${opt.id}">${opt.label}</label>
-                                <select id="${opt.id}" data-option="${opt.option}">
-                                    ${opt.values.map(val => 
-                                        `<option value="${val}" ${val === opt.default ? 'selected' : ''}>${val}</option>`
-                                    ).join('')}
-                                </select>
-                            `;
-                        } else if (opt.type === 'number') {
-                            optionGroup.innerHTML = `
-                                <label for="${opt.id}">${opt.label}</label>
-                                <input type="number" id="${opt.id}" data-option="${opt.option}" 
-                                       min="${opt.min}" max="${opt.max}" placeholder="${opt.min}-${opt.max}">
-                            `;
-                        }
-                        
-                        optionsContainer.appendChild(optionGroup);
-                    });
-                    
-                    // Show modal
-                    document.getElementById('image-converter-modal').style.display = 'flex';
-                }
-            });
-        }
-        
-        function closeImageConverter() {
-            document.getElementById('image-converter-modal').style.display = 'none';
-            selectedImagePath = '';
-            conversionOptions = {};
-        }
-        
-        function executeImageConversion() {
-            if (!selectedImagePath || !backend) {
-                showStatus('No image selected or backend not connected', 'error');
-                return;
-            }
-            
-            // Collect options
-            conversionOptions = {};
-            
-            imageConverterOptions.forEach(opt => {
-                const element = document.getElementById(opt.id);
-                if (element) {
-                    if (opt.type === 'checkbox') {
-                        if (element.checked) {
-                            conversionOptions[opt.option] = true;
-                        }
-                    } else if (opt.type === 'select') {
-                        const value = parseInt(element.value);
-                        if (value !== opt.default) {
-                            conversionOptions[opt.option] = value;
-                        }
-                    } else if (opt.type === 'number') {
-                        const value = element.value;
-                        if (value && !isNaN(value)) {
-                            conversionOptions[opt.option] = parseInt(value);
-                        }
-                    }
-                }
-            });
-            
-            // Execute conversion
-            backend.run_script_with_options('gfx-png-bmp-snes-converter', selectedImagePath, JSON.stringify(conversionOptions))
-                .then(success => {
-                    if (success) {
-                        showStatus('🎨 Image conversion completed!', 'success');
-                        closeImageConverter();
-                    }
-                })
-                .catch(error => {
-                    showStatus('❌ Error converting image: ' + error, 'error');
-                });
-        }
-        
-        // Close modal when clicking outside
-        document.getElementById('image-converter-modal').addEventListener('click', function(e) {
-            if (e.target === this) {
-                closeImageConverter();
-            }
-        });
-        
-        // Initialize main sections as open
-        document.addEventListener('DOMContentLoaded', function() {
-            // Main sections are already open by default (they have 'active' class)
-            console.log('SNES-IDE initialized');
-        });
     </script>
 </body>
 </html>

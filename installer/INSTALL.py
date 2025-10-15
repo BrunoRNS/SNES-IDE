@@ -1221,7 +1221,23 @@ class ApplicationInstaller:
             
             if not self._run_command([str(schism_installer_path)], shell=True)[0]:
                 return False
+            
+            if not self._run_command(["chmod", "-R", "+x", str(schism_installer_path.parent)], shell=True)[0]:
+                return False
 
+            sprite_editor: Path = self.app_dir / "bin" / "sprite-editor"
+            if not self._run_command(["chmod", "-R", "+x", str(sprite_editor)], shell=True)[0]:
+                return False
+
+            tmx_editor: Path = self.app_dir / "bin" / "tmx-editor"
+            if not self._run_command(["chmod", "-R", "+x", str(tmx_editor)], shell=True)[0]:
+                return False
+
+        elif os.name == "nt":
+
+            if not self._run_command(["choco", "install", "tiled", "--version=1.9.2", "-y"], shell=True)[0]:
+                return False
+               
         return True
 
     def create_shortcut(self) -> bool:

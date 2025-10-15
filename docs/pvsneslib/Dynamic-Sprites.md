@@ -1,1 +1,0 @@
-You can look inside the example file (**examples/graphics/Sprites/Dynamic...** folders)  to have an idea of how you can program with dynamic sprites.  
