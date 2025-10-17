@@ -31,9 +31,9 @@ def get_file_path(
     root: Optional[Tk] = None
     
     try:
-        # Create and configure the Tkinter root window
+
         root = Tk()
-        root.withdraw()  # Hide the main window
+        root.withdraw()
 
         try:
             root.attributes('-topmost', True)  # type: ignore
@@ -42,35 +42,31 @@ def get_file_path(
         selected_path: Union[str, List[str], Tuple[str, ...], None] = None
         
         if directory:
-            # Directory selection mode
             selected_path = filedialog.askdirectory(title=title)
+
         elif multiple:
-            # Multiple file selection mode
             selected_path = filedialog.askopenfilenames(
                 title=title, 
                 filetypes=file_types
             )
-            # Convert tuple to list for consistency
+
             if selected_path:
                 selected_path = list(selected_path)
+
         else:
-            # Single file selection mode
             selected_path = filedialog.askopenfilename(
                 title=title, 
                 filetypes=file_types
             )
         
-        # Safely destroy the Tkinter window
         if root:
             root.destroy()
             root = None
         
-        # Validate selection
         if not selected_path or (isinstance(selected_path, list) and len(selected_path) == 0):
             print("No file/directory selected. Application terminated.")
             sys.exit(1)
         
-        # Validate path exists (for single file/directory)
         if isinstance(selected_path, str) and not os.path.exists(selected_path):
             print(f"Selected path does not exist: {selected_path}")
             sys.exit(1)
@@ -78,12 +74,10 @@ def get_file_path(
         return selected_path
         
     except Exception as e:
-        # Ensure window is destroyed even if error occurs
         if root:
             try:
                 root.destroy()
-            except:
-                pass  # Ignore destruction errors during exception handling
+            except: ...
         
         print(f"Error in file dialog: {e}")
         sys.exit(1)
@@ -108,10 +102,10 @@ def get_executable_path() -> str:
 def get_home_path() -> str:
     """Get snes-ide home directory, can raise subprocess.CalledProcessError"""
 
-    command: list[str] = ["get-snes-ide-home.exe" if os.name == "nt" else "get-snes-ide-home"]
+    command: list[str] = ["get-snes-ide-home.exe" if os.name == "nt" else "./get-snes-ide-home"]
     cwd: str = get_executable_path()
 
-    return run(command, cwd=cwd, capture_output=True, text=True, check=True).stdout
+    return run(command, cwd=cwd, capture_output=True, text=True, check=True).stdout.strip()
 
 def convert() -> Literal[-1, 0]:
     """Convert BRR files to WAV using snesbrr converter."""

@@ -1,5 +1,8 @@
 from typing import Union, List, NoReturn, Optional, Tuple
+from subprocess import CompletedProcess
 from tkinter import Tk, filedialog
+from pathlib import Path
+import subprocess
 import sys
 import os
 
@@ -84,3 +87,62 @@ def get_file_path(
         
         print(f"Error in file dialog: {e}")
         sys.exit(1)
+
+
+def get_executable_path() -> str:
+    """Get the path of the executable or script based on whether the script is frozen 
+    (PyInstaller) or not."""
+
+    if getattr(sys, 'frozen', False):
+        # PyInstaller executable
+        print("executable path mode chosen")
+
+        return str(Path(sys.executable).parent)
+        
+    else:
+        # Normal script
+        print("Python script path mode chosen")
+
+        return str(Path(__file__).absolute().parent)
+
+
+def main() -> NoReturn:
+    """Main logic of the compilation of the pvsneslib project"""
+
+    output: CompletedProcess[str] = subprocess.run(
+        [".\\get-snes-ide-home.exe" if os.name == "nt" else "./get-snes-ide-home"],
+        cwd=get_executable_path(), shell=True, capture_output=True, text=True
+    )
+
+    if output.returncode != 0:
+        print(
+            f"get-snes-ide-home failed to execute duel to {output.stderr}, exiting..."
+        )
+        exit(-1)
+
+    pvsneslib_home: Path = Path(output.stdout.strip()) / "bin" / "pvsneslib"
+
+    os.environ["PVSNESLIB_HOME"] = str(pvsneslib_home)
+
+    pvsneslib_proj: Path = Path(str(get_file_path(
+        "Select PvSnesLib project directory", file_types=[("Directories", "*")],
+        multiple=False, directory=True
+    )))
+
+    if not (pvsneslib_proj / "Makefile").exists():
+        print("No Makefile to build project found, exiting...")
+        exit(-1)
+
+    make_output: CompletedProcess[bytes] = subprocess.run(
+        ["make"], cwd=pvsneslib_proj, shell=True, capture_output=True,
+        env=os.environ
+    )
+
+    if make_output.returncode != 0:
+        print(f"Error while compiling the software {make_output.stderr}, exiting...")
+        exit(-1)
+
+    exit(0)
+
+if __name__ == "__main__":
+    main()

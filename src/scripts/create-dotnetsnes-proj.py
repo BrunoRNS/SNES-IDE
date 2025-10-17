@@ -84,3 +84,4 @@ def get_file_path(
         
         print(f"Error in file dialog: {e}")
         sys.exit(1)
+

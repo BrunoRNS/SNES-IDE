@@ -108,10 +108,10 @@ def get_executable_path() -> str:
 def get_home_path() -> str:
     """Get snes-ide home directory, can raise subprocess.CalledProcessError"""
 
-    command: list[str] = ["get-snes-ide-home.exe" if os.name == "nt" else "get-snes-ide-home"]
+    command: list[str] = ["get-snes-ide-home.exe" if os.name == "nt" else "./get-snes-ide-home"]
     cwd: str = get_executable_path()
 
-    return run(command, cwd=cwd, capture_output=True, text=True, check=True).stdout
+    return run(command, cwd=cwd, capture_output=True, text=True, check=True).stdout.strip()
 
 def convert() -> Literal[-1, 0]:
     """Convert WAV files to BRR using snesbrr converter."""
@@ -131,7 +131,10 @@ def convert() -> Literal[-1, 0]:
             return -1
 
         input_file: Path = Path(str(
-            get_file_path("Select a WAV file", [("WAV files", "*.wav")], False, False)
+            get_file_path(
+                "Select a WAV file", [("WAV files", "*.wav")], 
+                multiple=False, directory=False
+            )
         ))
 
         if not input_file or not input_file.exists() or not str(input_file).endswith(".wav"):

@@ -88,10 +88,10 @@ class NoteManager(QMainWindow):
     def get_home_path(self) -> str:
         """Get snes-ide home directory, can raise subprocess.CalledProcessError"""
 
-        command: list[str] = ["get-snes-ide-home.exe" if os.name == "nt" else "get-snes-ide-home"]
+        command: list[str] = ["get-snes-ide-home.exe" if os.name == "nt" else "./get-snes-ide-home"]
         cwd: str = self.get_executable_path()
 
-        return subprocess.run(command, cwd=cwd, capture_output=True, text=True, check=True).stdout
+        return subprocess.run(command, cwd=cwd, capture_output=True, text=True, check=True).stdout.strip()
     
     def _generate_notes(self) -> List[MusicalNote]:
         """

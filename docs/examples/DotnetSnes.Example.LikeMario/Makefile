@@ -3,7 +3,7 @@
 SNES_NAME ?= LikeMario
 SNES_DLL ?= $(ARTIFACTS_ROOT)/DotnetSnes.Example.LikeMario.dll
 
-export REPO_DEFAULT_RULES ?= $(abspath ../Makefile.defaults)
+export REPO_DEFAULT_RULES ?= $(MAKEFILE_DEFAULTS)
 
 include $(REPO_DEFAULT_RULES)
 include $(DNSNES_BASE_MAKEFILE)
