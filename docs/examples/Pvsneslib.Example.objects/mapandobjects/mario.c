@@ -7,7 +7,7 @@
 
 
 ---------------------------------------------------------------------------------*/
-#include "snes.h"
+#include <snes.h>
 
 #define MARIO_MAXACCEL 0x0140
 #define MARIO_ACCEL 0x0038

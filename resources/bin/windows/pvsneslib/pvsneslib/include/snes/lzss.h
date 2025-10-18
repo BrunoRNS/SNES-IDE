@@ -31,7 +31,7 @@
 #ifndef SNES_LZSS_INCLUDE
 #define SNES_LZSS_INCLUDE
 
-#include "snes/snestypes.h"
+#include <snes/snestypes.h>
 
 /*! \brief Decompress Lzss data to VRAM
     \param source the source to decompress from

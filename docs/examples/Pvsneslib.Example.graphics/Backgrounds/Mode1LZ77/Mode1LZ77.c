@@ -8,7 +8,7 @@
 
 
 ---------------------------------------------------------------------------------*/
-#include "snes.h"
+#include <snes.h"
 
 extern char patterns, patterns_end;
 extern char palette, palette_end;

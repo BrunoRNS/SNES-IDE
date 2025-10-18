@@ -31,7 +31,7 @@
 #ifndef SNES_SCORE_INCLUDE
 #define SNES_SCORE_INCLUDE
 
-#include "snes/snestypes.h"
+#include <snes/snestypes.h>
 
 typedef struct
 {

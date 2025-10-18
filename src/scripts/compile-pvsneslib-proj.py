@@ -1,10 +1,42 @@
+"""
+SNES-IDE - compile-pvsneslib-proj.py
+Copyright (C) 2025 BrunoRNS
+
+This program is free software: you can redistribute it and/or modify
+it under the terms of the GNU General Public License as published by
+the Free Software Foundation, either version 3 of the License, or
+(at your option) any later version.
+
+This program is distributed in the hope that it will be useful,
+but WITHOUT ANY WARRANTY; without even the implied warranty of
+MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+GNU General Public License for more details.
+
+You should have received a copy of the GNU General Public License
+along with this program.  If not, see <http://www.gnu.org/licenses/>.
+"""
+
 from typing import Union, List, NoReturn, Optional, Tuple
 from subprocess import CompletedProcess
 from tkinter import Tk, filedialog
 from pathlib import Path
 import subprocess
+import platform
+import shutil
 import sys
 import os
+
+def check_if_path(program: str) -> bool:
+    """
+    Check if a program is available in the system PATH.
+    
+    Args:
+        program (str): The name of the program to check (e.g., 'make', 'tiled')
+        
+    Returns:
+        bool: True if the program is found in PATH, False otherwise
+    """
+    return shutil.which(program) is not None
 
 def get_file_path(
     title: str = "Select file",
@@ -31,9 +63,8 @@ def get_file_path(
     root: Optional[Tk] = None
     
     try:
-        # Create and configure the Tkinter root window
         root = Tk()
-        root.withdraw()  # Hide the main window
+        root.withdraw()
 
         try:
             root.attributes('-topmost', True)  # type: ignore
@@ -42,35 +73,30 @@ def get_file_path(
         selected_path: Union[str, List[str], Tuple[str, ...], None] = None
         
         if directory:
-            # Directory selection mode
             selected_path = filedialog.askdirectory(title=title)
+
         elif multiple:
-            # Multiple file selection mode
             selected_path = filedialog.askopenfilenames(
                 title=title, 
                 filetypes=file_types
             )
-            # Convert tuple to list for consistency
             if selected_path:
                 selected_path = list(selected_path)
+
         else:
-            # Single file selection mode
             selected_path = filedialog.askopenfilename(
                 title=title, 
                 filetypes=file_types
             )
         
-        # Safely destroy the Tkinter window
         if root:
             root.destroy()
             root = None
         
-        # Validate selection
         if not selected_path or (isinstance(selected_path, list) and len(selected_path) == 0):
             print("No file/directory selected. Application terminated.")
             sys.exit(1)
         
-        # Validate path exists (for single file/directory)
         if isinstance(selected_path, str) and not os.path.exists(selected_path):
             print(f"Selected path does not exist: {selected_path}")
             sys.exit(1)
@@ -78,12 +104,11 @@ def get_file_path(
         return selected_path
         
     except Exception as e:
-        # Ensure window is destroyed even if error occurs
         if root:
             try:
                 root.destroy()
             except:
-                pass  # Ignore destruction errors during exception handling
+                pass
         
         print(f"Error in file dialog: {e}")
         sys.exit(1)
@@ -94,16 +119,12 @@ def get_executable_path() -> str:
     (PyInstaller) or not."""
 
     if getattr(sys, 'frozen', False):
-        # PyInstaller executable
         print("executable path mode chosen")
-
         return str(Path(sys.executable).parent)
         
     else:
-        # Normal script
         print("Python script path mode chosen")
-
-        return str(Path(__file__).absolute().parent)
+        return str(Path(__file__).resolve().parent)
 
 
 def main() -> NoReturn:
@@ -133,10 +154,26 @@ def main() -> NoReturn:
         print("No Makefile to build project found, exiting...")
         exit(-1)
 
-    make_output: CompletedProcess[bytes] = subprocess.run(
-        ["make"], cwd=pvsneslib_proj, shell=True, capture_output=True,
-        env=os.environ
-    )
+    if not check_if_path("make") and not platform.system().lower() == "darwin":
+        print("Make not found in PATH, exiting...")
+        exit(-1)
+    elif not check_if_path("gmake") and platform.system().lower() == "darwin":
+        print("Gmake not found in PATH, exiting...")
+        exit(-1)
+
+    make_output: CompletedProcess[bytes]
+
+    if platform.system().lower() == "darwin":
+        make_output = subprocess.run(
+            ["gmake"], cwd=pvsneslib_proj, shell=True, capture_output=True,
+            env=os.environ
+        )
+        
+    else:
+        make_output = subprocess.run(
+            ["make"], cwd=pvsneslib_proj, shell=True, capture_output=True,
+            env=os.environ
+        )
 
     if make_output.returncode != 0:
         print(f"Error while compiling the software {make_output.stderr}, exiting...")

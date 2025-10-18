@@ -6,7 +6,7 @@
 
 
 ---------------------------------------------------------------------------------*/
-#include "snes.h"
+#include <snes.h>
 #include <stdarg.h>
 #include <stdio.h>
 

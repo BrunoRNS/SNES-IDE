@@ -5,7 +5,7 @@
 
 
 ---------------------------------------------------------------------------------*/
-#include "snes.h"
+#include <snes.h>
 
 extern char snesfont, snespal;
 extern char sprite8, sprite8_end, palsprite8, palsprite8_end;

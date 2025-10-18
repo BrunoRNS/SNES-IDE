@@ -9,9 +9,9 @@
 #include <snes.h>
 
 // Includes to have object prototypes
-#include "mario.h"
-#include "goomba.h"
-#include "koopatroopa.h"
+#include <mario.h>
+#include <goomba.h>
+#include <koopatroopa.h>
 
 // Graphics available outside the file
 extern char tileset, tilesetend, tilesetpal,tilesetdef, tilesetatt; // for map & tileset of map

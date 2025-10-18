@@ -32,15 +32,15 @@
 #ifndef CONSOLE_H
 #define CONSOLE_H
 
-#include "snes/snestypes.h"
+#include <snes/snestypes.h>
 
-#include "snes/background.h"
-#include "snes/dma.h"
-#include "snes/input.h"
-#include "snes/interrupt.h"
-#include "snes/sprite.h"
-#include "snes/sound.h"
-#include "snes/video.h"
+#include <snes/background.h>
+#include <snes/dma.h>
+#include <snes/input.h>
+#include <snes/interrupt.h>
+#include <snes/sprite.h>
+#include <snes/sound.h>
+#include <snes/video.h>
 
 extern u8 scr_txt_font_map[0x800]; /*!< \brief tilemap used for text display */
 extern u8 scr_txt_dirty;           /*!< \brief flag to redraw text during vblank */

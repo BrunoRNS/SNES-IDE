@@ -5,8 +5,8 @@
 
 
 ---------------------------------------------------------------------------------*/
-#include "snes.h"
-#include "logo.h"
+#include <snes.h>
+#include <logo.h>
 
 int main(void) {
     // Initialize sound engine (take some time)

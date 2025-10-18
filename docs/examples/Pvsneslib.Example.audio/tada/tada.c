@@ -6,7 +6,7 @@
 
 
 ---------------------------------------------------------------------------------*/
-#include "snes.h"
+#include <snes.h>
 
 extern char soundbrr, soundbrrend;
 brrsamples tadasound;

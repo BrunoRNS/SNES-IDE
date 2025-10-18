@@ -56,7 +56,7 @@
     }
 
 ---------------------------------------------------------------------------------*/
-#include "snes.h"
+#include <snes.h>
 
 extern char patterns, patterns_end, patterns2, patterns2_end;
 extern char palette, palette2, palette_end, palette2_end;

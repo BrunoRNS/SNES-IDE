@@ -173,18 +173,18 @@
 #ifndef SNES_INCLUDE
 #define SNES_INCLUDE
 
-#include "snes/libversion.h"
+#include <snes/libversion.h>
 
-#include "snes/background.h"
-#include "snes/console.h"
-#include "snes/dma.h"
-#include "snes/input.h"
-#include "snes/interrupt.h"
-#include "snes/map.h"
-#include "snes/object.h"
-#include "snes/scores.h"
-#include "snes/sound.h"
-#include "snes/sprite.h"
-#include "snes/video.h"
+#include <snes/background.h>
+#include <snes/console.h>
+#include <snes/dma.h>
+#include <snes/input.h>
+#include <snes/interrupt.h>
+#include <snes/map.h>
+#include <snes/object.h>
+#include <snes/scores.h>
+#include <snes/sound.h>
+#include <snes/sprite.h>
+#include <snes/video.h>
 
 #endif // SNES_INCLUDE

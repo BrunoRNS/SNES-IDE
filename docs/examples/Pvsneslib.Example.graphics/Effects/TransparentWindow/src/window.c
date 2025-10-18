@@ -6,8 +6,8 @@
 
 
 ---------------------------------------------------------------------------------*/
-#include "snes.h"
-#include "window.h"
+#include <snes.h>
+#include <window.h>
 
 // ROM
 

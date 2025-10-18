@@ -33,11 +33,11 @@
 #ifndef SNES_BACKGROUND_INCLUDE
 #define SNES_BACKGROUND_INCLUDE
 
-#include "snes/snestypes.h"
+#include <snes/snestypes.h>
 
-#include "snes/dma.h"
-#include "snes/interrupt.h"
-#include "snes/video.h"
+#include <snes/dma.h>
+#include <snes/interrupt.h>
+#include <snes/video.h>
 
 /** \brief The shift to apply to map base when storing it in a tile map location register */
 #define SC_BASE_SHIFT 2

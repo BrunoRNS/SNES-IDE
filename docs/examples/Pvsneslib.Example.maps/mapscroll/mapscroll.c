@@ -6,7 +6,7 @@
 
 
 ---------------------------------------------------------------------------------*/
-#include "snes.h"
+#include <snes.h>
 
 extern char tileset, tilesetend, tilesetpal; // for map & tileset of map
 extern char gfxsprite, gfxsprite_end, palsprite;

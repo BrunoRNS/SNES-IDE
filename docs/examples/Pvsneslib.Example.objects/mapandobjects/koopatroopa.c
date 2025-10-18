@@ -7,7 +7,7 @@
 
 
 ---------------------------------------------------------------------------------*/
-#include "snes.h"
+#include <snes.h>
 
 #define KOOPATROOPA_LEFT 1
 #define KOOPATROOPA_RIGHT 2

@@ -9,7 +9,7 @@
  Backgrounds inspired in SoR2
 
 ---------------------------------------------------------------------------------*/
-#include "snes.h"
+#include <snes.h"
 
 extern char BG1_tiles, BG1_tiles_end;
 extern char BG1_pal, BG1_pal_end;

@@ -9,7 +9,7 @@
 
 
 ---------------------------------------------------------------------------------*/
-#include "snes.h"
+#include <snes.h"
 
 extern char tilfont, palfont;
 

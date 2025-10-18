@@ -9,9 +9,9 @@
 
 ---------------------------------------------------------------------------------*/
 
-#include "snes.h"
-#include "superscope.h"
-#include "sin_cos.h"
+#include <snes.h>
+#include <superscope.h>
+#include <sin_cos.h>
 
 extern char tilfont, palfont;
 

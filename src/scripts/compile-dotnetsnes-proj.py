@@ -1,10 +1,42 @@
+"""
+SNES-IDE - compile-dotnetsnes-proj.py
+Copyright (C) 2025 BrunoRNS
+
+This program is free software: you can redistribute it and/or modify
+it under the terms of the GNU General Public License as published by
+the Free Software Foundation, either version 3 of the License, or
+(at your option) any later version.
+
+This program is distributed in the hope that it will be useful,
+but WITHOUT ANY WARRANTY; without even the implied warranty of
+MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+GNU General Public License for more details.
+
+You should have received a copy of the GNU General Public License
+along with this program.  If not, see <http://www.gnu.org/licenses/>.
+"""
+
 from typing import Union, List, NoReturn, Optional, Tuple
 from subprocess import CompletedProcess
 from tkinter import Tk, filedialog
 from pathlib import Path
 import subprocess
+import platform
+import shutil
 import sys
 import os
+
+def check_if_path(program: str) -> bool:
+    """
+    Check if a program is available in the system PATH.
+    
+    Args:
+        program (str): The name of the program to check (e.g., 'make', 'tiled')
+        
+    Returns:
+        bool: True if the program is found in PATH, False otherwise
+    """
+    return shutil.which(program) is not None
 
 def get_file_path(
     title: str = "Select file",
@@ -84,16 +116,14 @@ def get_executable_path() -> str:
     (PyInstaller) or not."""
 
     if getattr(sys, 'frozen', False):
-        # PyInstaller executable
-        print("executable path mode chosen")
 
+        print("executable path mode chosen")
         return str(Path(sys.executable).parent)
         
     else:
-        # Normal script
+        
         print("Python script path mode chosen")
-
-        return str(Path(__file__).absolute().parent)
+        return str(Path(__file__).resolve().parent)
 
 def main() -> NoReturn:
     """Main logic of the compilation of the dotnetsnes project"""
@@ -128,10 +158,26 @@ def main() -> NoReturn:
         print("No Makefile to build project found, exiting...")
         exit(-1)
 
-    make_output: CompletedProcess[bytes] = subprocess.run(
-        ["make"], cwd=dotsnes_proj_path, shell=True, capture_output=True,
-        env=os.environ
-    )
+    if not check_if_path("make") and not platform.system().lower() == "darwin":
+        print("Make not found in PATH, exiting...")
+        exit(-1)
+    elif not check_if_path("gmake") and platform.system().lower() == "darwin":
+        print("Gmake not found in PATH, exiting...")
+        exit(-1)
+
+    make_output: CompletedProcess[bytes]
+
+    if platform.system().lower() == "darwin":
+        make_output = subprocess.run(
+            ["gmake"], cwd=dotsnes_proj_path, shell=True, capture_output=True,
+            env=os.environ
+        )
+        
+    else:
+        make_output = subprocess.run(
+            ["make"], cwd=dotsnes_proj_path, shell=True, capture_output=True,
+            env=os.environ
+        )
 
     if make_output.returncode != 0:
         print(f"Error while compiling the software {make_output.stderr}, exiting...")

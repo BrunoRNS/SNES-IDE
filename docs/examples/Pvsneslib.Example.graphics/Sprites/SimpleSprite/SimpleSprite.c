@@ -6,7 +6,7 @@
 
 
 ---------------------------------------------------------------------------------*/
-#include "snes.h"
+#include <snes.h>
 
 extern char gfxpsrite, gfxpsrite_end;
 extern char palsprite, palsprite_end;

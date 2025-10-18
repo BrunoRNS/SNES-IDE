@@ -7,7 +7,7 @@
  Sprite from Stephen "Redshrike" Challener), http://opengameart.org
 
 ---------------------------------------------------------------------------------*/
-#include "snes.h"
+#include <snes.h>
 
 extern char gfxpsrite, gfxpsrite_end;
 extern char palsprite, palsprite_end;

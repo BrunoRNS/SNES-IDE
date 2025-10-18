@@ -1,9 +1,9 @@
 /*---------------------------------------------------------------------------------
     Simple music (>32k) demo
 ---------------------------------------------------------------------------------*/
-#include "snes.h"
+#include <snes.h>
 
-#include "res/soundbank.h"
+#include <res/soundbank.h>
 
 extern char snesfont, snespal;
 

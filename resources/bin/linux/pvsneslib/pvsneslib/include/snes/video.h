@@ -31,7 +31,7 @@
 #ifndef SNES_VIDEO_INCLUDE
 #define SNES_VIDEO_INCLUDE
 
-#include "snes/snestypes.h"
+#include <snes/snestypes.h>
 
 /*!	\brief Bit defines for the video control registers */
 typedef enum

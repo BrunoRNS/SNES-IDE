@@ -41,8 +41,8 @@
 #ifndef SNES_SOUND_INCLUDE
 #define SNES_SOUND_INCLUDE
 
-#include "snes/snestypes.h"
-#include "snes/interrupt.h"
+#include <snes/snestypes.h>
+#include <snes/interrupt.h>
 
 /*!	\struct brrsamples
     \brief brr sample sound header(8 bytes)

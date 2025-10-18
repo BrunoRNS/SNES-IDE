@@ -6,7 +6,7 @@
 
 
 ---------------------------------------------------------------------------------*/
-#include "snes.h"
+#include <snes.h"
 
 extern char patpvsneslib, patpvsneslib_end;
 extern char patshader, patshader_end;

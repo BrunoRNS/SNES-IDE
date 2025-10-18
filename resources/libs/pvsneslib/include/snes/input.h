@@ -37,8 +37,8 @@
 #ifndef SNES_INPUT_INCLUDE
 #define SNES_INPUT_INCLUDE
 
-#include "snes/snestypes.h"
-#include "snes/interrupt.h"
+#include <snes/snestypes.h>
+#include <snes/interrupt.h>
 
 /*!
     \brief common values for pad input.

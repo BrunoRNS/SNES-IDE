@@ -36,7 +36,7 @@
 #ifndef SNES_OBJECTS_INCLUDE
 #define SNES_OBJECTS_INCLUDE
 
-#include "snes/snestypes.h"
+#include <snes/snestypes.h>
 
 #define OB_MAX              80 /*!< total number of objects in the game */
 

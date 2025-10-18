@@ -1,3 +1,21 @@
+"""
+SNES-IDE - INSTALL.py
+Copyright (C) 2025 BrunoRNS
+
+This program is free software: you can redistribute it and/or modify
+it under the terms of the GNU General Public License as published by
+the Free Software Foundation, either version 3 of the License, or
+(at your option) any later version.
+
+This program is distributed in the hope that it will be useful,
+but WITHOUT ANY WARRANTY; without even the implied warranty of
+MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+GNU General Public License for more details.
+
+You should have received a copy of the GNU General Public License
+along with this program.  If not, see <http://www.gnu.org/licenses/>.
+"""
+
 from PySide6.QtWidgets import QApplication, QMainWindow, QVBoxLayout, QWidget, QMessageBox
 from PySide6.QtCore import Qt, QUrl, QThread, QCoreApplication
 from PySide6.QtWebEngineWidgets import QWebEngineView
@@ -296,7 +314,7 @@ class WebSocketManager:
             self.server = await serve(self._handler, "localhost", self.port)
             print(f"WebSocket server: ws://localhost:{self.port}")
 
-            await asyncio.Future()  # Run forever
+            await asyncio.Future()
 
         except exceptions.ConnectionClosed:
             pass
@@ -444,20 +462,20 @@ class PyQtWebApp:
         self.file_server = StaticFileServer(self.web_folder, self.http_port)
         self.file_server.start()
         
-        time.sleep(1)  # Wait for server to start
+        time.sleep(1)
         
-        # Start PySide6 application
         self.app = QApplication(sys.argv)
         self.window = QMainWindow()
+        try:
+            self.window.setStyle('Fusion') # type: ignore
+        except: ...
         self.window.setWindowTitle(self.window_title)
         self.window.resize(*self.window_size)
         
-        # Setup central widget
         central_widget: QWidget = QWidget()
         layout: QVBoxLayout = QVBoxLayout(central_widget)
         layout.setContentsMargins(0, 0, 0, 0)
         
-        # Create web view
         self.web_view = QWebEngineView()
         url: QUrl = QUrl(f"http://localhost:{self.http_port}")
         self.web_view.load(url)
@@ -520,10 +538,10 @@ class SystemRequirementsChecker:
         if system.lower() == "windows":
             return os.path.splitdrive(os.environ.get('PROGRAMFILES', 'C:'))[0] + '\\'
 
-        elif system.lower() == "darwin":  # macOS
+        elif system.lower() == "darwin":
             return "/Applications/"
 
-        else:  # Linux/Unix
+        else:
             return "/usr/"
     
     def check_disk_space(self, required_gb: int = 5) -> Tuple[bool, str]:
@@ -541,8 +559,7 @@ class SystemRequirementsChecker:
 
             drive: str = self._get_system_drive()
             disk_usage: Any = psutil.disk_usage(drive)
-            free_gb: float = disk_usage.free / (1024 ** 3)  # Convert to GB
-            # required_bytes = required_gb * (1024 ** 3)
+            free_gb: float = disk_usage.free / (1024 ** 3)
             
             success: bool = free_gb >= required_gb
             message: str = f"Disk space: {free_gb:.1f}GB free of {required_gb}GB required on {drive}"
@@ -570,7 +587,6 @@ class SystemRequirementsChecker:
         release: str = self.system_info['os_release']
         
         if system.lower() == "windows":
-            # Check Windows version (10+)
             try:
 
                 major_version: int = int(release.split('.')[0])
@@ -585,11 +601,9 @@ class SystemRequirementsChecker:
 
                 return False, f"Windows version check failed"
                 
-        elif system == "Darwin":  # macOS
-            # Check macOS version (BigSur+ = 11.0+)
+        elif system == "Darwin":
 
             try:
-
                 version_str: str = platform.mac_ver()[0]
                 major_version = int(version_str.split('.')[0]) if version_str else 0
 
@@ -603,12 +617,10 @@ class SystemRequirementsChecker:
                 return False, "macOS version check failed"
                 
         elif system == "Linux":
-            # Check Linux distribution and architecture
             distro_info: "Dict[str, str] | None" = self._get_linux_distro()
             distro_name: str = distro_info['name'].lower() if distro_info else "unknown"
             distro_like: str = distro_info['id_like'].lower() if distro_info else "unknown"
             
-            # Check if it's Ubuntu based
             is_ubuntu_based: bool = any(name in distro_name + distro_like for name in ['ubuntu', 'mint', 'elementary'])
             
             if (is_ubuntu_based) and arch.lower() in ['x86_64', 'amd64']:
@@ -627,7 +639,6 @@ class SystemRequirementsChecker:
     def _get_linux_distro() -> Optional[Dict[str, str]]:
         """Get Linux distribution information"""
         try:
-            # Try to read /etc/os-release
             with open('/etc/os-release', 'r') as f:
                 lines: List[str] = f.readlines()
             
@@ -700,14 +711,12 @@ class SystemRequirementsChecker:
         """Check and install Chocolatey on Windows"""
 
         try:
-            # Check if Chocolatey is installed
             result: CompletedProcess[str] = subprocess.run(['choco', '--version'], 
                                   capture_output=True, text=True, shell=True)
 
             if result.returncode == 0:
                 return True, "Chocolatey is installed"
             
-            # Install Chocolatey
             print("Installing Chocolatey...")
             install_script: str = (
                 "Set-ExecutionPolicy Bypass -Scope Process -Force; "
@@ -735,7 +744,6 @@ class SystemRequirementsChecker:
         """Check and install Homebrew on macOS"""
 
         try:
-            # Check if Homebrew is installed
             result: CompletedProcess[str] = subprocess.run(['brew', '--version'], 
                                   capture_output=True, text=True)
 
@@ -745,7 +753,6 @@ class SystemRequirementsChecker:
             print("Installing x-code...")
             xcode: CompletedProcess[str] = subprocess.run(["xcode-select", "--install"], shell=True, capture_output=True, text=True)
 
-            # Install Homebrew
             print("Installing Homebrew...")
             install_script: str = (
                 '/bin/bash -c "$(curl -fsSL https://raw.githubusercontent.com/'
@@ -768,7 +775,6 @@ class SystemRequirementsChecker:
     def _check_linux_package_manager() -> Tuple[bool, str]:
         """Check for apt on Linux"""
         try:
-            # Check for apt (Ubuntu)
             if shutil.which('apt'):
                 result: CompletedProcess[str] = subprocess.run(['apt', '--version'], 
                                       capture_output=True, text=True)
@@ -792,7 +798,6 @@ class SystemRequirementsChecker:
         print(f"Platform: {self.system_info['platform']}")
         print()
         
-        # Perform all checks
         checks: List[Tuple[str, Tuple[bool, str]]] = [
             ("Disk Space", self.check_disk_space(required_gb=10)),
             ("Operating System", self.check_operating_system()),
@@ -800,7 +805,6 @@ class SystemRequirementsChecker:
             ("Package Manager", self.check_package_manager())
         ]
         
-        # Store results
         all_passed: bool = True
 
         for check_name, (passed, message) in checks:
@@ -874,19 +878,15 @@ class SystemRequirementsChecker:
             
         try:
             
-            # Get or create QApplication instance
             app: "QCoreApplication | None" = QApplication.instance() # type: ignore
             if not app:
                 raise Exception("Failed to recognize application")
             
-            # Create error message
             error_text: str = "System requirements check failed:\n\n"
             error_text += "\n".join(self.error_messages)
             
-            # Add resolution guidance
             error_text += "\n\nPlease resolve these issues and restart the application."
             
-            # Create and show message box
             msg_box: QMessageBox = QMessageBox()
             msg_box.setWindowTitle("System Requirements Not Met")
             msg_box.setIcon(QMessageBox.Icon.Critical)
@@ -894,7 +894,6 @@ class SystemRequirementsChecker:
             msg_box.setDetailedText(error_text)
             msg_box.setStandardButtons(QMessageBox.StandardButton.Ok)
             
-            # Set window properties
             msg_box.setWindowFlags(msg_box.windowFlags() | Qt.WindowType.WindowStaysOnTopHint)
             msg_box.resize(600, 400)
             
@@ -959,7 +958,7 @@ class ApplicationInstaller:
         elif system == "Darwin":
             return Path("/Applications") / f"{self.app_name}.app"
 
-        else:  # Linux
+        else:
             return Path("/opt") / self.app_name
     
     def _get_temp_directory(self) -> Path:
@@ -971,7 +970,7 @@ class ApplicationInstaller:
     def _get_desktop_directory(self) -> Path:
         """Get desktop directory for shortcuts"""
 
-        return Path.home().absolute() / 'Desktop'
+        return Path.home().resolve() / 'Desktop'
         
     def _run_command(self, command: List[str], shell: bool = False) -> Tuple[bool, str]:
         """
@@ -1046,7 +1045,6 @@ class ApplicationInstaller:
         output: str
         
         if system == "Windows":
-            # Install make using Chocolatey
             success, output = self._run_command(['choco', 'install', 'make', '-y'])
 
             if success:
@@ -1065,14 +1063,12 @@ class ApplicationInstaller:
             return success
             
         elif system == "Darwin":
-            # Install gmake using Homebrew
             success, output = self._run_command(['brew', 'install', 'make', 'cmake', 'gcc'])
             if success:
                 print("gmake installed via Homebrew")
             return success
             
-        else:  # Linux
-            # Install make using package manager
+        else:
             if shutil.which('apt'):
                 success, output = self._run_command(['sudo', 'apt', 'update'])
                 success, output = self._run_command(['sudo', 'apt', 'install', '-y', 'make', 'cmake', 'g++'])
@@ -1101,7 +1097,6 @@ class ApplicationInstaller:
         commands: List[List[str]]
 
         if system == "Windows":
-            # Install using Chocolatey
             success, output = self._run_command(['choco', 'install', 'dotnet-8.0-sdk', '-y'])
 
             if success:
@@ -1110,7 +1105,6 @@ class ApplicationInstaller:
             return success
             
         elif system == "Darwin":
-            # Install using Homebrew
             success, output = self._run_command(['brew', 'install', '--cask', 'dotnet-sdk'])
 
             if success:
@@ -1118,10 +1112,8 @@ class ApplicationInstaller:
 
             return success
             
-        else:  # Linux
-            # Install using package manager or Microsoft's script
+        else:
             if shutil.which('apt'):
-                # Ubuntu
                 commands = [
                     ['wget', 'https://packages.microsoft.com/config/ubuntu/22.04/packages-microsoft-prod.deb', '-O', '/tmp/packages-microsoft-prod.deb'],
                     ['sudo', 'dpkg', '-i', '/tmp/packages-microsoft-prod.deb'],
@@ -1260,10 +1252,8 @@ class ApplicationInstaller:
             return False
         
         if system.lower() == "windows":
-            # Create .lnk shortcut on Windows
             shortcut_path: Path = self.desktop_dir / f"{self.app_name}.lnk"
             
-            # Using PowerShell to create shortcut
             ps_script: str = f"""
             $WshShell = New-Object -comObject WScript.Shell
             $Shortcut = $WshShell.CreateShortcut("{shortcut_path}")
@@ -1280,8 +1270,6 @@ class ApplicationInstaller:
             return success
             
         elif system.lower() == "darwin":
-            # Create .app bundle or symlink
-            # For simplicity, creating a symlink in Applications
             apps_dir: Path = Path("/Applications")
             app_link: Path = apps_dir / f"{self.app_name}.app"
             
@@ -1290,8 +1278,6 @@ class ApplicationInstaller:
                 if app_link.exists():
                     app_link.unlink()
                 
-                # Create actual .app bundle structure would be more complex
-                # For now, creating a simple symlink
                 app_link.symlink_to(self.app_dir)
                 print(f"macOS application link created: {app_link}")
 
@@ -1302,8 +1288,7 @@ class ApplicationInstaller:
                 print(f"Failed to create macOS shortcut: {str(e)}")
                 return False
                 
-        else:  # Linux
-            # Create .desktop file
+        else:
             desktop_file: Path = self.desktop_dir / f"{self.app_name}.desktop"
             desktop_content: str = f"""[Desktop Entry]
 Version={self.app_version}
@@ -1321,10 +1306,8 @@ Categories=Utility;
                 with open(desktop_file, 'w') as f:
                     f.write(desktop_content)
                 
-                # Make executable
                 desktop_file.chmod(desktop_file.stat().st_mode | stat.S_IEXEC)
                 
-                # Also create symlink in /usr/local/bin for command line access
                 bin_link: Path = Path("/usr/local/bin") / self.app_name.lower()
 
                 if bin_link.exists():
@@ -1339,6 +1322,19 @@ Categories=Utility;
                 print(f"Failed to create Linux shortcut: {str(e)}")
                 return False
     
+    @staticmethod
+    def check_if_path(program: str) -> bool:
+        """
+        Check if a program is available in the system PATH.
+    
+        Args:
+            program (str): The name of the program to check (e.g., 'make', 'tiled')
+        
+        Returns:
+            bool: True if the program is found in PATH, False otherwise
+        """
+        return shutil.which(program) is not None
+
     def verify_installation(self) -> bool:
         """
         Verify that installation was successful
@@ -1352,24 +1348,33 @@ Categories=Utility;
         success: bool
         output: str
         
-        # Check if app directory exists and has content
         checks.append(("App directory", self.app_dir.exists() and any(self.app_dir.iterdir())))
         
-        # Check if main executable exists
         system: str = self.system_info['os']
         main_executable: Path = self.app_dir / f"{self.app_name.lower()}.exe" if system == "Windows" else self.app_dir / "bin" / self.app_name.lower()
         checks.append(("Main executable", main_executable.exists()))
         
-        # Check if .NET is available
         success, output = self._run_command(['dotnet', '--version'])
         checks.append((".NET SDK", success and '8.' in output))
         
-        # Check if make is available
         make_cmd: "Literal['gmake']|Literal['make']" = 'gmake' if system == "Darwin" else 'make'
         success, output = self._run_command([make_cmd, '--version'])
         checks.append(("Make tool", success))
+
+        tiled_cmd: Literal['tiled'] = 'tiled'
+        if os.name == "nt":
+            success, output = self._run_command([tiled_cmd, '--version'])
+        else:
+            success = True
+        checks.append(("Tiled tool", success))
+
+        schism_cmd: Literal['schismtracker'] = 'schismtracker'
+        if system.lower() == "linux":
+            success = self.check_if_path(schism_cmd)
+        else:
+            success = True
+        checks.append(("Schimstracker tool", success))
         
-        # Check if Java is available (if JDK was installed)
         jdk_dir: Path = self.app_dir / "bin" / "jdk8"
 
         if jdk_dir.exists():
@@ -1381,7 +1386,6 @@ Categories=Utility;
             success, output = self._run_command([str(java_exec), '-version'])
             checks.append(("Java Runtime", success))
         
-        # Print results
         all_passed: bool = True
         for check_name, passed in checks:
             status: Literal['PASS', 'FAIL'] = "PASS" if passed else "FAIL"
@@ -1421,10 +1425,10 @@ Categories=Utility;
 def check_if_admin() -> bool:
     """Check if the script is being executed by an admin user."""
 
-    if os.name == "posix": # If UNIX, root user should be UID 0 
+    if os.name == "posix":
         return os.getuid() == 0
     
-    else: # Windows, using ctypes.windll.shell32.IsUserAnAdmin, should work in windows XP or later
+    else:
 
         try:
             return ctypes.windll.shell32.IsUserAnAdmin()
@@ -1439,16 +1443,12 @@ def get_executable_path() -> Path:
     (PyInstaller) or not."""
 
     if getattr(sys, 'frozen', False):
-        # PyInstaller executable
         print("executable path mode chosen")
-
-        return Path(sys.executable).absolute().parent
+        return Path(sys.executable).resolve().parent
         
     else:
-        # Normal script
         print("Python script path mode chosen")
-
-        return Path(__file__).absolute().parent
+        return Path(__file__).resolve().parent
 
 
 def install(
@@ -1506,6 +1506,12 @@ def main() -> None:
     if not check_if_admin():
         exit(-1)
 
+    if os.name == 'posix':
+        subprocess.run(
+            ["chmod", "-R", "+x", "./SNES-IDE"],
+            shell=True, check=True, cwd=get_executable_path()
+        )
+
     checker: SystemRequirementsChecker = SystemRequirementsChecker()
     print("System Requirements Checker")
     print("=" * 30)
@@ -1542,6 +1548,8 @@ def main() -> None:
 
                 if ws.get_connection_count() > 0:
                     break
+                else:
+                    time.sleep(0.5)
             
             return_install: "Tuple[Literal[False], str] | Literal[True]"
             return_install = install(ws, zip_extractor, get_executable_path())

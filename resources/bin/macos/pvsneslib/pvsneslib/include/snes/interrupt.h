@@ -64,7 +64,7 @@
 #ifndef SNES_INTERRUPT_INCLUDE
 #define SNES_INTERRUPT_INCLUDE
 
-#include "snes/snestypes.h"
+#include <snes/snestypes.h>
 
 /**
  * \brief VBlank ISR flag.

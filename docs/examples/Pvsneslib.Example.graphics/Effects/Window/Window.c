@@ -6,7 +6,7 @@
 
 
 ---------------------------------------------------------------------------------*/
-#include "snes.h"
+#include <snes.h>
 #include <string.h>
 
 extern char patternsbg1, patternsbg1_end;

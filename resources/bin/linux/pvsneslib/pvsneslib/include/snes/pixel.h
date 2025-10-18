@@ -34,7 +34,7 @@
 #ifndef SNES_PIXEL_INCLUDE
 #define SNES_PIXEL_INCLUDE
 
-#include "snes/snestypes.h"
+#include <snes/snestypes.h>
 
 /*!	\fn pixSetPixel(u8 x,u8 y, u8 color)
     \brief Draw a dot

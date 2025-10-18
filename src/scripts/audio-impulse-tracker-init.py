@@ -1,25 +1,54 @@
+"""
+SNES-IDE - audio-impulse-tracker-init.py
+Copyright (C) 2025 BrunoRNS
+
+This program is free software: you can redistribute it and/or modify
+it under the terms of the GNU General Public License as published by
+the Free Software Foundation, either version 3 of the License, or
+(at your option) any later version.
+
+This program is distributed in the hope that it will be useful,
+but WITHOUT ANY WARRANTY; without even the implied warranty of
+MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+GNU General Public License for more details.
+
+You should have received a copy of the GNU General Public License
+along with this program.  If not, see <http://www.gnu.org/licenses/>.
+"""
+
 from subprocess import run, CalledProcessError
 from typing_extensions import Literal
 from pathlib import Path
 import platform
+import shutil
 import sys
 import os
+
+def check_if_path(program: str) -> bool:
+    """
+    Check if a program is available in the system PATH.
+    
+    Args:
+        program (str): The name of the program to check (e.g., 'make', 'tiled')
+        
+    Returns:
+        bool: True if the program is found in PATH, False otherwise
+    """
+    return shutil.which(program) is not None
 
 def get_executable_path() -> str:
     """Get the path of the executable or script based on whether the script is frozen 
     (PyInstaller) or not."""
 
     if getattr(sys, 'frozen', False):
-        # PyInstaller executable
-        print("executable path mode chosen")
 
+        print("executable path mode chosen")
         return str(Path(sys.executable).parent)
         
     else:
-        # Normal script
-        print("Python script path mode chosen")
 
-        return str(Path(__file__).absolute().parent)
+        print("Python script path mode chosen")
+        return str(Path(__file__).resolve().parent)
 
 
 def get_home_path() -> str:
@@ -32,20 +61,25 @@ def get_home_path() -> str:
 
 
 def convert() -> Literal[-1, 0]:
-    """Convert Impulse Tracker files to HiROM SNES' soundbank using smconv."""
+    """Init schismtracker."""
 
     schism: "Path|str"
     
-    if os.name == "nt":
+    if platform.system().lower() == "windows":
         schism = Path(get_home_path()) / "bin" / "schismtracker" / "schismtracker.exe"
     
     elif platform.system().lower() == "darwin":
         schism = Path(get_home_path()) / "bin" / "schismtracker" / "Schism Tracker.app"
 
-    elif platform.system().lower() == "linux": # then should be in path
+    else:
         schism = "schismtracker"
 
-    if not schism or not schism.exists():
+    if isinstance(schism, str):
+        if not check_if_path(schism):
+            print(f"Failed, schism tracker does not exist in system's PATH")
+            return -1
+
+    elif not schism or not schism.exists():
 
         print(f"Failed, schism tracker does not exist in: {schism}")
         return -1

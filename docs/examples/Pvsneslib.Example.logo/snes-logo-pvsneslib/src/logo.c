@@ -5,8 +5,8 @@
 
 
 ---------------------------------------------------------------------------------*/
-#include "snes.h"
-#include "soundbank.h"
+#include <snes.h>
+#include <soundbank.h>
 
 // ROM
 

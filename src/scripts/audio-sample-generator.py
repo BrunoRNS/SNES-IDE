@@ -1,3 +1,21 @@
+"""
+SNES-IDE - audio-sample-generator.py
+Copyright (C) 2025 BrunoRNS
+
+This program is free software: you can redistribute it and/or modify
+it under the terms of the GNU General Public License as published by
+the Free Software Foundation, either version 3 of the License, or
+(at your option) any later version.
+
+This program is distributed in the hope that it will be useful,
+but WITHOUT ANY WARRANTY; without even the implied warranty of
+MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+GNU General Public License for more details.
+
+You should have received a copy of the GNU General Public License
+along with this program.  If not, see <http://www.gnu.org/licenses/>.
+"""
+
 from PySide6.QtWidgets import (
     QApplication, QMainWindow, QVBoxLayout, QHBoxLayout, 
     QWidget, QListWidget, QCheckBox, QComboBox, QLineEdit,
@@ -74,16 +92,14 @@ class NoteManager(QMainWindow):
         (PyInstaller) or not."""
 
         if getattr(sys, 'frozen', False):
-            # PyInstaller executable
-            print("executable path mode chosen")
 
+            print("executable path mode chosen")
             return str(Path(sys.executable).parent)
         
         else:
-            # Normal script
-            print("Python script path mode chosen")
 
-            return str(Path(__file__).absolute().parent)
+            print("Python script path mode chosen")
+            return str(Path(__file__).resolve().parent)
 
     def get_home_path(self) -> str:
         """Get snes-ide home directory, can raise subprocess.CalledProcessError"""
@@ -104,15 +120,12 @@ class NoteManager(QMainWindow):
         note_names: list[str] = ['C', 'C#', 'D', 'D#', 'E', 'F', 'F#', 'G', 'G#', 'A', 'A#', 'B']
         wave_types: list[str] = ['sine', 'square', 'triangle']
         
-        # MIDI note numbers: A1 = 33, G#7 = 104
-        midi_start: int = 33  # A1
-        midi_end: int = 104   # G#7
+        midi_start: int = 33
+        midi_end: int = 104
         
         for midi_note in range(midi_start, midi_end + 1):
-            # Calculate MIDI frequency
             frequency: float = 440.0 * math.pow(2, (midi_note - 69) / 12.0)
             
-            # Convert MIDI to note name and octave
             note_index: int = (midi_note - 12) % 12
             octave: int = (midi_note - 12) // 12
             
@@ -137,15 +150,12 @@ class NoteManager(QMainWindow):
         self.setWindowTitle("Musical Note Manager")
         self.setGeometry(100, 100, 1000, 700)
         
-        # Main layout
         main_widget: QWidget = QWidget()
         main_layout: QHBoxLayout = QHBoxLayout()
         
-        # Filter panel
         filter_panel: QGroupBox = self._create_filter_panel()
         main_layout.addWidget(filter_panel, 1)
         
-        # List and controls panel
         list_panel: QWidget = self._create_list_panel()
         main_layout.addWidget(list_panel, 2)
         
@@ -164,27 +174,21 @@ class NoteManager(QMainWindow):
         panel: QGroupBox = QGroupBox("Filters")
         layout: QVBoxLayout = QVBoxLayout()
         
-        # Wave type filter
         wave_group: QGroupBox = self._create_wave_type_filter()
         layout.addWidget(wave_group)
         
-        # Octave filter
         octave_group: QGroupBox = self._create_octave_filter()
         layout.addWidget(octave_group)
         
-        # Base note filter
         note_group: QGroupBox = self._create_note_filter()
         layout.addWidget(note_group)
         
-        # Sharp filter
         sharp_group: QGroupBox = self._create_sharp_filter()
         layout.addWidget(sharp_group)
         
-        # Frequency filter
         freq_group: QGroupBox = self._create_frequency_filter()
         layout.addWidget(freq_group)
         
-        # Clear filters button
         self.clear_filters_btn: QPushButton = QPushButton("Clear All Filters")
         self.clear_filters_btn.clicked.connect(self._clear_filters)
         layout.addWidget(self.clear_filters_btn)
@@ -293,7 +297,6 @@ class NoteManager(QMainWindow):
         panel: QWidget = QWidget()
         layout: QVBoxLayout = QVBoxLayout()
         
-        # Action controls
         action_layout: QHBoxLayout = QHBoxLayout()
         
         self.select_all_btn: QPushButton = QPushButton("Select All")
@@ -310,10 +313,8 @@ class NoteManager(QMainWindow):
         action_layout.addWidget(self.download_btn)
         action_layout.addStretch()
         
-        # Counter
         self.count_label: QLabel = QLabel("0 notes selected")
         
-        # Notes list
         self.notes_list: QListWidget = QListWidget()
         self.notes_list.setSelectionMode(QListWidget.SelectionMode.MultiSelection)
         
@@ -328,7 +329,6 @@ class NoteManager(QMainWindow):
         """Apply all active filters and update the notes list."""
         self.filtered_notes = self.notes.copy()
         
-        # Filter by wave type
         wave_types: list[str] = []
         if self.sine_check.isChecked():
             wave_types.append('sine')
@@ -341,18 +341,15 @@ class NoteManager(QMainWindow):
             
         self.filtered_notes = [n for n in self.filtered_notes if n.wave_type in wave_types]
         
-        # Filter by octave range
         octave_from: int = int(self.octave_from.currentText())
         octave_to: int = int(self.octave_to.currentText())
         self.filtered_notes = [n for n in self.filtered_notes if octave_from <= n.octave <= octave_to]
         
-        # Filter by base note
         note_filter: str = self.note_combo.currentText()
 
         if note_filter != 'All':
             self.filtered_notes = [n for n in self.filtered_notes if n.base_note == note_filter.replace('#', '')]
         
-        # Filter by sharp notes
         sharp_filter: str = self.sharp_combo.currentText()
 
         if sharp_filter == 'Only Sharps':
@@ -361,7 +358,6 @@ class NoteManager(QMainWindow):
         elif sharp_filter == 'No Sharps':
             self.filtered_notes = [n for n in self.filtered_notes if not n.is_sharp]
         
-        # Filter by frequency range
         try:
             if self.freq_min.text():
                 freq_min: float = float(self.freq_min.text())

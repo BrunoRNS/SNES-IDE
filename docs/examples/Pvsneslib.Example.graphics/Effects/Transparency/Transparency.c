@@ -6,7 +6,7 @@
 
 
 ---------------------------------------------------------------------------------*/
-#include "snes.h"
+#include <snes.h>
 
 extern char LandTiles, LandTiles_end;
 extern char CloudTiles, CloudTiles_end;

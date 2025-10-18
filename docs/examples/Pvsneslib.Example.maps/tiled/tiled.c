@@ -6,7 +6,7 @@
 
 
 ---------------------------------------------------------------------------------*/
-#include "snes.h"
+#include <snes.h>
 
 // Graphics available outside the file
 extern char tileset, tilesetend, tilesetpal; // for map & tileset of map

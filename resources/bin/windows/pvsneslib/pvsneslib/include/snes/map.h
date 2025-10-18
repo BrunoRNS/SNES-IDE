@@ -33,7 +33,7 @@
 #ifndef SNES_MAPS_INCLUDE
 #define SNES_MAPS_INCLUDE
 
-#include "snes/snestypes.h"
+#include <snes/snestypes.h>
 
 #define T_EMPTY 0x0000 /*!< \brief Type Empty (action will be fall) for tile  */
 #define T_SOLID 0xFF00 /*!< \brief Type Solid (action is walk only) for tile  */

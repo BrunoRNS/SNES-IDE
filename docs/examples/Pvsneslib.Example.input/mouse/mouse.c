@@ -8,7 +8,7 @@
 
 
 ---------------------------------------------------------------------------------*/
-#include "snes.h"
+#include <snes.h>
 
 #ifndef MOUSE_SPEED
 #define MOUSE_SPEED

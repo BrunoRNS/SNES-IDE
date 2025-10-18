@@ -6,7 +6,7 @@
 
 
 ---------------------------------------------------------------------------------*/
-#include "snes.h"
+#include <snes.h"
 
 extern unsigned char bgm0, bgm0_end, p0, p0_end, t0, t0_end;
 extern unsigned char bgm1, bgm1_end, p1, p1_end, t1, t1_end;

@@ -6,8 +6,8 @@
 
 
 ---------------------------------------------------------------------------------*/
-#include "snes.h"
-#include "soundbank.h"
+#include <snes.h>
+#include <soundbank.h>
 
 #define BG0 0
 #define BG1 1

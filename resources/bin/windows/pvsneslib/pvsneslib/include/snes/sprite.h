@@ -32,7 +32,7 @@
 #ifndef SNES_SPRITES_INCLUDE
 #define SNES_SPRITES_INCLUDE
 
-#include "snes/snestypes.h"
+#include <snes/snestypes.h>
 
 #define ATTR2_DISABLED (0xe8)
 

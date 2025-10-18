@@ -7,7 +7,7 @@
 
 
 ---------------------------------------------------------------------------------*/
-#include "snes.h"
+#include <snes.h>
 
 #define GOOMBA_LEFT 1
 #define GOOMBA_RIGHT 2

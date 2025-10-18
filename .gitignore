@@ -67,7 +67,6 @@ __pycache__/
 
 # Distribution files
 dist/
-build/
 *.egg-info/
 *.whl
 

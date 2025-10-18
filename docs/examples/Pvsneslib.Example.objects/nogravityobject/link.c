@@ -7,9 +7,9 @@
 
 
 ---------------------------------------------------------------------------------*/
-#include "snes.h"
+#include <snes.h>
 
-#include "link.h"
+#include <link.h>
 
 extern u16 sprnum; // from main file to have sprite index
 

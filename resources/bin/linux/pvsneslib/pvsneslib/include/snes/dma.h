@@ -31,11 +31,11 @@
 #ifndef SNES_DMA_INCLUDE
 #define SNES_DMA_INCLUDE
 
-#include "snes/snestypes.h"
+#include <snes/snestypes.h>
 
-#include "snes/background.h"
-#include "snes/sprite.h"
-#include "snes/video.h"
+#include <snes/background.h>
+#include <snes/sprite.h>
+#include <snes/video.h>
 
 /*!	\brief Bit defines for the HDMA channels */
 #define HDMA_CHANNEL0			(1 << 0)
