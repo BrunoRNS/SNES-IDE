@@ -47,7 +47,7 @@ jobs:
       - name: Verify INSTALL exists
         run: |
           cd "${{ github.workspace }}"
-          if [ ! -d "SNES-IDE-out/INSTALL" ]; then
+          if [ ! -f "SNES-IDE-out/INSTALL" ]; then
             echo "INSTALL not found in build output!"
             exit 1
           fi
