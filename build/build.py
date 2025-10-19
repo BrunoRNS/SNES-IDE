@@ -334,13 +334,13 @@ def compile_and_copy_installer() -> None:
             continue
 
         rel_path: Path = file.relative_to(ROOT / 'installer')
-        dest_path: Path = SNESIDEOUT / "SNES-IDE" / rel_path
+        dest_path: Path = SNESIDEOUT / rel_path
         dest_path.parent.mkdir(parents=True, exist_ok=True)
 
         if file.suffix == ".py":
             compile_python(
                 file, dest_path.parent /
-                (file.stem + ".exe" if os.name == "nt" else ""),
+                (file.stem + ".exe" if os.name == "nt" else file.stem),
                 icon_path=ROOT/"icon.png",
                 windowed=True, do_chmod_x=os.name=="posix", clean_tmp_exec=True
             )
@@ -366,14 +366,14 @@ def compile_and_copy_source() -> None:
         if file.name == "snes-ide.py":
             compile_python(
                 file, dest_path.parent /
-                (file.stem + ".exe" if os.name == "nt" else ""),
+                (file.stem + ".exe" if os.name == "nt" else file.stem),
                 icon_path=ROOT/"icon.png",
                 windowed=True, do_chmod_x=os.name=="posix", clean_tmp_exec=True
             )
         elif file.suffix == ".py":
             compile_python(
                 file, dest_path.parent /
-                (file.stem + ".exe" if os.name == "nt" else ""),
+                (file.stem + ".exe" if os.name == "nt" else file.stem),
                 icon_path=ROOT/"icon.png",
                 windowed=False, do_chmod_x=os.name=="posix", clean_tmp_exec=True
             )
