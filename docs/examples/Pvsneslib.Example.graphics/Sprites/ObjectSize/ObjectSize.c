@@ -14,7 +14,7 @@ extern char sprite32, sprite32_end, palsprite32, palsprite32_end;
 extern char sprite64, sprite64_end, palsprite64, palsprite64_end;
 
 u16 selectedItem;
-snesbool keyPressed;
+bool keyPressed;
 unsigned short pad0;
 
 #define ADRBG1 0x2000
@@ -105,8 +105,8 @@ void changeObjSize()
 int main(void)
 {
     // Initialize text console with our font
-    consoleSetTextVramBGAdr(0x6800);
-    consoleSetTextVramAdr(0x3000);
+    consoleSetTextMapPtr(0x6800);
+    consoleSetTextGfxPtr(0x3000);
     consoleSetTextOffset(0x0100);
     consoleInitText(0, 16 * 2, &snesfont, &snespal);
 

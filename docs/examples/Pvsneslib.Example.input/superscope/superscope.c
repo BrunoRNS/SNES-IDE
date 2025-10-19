@@ -10,8 +10,8 @@
 ---------------------------------------------------------------------------------*/
 
 #include <snes.h>
-#include <superscope.h>
-#include <sin_cos.h>
+#include "superscope.h"
+#include "sin_cos.h"
 
 extern char tilfont, palfont;
 
@@ -67,8 +67,8 @@ void resetGame()
 int main(void)
 {
     // Initialize text console with our font
-    consoleSetTextVramBGAdr(0x2000);
-    consoleSetTextVramAdr(0x3800);
+    consoleSetTextMapPtr(0x2000);
+    consoleSetTextGfxPtr(0x3800);
     consoleSetTextOffset(0x0080);
     consoleInitText(1, 16 * 2, &tilfont, &palfont);
 
@@ -339,7 +339,7 @@ PLAY_GAME:
         target_oam_id[target_id] = 16 + target_id << 2;
     }
 
-    snesbool print_once = true; // We'll use this later to print text just once inside our loop
+    bool print_once = true; // We'll use this later to print text just once inside our loop
     u8 text_timer = 0;
 
 CONTINUE_GAME:

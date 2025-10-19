@@ -9,7 +9,7 @@
 #include <snes.h>
 
 // Includes to have object prototypes
-#include <link.h>
+#include "link.h"
 
 // Graphics available outside the file
 extern char tileset, tilesetend, tilepal, pallink, tilesetdef, tilesetatt; // for map & tileset of map

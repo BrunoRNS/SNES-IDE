@@ -43,7 +43,7 @@ typedef struct
     u16 scrY;
     u8 *bgMap;
     u8 mapPage;
-    snesbool vRamFirstPage;
+    bool vRamFirstPage;
     u16 scrollX;
     u16 maxScrollX;
 } scroll;

@@ -304,6 +304,12 @@ def copy_bin() -> None:
     if system == 'darwin':
         system = 'macos'
 
+    path: Path = ROOT / 'resources' / 'bin' / 'COPYING.md'
+    dest_path: Path = SNESIDEOUT / 'SNES-IDE' / 'bin' / 'COPYING.md'
+
+    dest_path.parent.mkdir(parents=True, exist_ok=True)
+    shutil.copy(path, dest_path)
+
     for file in (ROOT / 'resources' / 'bin' / system).rglob("*"):
 
         if file.is_dir():

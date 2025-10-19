@@ -4,18 +4,18 @@
     Simple effect & music sound demo
 	/*\ WARNING effects must be 1st IT file in convertion 
 		all musics must be after IT file
-		each combination of a music + effect must be lower than 60K (not 64K because of size of sound drivers)
+		each combination of a music + effect must be lower than 58K (not 64K because of size of sound drivers)
     -- alekmaul
 
 
 ---------------------------------------------------------------------------------*/
 #include <snes.h>
 
-#include <res/soundbank.h>
+#include "res/soundbank.h"
 
 extern char snesfont, snespal;
 
-extern char SOUNDBANK__0,SOUNDBANK__1;
+extern char SOUNDBANK__;
 
 u8 i,j, keyapressed = 0,keybpressed = 0,keyxpressed = 0,keylpressed = 0,keyrpressed = 0;
 
@@ -27,17 +27,13 @@ int main(void)
     spcBoot();
 
     // Initialize text console with our font
-    consoleSetTextVramBGAdr(0x6800);
-    consoleSetTextVramAdr(0x3000);
+    consoleSetTextMapPtr(0x6800);
+    consoleSetTextGfxPtr(0x3000);
     consoleSetTextOffset(0x0100);
     consoleInitText(0, 16 * 2, &snesfont, &snespal);
 
     // Set soundbanks in reverse order
-    spcSetBank(&SOUNDBANK__1);
-	spcSetBank(&SOUNDBANK__0);
-
-    // Load effects
-    spcLoad(MOD_EFFECTSSFX);
+	spcSetBank(&SOUNDBANK__);
 
     // Init background
     bgSetGfxPtr(0, 0x2000);
@@ -48,11 +44,12 @@ int main(void)
     bgSetDisable(1);
     bgSetDisable(2);
 
-	// Load all effects
-	spcStop(); spcLoad(0); 
+    // Load effects
+    spcStop(); spcLoad(MOD_EFFECTSSFX);
 	for (j=0;j<5;j++) { 
         spcLoadEffect(j); 
     }
+    WaitVBLFlag;
 
     // Draw a wonderfull text :P
     consoleDrawText(5, 11, "Press A to play effect !");
@@ -75,7 +72,7 @@ int main(void)
             {
                 keyapressed = 1;
                 // Play effect
-                spcEffect(8,i,15*16+8); // (u16 pitch,u16 sfxIndex, u8 volpan); pitch=1=4Khz , 2=8khz, 8=32Khz
+                spcEffect(4,i,15*16+8); // (u16 pitch,u16 sfxIndex, u8 volpan); pitch=1=4Khz , 2=8khz, 4=16Khz, 8=32Khz
             }
         }
         else

@@ -6,7 +6,7 @@ with each other, so using it, you should have received a copy of all those licen
 and you should have agreed with all of them.
 When copying or modifying the software, you must respect each of those licenses in each of those projects.
 
-> Any questions about the software's usage, open an issue in https://github.com/BrunoRNS/SNES-IDE, it will be answered as soon as possible.
+> Any questions about the software's usage, open an issue in https://github.com/BrunoRNS/SNES-IDE/issues, it will be answered as soon as possible.
 
 ## PvSnesLib by Alekmaul
 

@@ -7,8 +7,8 @@
 #define max_bullets 32
 #define max_targets 64
 
-snesbool sscope_disconnected = false; // if SuperScope is disconnected during gameplay, and plugged again, we can control some behavior
-snesbool pause_adjust = false;        // If we pause during game, will lead us to calibration screen, but we will be able to continue our game
+bool sscope_disconnected = false; // if SuperScope is disconnected during gameplay, and plugged again, we can control some behavior
+bool pause_adjust = false;        // If we pause during game, will lead us to calibration screen, but we will be able to continue our game
 
 // Let's declare some usefull variables to animate our fantastic blue bullets :D
 u8 ready_to_fire = 0;
@@ -32,9 +32,9 @@ u8 bullet_diff[max_bullets] = {1};
 
 u8 bullet_frames[] = {0, 4, 8, 12, 64, 68, 72, 76}; // GFX positions for the OAM table
 
-snesbool enable_fire = false;
-snesbool enable_pause = false;
-snesbool enable_cursor = false;
+bool enable_fire = false;
+bool enable_pause = false;
+bool enable_cursor = false;
 
 // And out targets
 u8 target_id = 0;
@@ -48,7 +48,7 @@ u8 target_y[max_targets];
 s8 target_collision_x[max_targets];
 s8 target_collision_y[max_targets];
 
-snesbool target_kill[max_targets] = {false};
+bool target_kill[max_targets] = {false};
 u8 target_kill_count[max_targets] = {0};
 u8 target_gravity[max_targets] = {0};
 u8 targets_shot = 0;

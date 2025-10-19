@@ -1,2 +1,176 @@
-name: Linux (Build and Test)
-# TODO: implement workflow
+name: Ubuntu (Build and Test)
+
+on:
+  push:
+    branches: [ ubuntu/** ]
+    tags: [ 'v*' ]
+  pull_request:
+    branches: [ main, develop ]
+
+jobs:
+  ubuntu-build:
+    name: Build (Green-Light)
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.13"
+
+      - name: Install Dependencies
+        run: |
+          python -m pip install --upgrade pip
+          cd "${{ github.workspace }}"
+          python -m pip install -r build/requirements.txt
+
+      - name: Install system dependencies
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y binutils
+
+      - name: Build
+        run: |
+          cd "${{ github.workspace }}"
+          python build/build.py
+
+      - name: Verify
+        run: |
+          cd "${{ github.workspace }}"
+          if [ ! -d "SNES-IDE-out" ]; then
+            echo "Build artifact not found!"
+            exit 1
+          fi
+
+      - name: Verify INSTALL exists
+        run: |
+          cd "${{ github.workspace }}"
+          if [ ! -d "SNES-IDE-out/INSTALL" ]; then
+            echo "INSTALL not found in build output!"
+            exit 1
+          fi
+
+      - name: Give Execution permission
+        run: |
+          cd "${{ github.workspace }}"
+          chmod -R +x SNES-IDE-out/
+
+      - name: Compress (tar.gz)
+        run: |
+          cd "${{ github.workspace }}"
+          tar -czf sneside-ubuntu-x64.tar.gz -C SNES-IDE-out .
+
+      - name: Upload
+        uses: actions/upload-artifact@v4
+        with:
+          name: sneside-ubuntu-x64
+          path: sneside-ubuntu-x64.tar.gz
+          retention-days: 7
+
+  ubuntu-tests-greenlight:
+    name: Tests (Green-Light)
+    runs-on: ubuntu-latest
+    needs: ubuntu-build
+    steps:
+      - name: Download build artifact
+        uses: actions/download-artifact@v4
+        with:
+          name: sneside-ubuntu-x64
+
+      - name: Extract sneside-ubuntu-x64.tar.gz
+        run: |
+          mkdir sneside-ubuntu
+          tar -xzf sneside-ubuntu-x64.tar.gz -C sneside-ubuntu
+
+      - name: Check expected `SNES-IDE/libs` folders
+        run: |
+          cd sneside-ubuntu
+          expected=(
+            "DntcTranspiler"
+            "DotnetSnesLib"
+            "javasnes"
+            "pvsneslib"
+            "SampleLibrary"
+            "COPYING.md"
+          )
+          for lib in "${expected[@]}"; do
+            if [ ! -e "SNES-IDE/libs/$lib" ]; then
+              echo "Missing: $lib"
+              exit 1
+            fi
+          done
+          echo "All expected lib files found."
+
+      - name: Check expected `SNES-IDE/bin` folders
+        run: |
+          cd sneside-ubuntu
+          expected=(
+            "jdk8"
+            "pvsneslib"
+            "schismtracker"
+            "snes-emulator"
+            "sprite-editor"
+            "tmx-editor"
+            "COPYING.md"
+          )
+          for binary in "${expected[@]}"; do
+            if [ ! -e "SNES-IDE/bin/$binary" ]; then
+              echo "Missing: $binary"
+              exit 1
+            fi
+          done
+          echo "All expected bin files found."
+
+      - name: Check expected `SNES-IDE/scripts` files
+        run: |
+          cd sneside-ubuntu
+          expected=(
+            "audio-brr-wav-converter"
+            "audio-impulse-tracker-init"
+            "audio-sample-generator"
+            "audio-wav-brr-converter"
+            "compile-dotnetsnes-proj"
+            "compile-javasnes-proj"
+            "compile-pvsneslib-proj"
+            "get-snes-ide-home"
+            "gfx-png-bmp-editor"
+            "gfx-png-bmp-snes-converter"
+            "gfx-tmx-editor"
+            "gfx-tmx-tmj-converter"
+            "open-emulator"
+          )
+          for exe in "${expected[@]}"; do
+            if [ ! -f "SNES-IDE/scripts/$exe" ]; then
+              echo "Missing: $exe"
+              exit 1
+            fi
+          done
+          echo "All expected script files found."
+
+      - name: Check file permissions
+        run: |
+          cd sneside-ubuntu/SNES-IDE/scripts
+          chmod +x *
+
+  ubuntu-tests-redlight:
+    if: github.ref_name == 'ubuntu/red'
+    name: Tests (Red-Light)
+    runs-on: ubuntu-latest
+    needs: ubuntu-build
+    steps:
+      - name: Download build artifact
+        uses: actions/download-artifact@v4
+        with:
+          name: sneside-ubuntu-x64
+
+      - name: Extract sneside-ubuntu-x64.tar.gz
+        run: |
+          mkdir sneside-ubuntu
+          tar -xzf sneside-ubuntu-x64.tar.gz -C sneside-ubuntu
+
+      - name: Deliberately failing example test
+        run: |
+          echo "This is a deliberate failure for Red-Light testing."
+          exit 1
