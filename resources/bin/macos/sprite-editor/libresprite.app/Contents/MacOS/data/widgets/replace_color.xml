@@ -1,0 +1,16 @@
+<!-- LibreSprite -->
+<!-- Copyright (C) 2001-2013 by David Capello -->
+<gui>
+  <box vertical="true" expansive="true" id="controls">
+    <box horizontal="true" expansive="true">
+      <grid columns="2" id="controls">
+        <label text="From:" />
+        <colorpicker id="from" cell_align="horizontal" />
+        <label text="To:" />
+        <colorpicker id="to" cell_align="horizontal" />
+      </grid>
+    </box>
+    <label text="Tolerance:" />
+    <slider min="0" max="255" id="tolerance" />
+  </box>
+</gui>

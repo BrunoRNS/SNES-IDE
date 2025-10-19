@@ -1,0 +1,14 @@
+﻿<Project Sdk="Microsoft.NET.Sdk">
+
+    <PropertyGroup>
+        <TargetFramework>net8.0</TargetFramework>
+        <Nullable>enable</Nullable>
+        <AllowUnsafeBlocks>true</AllowUnsafeBlocks>
+    </PropertyGroup>
+
+    <ItemGroup>
+      <ProjectReference Include="..\..\..\DntcTranspiler\Dntc.Attributes\Dntc.Attributes.csproj" />
+      <ProjectReference Include="..\..\..\DntcTranspiler\Dntc.Common\Dntc.Common.csproj" />
+    </ItemGroup>
+
+</Project>

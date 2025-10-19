@@ -1,50 +1,63 @@
-# This script is used to build the project.
+"""
+SNES-IDE - build.py
+Copyright (C) 2025 BrunoRNS and Atomic-Germ
 
+This program is free software: you can redistribute it and/or modify
+it under the terms of the GNU General Public License as published by
+the Free Software Foundation, either version 3 of the License, or
+(at your option) any later version.
+
+This program is distributed in the hope that it will be useful,
+but WITHOUT ANY WARRANTY; without even the implied warranty of
+MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+GNU General Public License for more details.
+
+You should have received a copy of the GNU General Public License
+along with this program.  If not, see <http://www.gnu.org/licenses/>.
+"""
+
+from colorama import init, Fore, Style
+
+from typing import Any, List, Tuple, Callable
+from typing_extensions import Literal
+
+from subprocess import CompletedProcess
 from pathlib import Path
+import subprocess
 import traceback
-import sys
-import shutil as pyshutil
-import os
+import platform
+import shutil
 import locale
+import stat
+import sys
+import os
 
-# This is just to make the CI prettier
-try:
-    from colorama import init, Fore, Style
-    init(autoreset=True)
-    COLOR_OK = Fore.GREEN + Style.BRIGHT
-    COLOR_FAIL = Fore.RED + Style.BRIGHT
-    COLOR_STEP = Fore.CYAN + Style.BRIGHT
-    COLOR_RESET = Style.RESET_ALL
-except ImportError:
-    COLOR_OK = COLOR_FAIL = COLOR_STEP = COLOR_RESET = ""
+"""
+Print functions
+"""
+def _supports_unicode() -> bool:
+    encoding: Any | None = getattr(sys.stdout, "encoding", None)
 
-def _supports_unicode():
-    encoding = getattr(sys.stdout, "encoding", None)
     if not encoding:
         encoding = locale.getpreferredencoding(False)
     try:
         "✔".encode(encoding)
         "✖".encode(encoding)
         return True
+
     except Exception:
         return False
 
-USE_UNICODE = _supports_unicode()
-
-OK_SYMBOL = "✔" if USE_UNICODE else "[OK]"
-FAIL_SYMBOL = "✖" if USE_UNICODE else "[FAIL]"
-STEP_SYMBOL = "==>"  # Always ASCII
-
-def print_step(msg):
+def print_step(msg: str) -> None:
     print(f"{COLOR_STEP}{STEP_SYMBOL} {msg}{COLOR_RESET}")
 
-def print_ok(msg):
+def print_ok(msg: str) -> None:
     print(f"{COLOR_OK}{OK_SYMBOL} {msg}{COLOR_RESET}")
 
-def print_fail(msg):
+def print_fail(msg: str) -> None:
     print(f"{COLOR_FAIL}{FAIL_SYMBOL} {msg}{COLOR_RESET}")
 
-def print_summary(success, failed_steps):
+def print_summary(success: bool, failed_steps: List[str]) -> None:
     print("\n" + "="*40)
     if success:
         print_ok("BUILD SUCCESSFUL")
@@ -53,36 +66,165 @@ def print_summary(success, failed_steps):
         print_fail(f"Failed steps: {', '.join(failed_steps)}")
     print("="*40 + "\n")
 
+"""
+Definitions
+"""
+init(autoreset=True)
 
-class shutil:
-    """Reimplementation of class shutil to avoid errors in Wine"""
+COLOR_OK: str = Fore.GREEN + Style.BRIGHT
+COLOR_FAIL: str = Fore.RED + Style.BRIGHT
+COLOR_STEP: str = Fore.CYAN + Style.BRIGHT
+COLOR_RESET: str = Style.RESET_ALL
 
-    @staticmethod
-    def copy(src: str|Path, dst: str|Path) -> None:
-        src, dst = map(lambda x: Path(x).resolve(), (src, dst))
-        pyshutil.copy2(src, dst)
+USE_UNICODE: bool = _supports_unicode()
 
-    @staticmethod
-    def copytree(src: str|Path, dst: str|Path) -> None:
-        src, dst = map(lambda x: Path(x).resolve(), (src, dst))
-        pyshutil.copytree(src, dst, dirs_exist_ok=True)
+OK_SYMBOL: Literal['✔', '[OK]'] = "✔" if USE_UNICODE else "[OK]"
+FAIL_SYMBOL: Literal['✖', '[FAIL]'] = "✖" if USE_UNICODE else "[FAIL]"
+STEP_SYMBOL: Literal['==>'] = "==>"
 
-    @staticmethod
-    def rmtree(path: str|Path) -> None:
-        path = Path(path).resolve()
-        pyshutil.rmtree(path)
+ROOT: Path = Path(__file__).parent.parent.resolve()
+SNESIDEOUT: Path = ROOT / "SNES-IDE-out"
 
-    @staticmethod
-    def move(src: str|Path, dst: str|Path) -> None:
-        src, dst = map(lambda x: Path(x).resolve(), (src, dst))
-        pyshutil.move(src, dst)
+"""
+Build python script
+"""
 
-# Copy all files from root to the SNES-IDE-out directory
+def compile_python(
+    python_file_path: Path, target_file_path: Path, windowed: bool,
+    icon_path: Path, do_chmod_x: bool, clean_tmp_exec: bool
+) -> int:
+    """
+    Compile a Python script to executable using PyInstaller.
+    
+    Args:
+        python_file_path: Path to the source Python file
+        target_file_path: Path where the executable should be placed
+        windowed: Whether to run without console (windowed mode)
+        icon_path: Path to icon file for the executable
+        do_chmod_x: Whether to make executable with chmod +x (Unix-like systems)
+        clean_tmp_exec: Whether to clean temporary build files
+    
+    Returns:
+        int: Return code (0 for success, non-zero for failure)
+    """
+    
+    if not python_file_path.exists():
+        print(f"Error: Python file not found: {python_file_path}")
+        return 1
 
-ROOT = Path(__file__).parent.parent.resolve().absolute()
+    file_path: Path = target_file_path
+    
+    file_path.parent.mkdir(parents=True, exist_ok=True)
+    
+    system: str = platform.system()
+    cmd: List[str] = ["pyinstaller", "--onefile"]
+    
+    if system == "Darwin":
+        if windowed:
+            cmd.remove("--onefile")
+            cmd.append("--windowed")
+            if not file_path.name.endswith(".app"):
+                file_path: Path = file_path.parent / f"{file_path.stem}.app"
+        else:
+            cmd.append("--console")
+            
+    elif system == "Windows":
+        if windowed:
+            cmd.append("--windowed")
+        else:
+            cmd.append("--console")
 
-SNESIDEOUT = ROOT / "SNES-IDE-out"
+        if not file_path.name.endswith(".exe"):
+            file_path = file_path.parent / f"{file_path.stem}.exe"
+            
+    else:
+        if windowed:
+            cmd.append("--noconsole")
+        else:
+            cmd.append("--console")
+    
+    if icon_path and icon_path.exists():
+        cmd.extend(["--icon", str(icon_path)])
+    
+    cmd.append(str(python_file_path))
+    
+    try:
+        print(f"Running PyInstaller with command: {' '.join(cmd)}")
+        result: CompletedProcess[str] = subprocess.run(cmd, capture_output=True, text=True)
+        
+        if result.returncode != 0:
+            print(f"PyInstaller failed with return code: {result.returncode}")
+            print(f"Stdout: {result.stdout}")
+            print(f"Stderr: {result.stderr}")
+            return result.returncode
+        
+        dist_dir: Path = Path("dist")
+        if not dist_dir.exists():
+            print("Error: PyInstaller dist directory not found")
+            return 1
+        
+        exec_name: str = python_file_path.stem
 
+        generated_item: Path
+        item_type: str
+
+        if system == "Darwin" and windowed:
+            generated_item = dist_dir / f"{exec_name}.app"
+            item_type = "app bundle"
+        elif system == "Windows":
+            generated_item = dist_dir / f"{exec_name}.exe"
+            item_type = "executable"
+        else:
+            generated_item = dist_dir / exec_name
+            item_type = "executable"
+        
+        if not generated_item.exists():
+            print(f"Error: Generated {item_type} not found: {generated_item}")
+            return 1
+        
+        if generated_item.is_dir():
+            if file_path.exists():
+                if file_path.is_dir():
+                    shutil.rmtree(file_path)
+                else:
+                    file_path.unlink()
+            shutil.copytree(generated_item, file_path)
+            shutil.rmtree(generated_item)
+        else:
+            shutil.move(str(generated_item), str(file_path))
+        
+        print(f"{item_type.capitalize()} created at: {file_path}")
+        
+        if do_chmod_x and system != "Windows":
+            if system == "Darwin" and windowed:
+                actual_executable: Path = file_path / "Contents" / "MacOS" / exec_name
+                if actual_executable.exists():
+                    actual_executable.chmod(actual_executable.stat().st_mode | stat.S_IEXEC)
+                    print(f"Set executable permissions on: {actual_executable}")
+            else:
+                file_path.chmod(file_path.stat().st_mode | stat.S_IEXEC)
+                print(f"Set executable permissions on: {file_path}")
+        
+        if clean_tmp_exec:
+            cleanup_files: List[str] = ["build", "dist", f"{exec_name}.spec"]
+            for item in cleanup_files:
+                path: Path = Path(item)
+                if path.exists():
+                    if path.is_dir():
+                        shutil.rmtree(path)
+                    else:
+                        path.unlink()
+                    print(f"Cleaned up: {item}")
+        
+        return 0
+    
+    except Exception as e:
+        print(f"Error during compilation: {e}")
+        return 1
+
+"""
+Build Steps
+"""
 def clean_all() -> None:
     """
     Clean the SNES-IDE-out directory.
@@ -91,7 +233,7 @@ def clean_all() -> None:
     if SNESIDEOUT.exists():
         shutil.rmtree(SNESIDEOUT)
 
-    return None
+    return
 
 
 def copy_root() -> None:
@@ -99,16 +241,16 @@ def copy_root() -> None:
     Copy all files from the root directory to the SNES-IDE-out directory.
     """
     SNESIDEOUT.mkdir(exist_ok=True)
+    (SNESIDEOUT / 'SNES-IDE').mkdir(exist_ok=True)
 
-    for file in ROOT.glob("*"):
-
+    for file in ROOT.glob("*.*"):
         if file.is_dir():
-
             continue
 
         shutil.copy(file, SNESIDEOUT / file.name)
+        shutil.copy(file, SNESIDEOUT / 'SNES-IDE' / file.name)
     
-    return None
+    return
 
 
 def copy_lib() -> None:
@@ -116,19 +258,19 @@ def copy_lib() -> None:
     Copy all files from the lib directory to the SNES-IDE-out directory.
     """
 
-    (SNESIDEOUT / 'libs').mkdir(exist_ok=True)
+    (SNESIDEOUT / 'SNES-IDE' / 'libs').mkdir(exist_ok=True)
 
-    for file in (ROOT / 'libs').rglob("*"):
+    for file in (ROOT / 'resources' / 'libs').rglob("*"):
 
         if file.is_dir():
             continue
 
-        rel_path = file.relative_to(ROOT / 'libs')
-        dest_path = SNESIDEOUT / 'libs' / rel_path
+        rel_path: Path = file.relative_to(ROOT / 'resources' / 'libs')
+        dest_path: Path = SNESIDEOUT / 'SNES-IDE' / 'libs' / rel_path
         dest_path.parent.mkdir(parents=True, exist_ok=True)
         shutil.copy(file, dest_path)
     
-    return None
+    return
 
 
 def copy_docs() -> None:
@@ -136,149 +278,151 @@ def copy_docs() -> None:
     Copy the docs directory to the SNES-IDE-out directory.
     """
 
-    (SNESIDEOUT / 'docs').mkdir(exist_ok=True)
+    (SNESIDEOUT / 'SNES-IDE' / 'docs').mkdir(exist_ok=True)
 
     for file in (ROOT / 'docs').rglob("*"):
 
         if file.is_dir():
             continue
 
-        rel_path = file.relative_to(ROOT / 'docs')
-        dest_path = SNESIDEOUT / 'docs' / rel_path
+        rel_path: Path = file.relative_to(ROOT / 'docs')
+        dest_path: Path = SNESIDEOUT / 'SNES-IDE' / 'docs' / rel_path
         dest_path.parent.mkdir(parents=True, exist_ok=True)
         shutil.copy(file, dest_path)
     
-    return None
+    return
 
-def copy_bat() -> None:
+def copy_bin() -> None:
     """
-    Copy the bat files to the SNES-IDE-out directory.
+    Copy the bin files to the SNES-IDE-out directory.
     """
 
-    (SNESIDEOUT / 'tools').mkdir(exist_ok=True)
+    (SNESIDEOUT / 'SNES-IDE' / 'bin').mkdir(exist_ok=True)
 
-    for file in (ROOT / 'src' / 'tools' ).rglob("*.bat"):
+    system: str = platform.system().lower()
+
+    if system == 'darwin':
+        system = 'macos'
+
+    path: Path = ROOT / 'resources' / 'bin' / 'COPYING.md'
+    dest_path: Path = SNESIDEOUT / 'SNES-IDE' / 'bin' / 'COPYING.md'
+
+    dest_path.parent.mkdir(parents=True, exist_ok=True)
+    shutil.copy(path, dest_path)
+
+    for file in (ROOT / 'resources' / 'bin' / system).rglob("*"):
 
         if file.is_dir():
-
             continue
 
-        rel_path = file.relative_to(ROOT / 'src' / 'tools')
-
-        dest_path = SNESIDEOUT / 'tools' / rel_path
+        rel_path: Path = file.relative_to(ROOT / 'resources' / 'bin' / system)
+        dest_path: Path = SNESIDEOUT / 'SNES-IDE' / 'bin' / rel_path
 
         dest_path.parent.mkdir(parents=True, exist_ok=True)
-
         shutil.copy(file, dest_path)
     
-    return None
+    return
 
-def copy_dlls() -> None:
+def compile_and_copy_installer() -> None:
     """
-    Copy the dlls from tools dir
+    Copy the installer to SNES-IDE-out directory
     """
 
-    (SNESIDEOUT / 'tools').mkdir(exist_ok=True)
-
-    for file in (ROOT / 'tools').rglob("*.dll"):
+    for file in (ROOT / 'installer').rglob("*"):
 
         if file.is_dir():
-
             continue
 
-        rel_path = file.relative_to(ROOT / 'tools')
-
-        dest_path = SNESIDEOUT / 'tools' / rel_path
-
+        rel_path: Path = file.relative_to(ROOT / 'installer')
+        dest_path: Path = SNESIDEOUT / rel_path
         dest_path.parent.mkdir(parents=True, exist_ok=True)
 
-        shutil.copy(file, dest_path)
-    
-    return None
-
-def compile() -> None:
-    """
-    Compile the project.
-    """
-
-    src_dir = ROOT / "src"
-
-    # Compile Python files
-
-    for file in src_dir.rglob("*.py"):
-
-        rel_path = file.relative_to(src_dir)
-        out_path = SNESIDEOUT / rel_path.with_suffix(".exe")
-        out_path.parent.mkdir(parents=True, exist_ok=True)
-
-        if len(sys.argv) > 1 and sys.argv[1] == "linux":
-            # On Linux, copy the .py file and create a .bat file to call it with python
-
-            py_out = SNESIDEOUT / rel_path
-            py_out.parent.mkdir(parents=True, exist_ok=True)
-            shutil.copy(file, py_out)
-
-            bat_path = out_path.with_suffix(".bat")
-
-            with open(bat_path, "w") as bat_file:
-
-                bat_file.write(f'@echo off\npython "{Path(py_out).resolve().absolute()}" %*\n')
-
+        if file.suffix == ".py":
+            compile_python(
+                file, dest_path.parent /
+                (file.stem + ".exe" if os.name == "nt" else file.stem),
+                icon_path=ROOT/"icon.png",
+                windowed=True, do_chmod_x=os.name=="posix", clean_tmp_exec=True
+            )
         else:
-
-            from buildModules.buildPy import main as mpy
-
-            out: int = mpy(file, out_path.parent)
-
-            if out != 0:
-                
-                raise Exception(f"ERROR while compiling python files: -{abs(out)}")
-            
-
-    sys.stdout.write("Success compiling Python files.\n")
+            shutil.copy(file, dest_path)
     
-def copyTracker() -> None:
-    
-    src_dir = ROOT / "src" / "tools" / "soundsnes" / "tracker"
-    dest_dir = ROOT / "SNES-IDE-out" / "tools" / "soundsnes" / "tracker"
-    
-    shutil.copytree(src_dir, dest_dir)
+    return
 
-# Pretty formatting for CI logs
-def run_step(step_name, func):
+def compile_and_copy_source() -> None:
+    """
+    Compile and copy the project's main source code.
+    """
+
+    for file in (ROOT / 'src').rglob("*"):
+
+        if file.is_dir():
+            continue
+
+        rel_path: Path = file.relative_to(ROOT / 'src')
+        dest_path: Path = SNESIDEOUT / "SNES-IDE" / rel_path
+        dest_path.parent.mkdir(parents=True, exist_ok=True)
+
+        if file.name == "snes-ide.py":
+            compile_python(
+                file, dest_path.parent /
+                (file.stem + ".exe" if os.name == "nt" else file.stem),
+                icon_path=ROOT/"icon.png",
+                windowed=True, do_chmod_x=os.name=="posix", clean_tmp_exec=True
+            )
+        elif file.suffix == ".py":
+            compile_python(
+                file, dest_path.parent /
+                (file.stem + ".exe" if os.name == "nt" else file.stem),
+                icon_path=ROOT/"icon.png",
+                windowed=False, do_chmod_x=os.name=="posix", clean_tmp_exec=True
+            )
+        else:
+            shutil.copy(file, dest_path)
+    
+    return
+
+def run_step(step_name: str, func: Callable[..., None]) -> bool:
+    """Pretty formatting for CI logs"""
+
     print_step(f"{step_name}...")
+
     try:
         func()
         print_ok(f"{step_name} completed.")
         return True
+
     except Exception as e:
         print_fail(f"{step_name} failed: {e}")
-        traceback.print_exception(e)
+        traceback.print_exception(Exception, e, None)
         return False
 
 def main() -> int:
     """
     Main function to run the build process.
     """
-    steps = [
+
+    steps: List[Tuple[str, Callable[..., None]]] = [
         ("Cleaning SNES-IDE-out", clean_all),
         ("Copying root files", copy_root),
         ("Copying libs", copy_lib),
         ("Copying docs", copy_docs),
-        ("Copying bat files", copy_bat),
-        ("Copying dlls", copy_dlls),
-        ("Copying tracker", copyTracker),
-        ("Compiling python files", compile),
+        ("Copying binary files", copy_bin),
+        ("Compiling and copying installer", compile_and_copy_installer),
+        ("Compiling and copying source", compile_and_copy_source),
     ]
-    failed_steps = []
+
+    failed_steps: List[str] = []
     for name, func in steps:
         if not run_step(name, func):
             failed_steps.append(name)
+
     print_summary(len(failed_steps) == 0, failed_steps)
+
     return 0 if not failed_steps else -1
 
 if __name__ == "__main__":
     """
     Run the main function.
     """
-    sys.exit(main())
+    exit(main())

@@ -1,0 +1,31 @@
+<!-- LibreSprite -->
+<!-- Copyright (C) 2015 by David Capello -->
+<!-- Copyright (C) 2021 LibreSprite contributors -->
+<gui>
+<window text="Insert Text" id="paste_text">
+  <grid columns="2">
+    <label text="Text:" />
+    <entry expansive="true" maxsize="256" id="user_text" magnet="true" cell_align="horizontal" height="20" width="200" />
+
+    <label text="Font Size:" />
+    <entry id="font_size" maxsize="3" text="32" cell_align="horizontal" />
+
+    <label text="Font:" />
+    <dropdownbutton minwidth="60" id="font_face" text="Select Font" cell_align="horizontal" />
+
+    <label text="Color:" />
+    <colorpicker id="font_color" cell_align="horizontal" />
+
+    <hbox />
+    <check id="antialias" text="Anti-aliasing filter" cell_align="horizontal"
+           tooltip="Smooth font edges" />
+
+    <separator horizontal="true" cell_hspan="2" />
+
+    <box horizontal="true" homogeneous="true" cell_hspan="2" cell_align="right">
+      <button text="&amp;OK" closewindow="true" id="ok" magnet="true" minwidth="60" />
+      <button text="&amp;Cancel" closewindow="true" />
+    </box>
+  </grid>
+</window>
+</gui>

@@ -1,0 +1,27 @@
+<!-- LibreSprite -->
+<!-- Copyright (C) 2001-2013 by David Capello -->
+<gui>
+<window text="Grid Settings" id="grid_settings">
+  <grid columns="4">
+
+    <label text="X:" />
+    <entry id="grid_x" text="" maxsize="4" magnet="true" />
+
+    <label text="Y:" />
+    <entry id="grid_y" text="" maxsize="4" />
+
+    <label text="Width:" />
+    <entry id="grid_w" text="" maxsize="4" />
+
+    <label text="Height:" />
+    <entry id="grid_h" text="" maxsize="4" />
+
+    <separator horizontal="true" cell_hspan="4" />
+
+    <box horizontal="true" homogeneous="true" cell_hspan="4" cell_align="right">
+      <button text="&amp;OK" closewindow="true" id="ok" magnet="true" minwidth="60" />
+      <button text="&amp;Cancel" closewindow="true" />
+    </box>
+  </grid>
+</window>
+</gui>

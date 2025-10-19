@@ -1,2 +1,1 @@
-docs/examples/** linguist-vendored
-libs/** linguist-vendored
+resources/** linguist-vendored
