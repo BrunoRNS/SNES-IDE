@@ -1,0 +1,30 @@
+<!-- LibreSprite -->
+<!-- Copyright (C) 2001-2013, 2015 by David Capello -->
+<gui>
+<window text="Sprite Properties" id="sprite_properties">
+  <vbox>
+    <grid columns="2">
+      <label text="File name:" />
+      <entry text="" id="name" maxsize="256" minwidth="64" readonly="true" cell_align="horizontal" />
+
+      <label text="Type:" />
+      <label text="" id="type" />
+
+      <label text="Size:" />
+      <label text="" id="size" />
+
+      <label text="Frames:" />
+      <label text="" id="frames" />
+
+      <label text="Transparent Color:" />
+      <hbox id="transparent_color_placeholder" tooltip="Palette entry used as&#10;transparent color in each&#10;layer (only for indexed images)." />
+    </grid>
+    <separator horizontal="true" />
+    <hbox>
+      <boxfiller />
+      <button text="&amp;OK" closewindow="true" id="ok" magnet="true" width="60" />
+      <button text="&amp;Cancel" closewindow="true" id="cancel" width="60" />
+    </hbox>
+  </vbox>
+</window>
+</gui>

@@ -2,36 +2,31 @@
 
 This document will help you get started as a developer.
 
----
-
 ## 🚀 Project Overview
 
 SNES-IDE is a development environment for SNES homebrew. The project includes tools, libraries, and documentation for SNES development.
 
----
-
 ## Repository Structure
 
-- `build/` — Build scripts and automation
-- `docs/` — Documentation and examples
-- `libs/` — SNES development libraries
-- `tools/` — SNES-IDE tools and utilities
-- `tests/` — Automated tests
-- `build-requirements.txt` — Python dependencies for building
-- `INSTALL.md` — Installation instructions
-- `dependencies.md` — Third-party libraries and tools
-- `CODE_OF_CONDUCT.md` — Contributor guidelines
-
----
+- `.github/` — Automated workflows and tests.
+- `build/` — Build scripts and automation.
+- `docs/` — Documentation and examples.
+- `gh-pages/` — Github-pages documentation.
+- `installer/` — Installation scripts and automation.
+- `resources/bin/<os>` — SNES-IDE development OS specifics binaries.
+- `resources/libs/` — SNES development libraries.
+- `src/` — Main source of SNES-IDE.
+- `src/scripts/` — Scripts used by the source.
+- `CODE_OF_CONDUCT.md` — Contributor guidelines.
 
 ## Building SNES-IDE
 
 ### Local Build (Windows)
 
 1. Install [Python 3.13+](https://www.python.org/downloads/windows/)
-2. Install [PyInstaller](https://pyinstaller.org/):  
+2. Install Dependencies:  
    ```
-   pip install pyinstaller
+   pip install -r build\requirements.txt
    ```
 3. Run the build script:
    ```
@@ -39,13 +34,24 @@ SNES-IDE is a development environment for SNES homebrew. The project includes to
    ```
 4. Output will be in `SNES-IDE-out/`
 
----
+### Local Build (UNIX)
+
+1. Install [Python 3.13+](https://www.python.org/downloads/)
+2. Install Dependencies:  
+   ```
+   pip3 install -r ./build/requirements.txt
+   ```
+3. Run the build script:
+   ```
+   python3 ./build/build.py
+   ```
+4. Output will be in `SNES-IDE-out/`
 
 ## Testing
 
 ### Build Tests
 
-[![Build (Green Light)](https://github.com/BrunoRNS/SNES-IDE/actions/workflows/Windows.yml/badge.svg?branch=windows%2Fci)](https://github.com/Atomic-Germ/SNES-IDE/actions/workflows/Windows.yml)
+[![Build (Green Light)](https://github.com/BrunoRNS/SNES-IDE/actions/workflows/Windows.yml/badge.svg?branch=windows%2Fci)](https://github.com/BrunoRNS/SNES-IDE/actions/workflows/Windows.yml)
 
 - These should never be failing. If they do, fix the build until red
 status is green and then move them.
@@ -57,13 +63,13 @@ status is green and then move them.
 - Run automatically in CI after each build.
 - Check for presence of key libraries and executables.
 - Example:  
-  - `libs/bsnes`, `libs/font`, `tools/snes-ide.exe`, etc.
+  - `libs/javasnes`, `libs/pvsneslib`, `bin/jdk8`, etc.
 
 ### Red-Light Tests
 
 [![Tests (Red Light)](https://github.com/BrunoRNS/SNES-IDE/actions/workflows/Windows.yml/badge.svg?branch=windows%2Fred)](https://github.com/BrunoRNS/SNES-IDE/actions/workflows/Windows.yml)
 
-- Only run on the `windows/red` branch.
+- Only run on the `<os>/red` branch.
 - Used for TDD: write failing tests before implementing new features.
 
 ## Contributing
@@ -73,14 +79,9 @@ status is green and then move them.
 - Submit pull requests to `devel`
 - See [CODE_OF_CONDUCT.md](CODE_OF_CONDUCT.md) for community guidelines
 
----
-
 ## Documentation & Resources
 
 - [docs/](docs/) — Examples and guides
-- [dependencies.md](dependencies.md) — Third-party libraries and tools
 - [CODE_OF_CONDUCT.md](CODE_OF_CONDUCT.md) — Contributor guidelines
-
----
 
 - Open an issue for bugs or feature requests!

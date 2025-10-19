@@ -1,0 +1,195 @@
+<!-- LibreSprite -->
+<!-- Copyright (C) 2001-2016 by David Capello -->
+<gui>
+  <window id="options" text="Preferences">
+  <vbox>
+    <hbox expansive="true">
+      <view maxsize="true">
+        <listbox id="section_listbox">
+          <listitem text="General" value="section_general" />
+          <listitem text="Editor" value="section_editor" />
+          <listitem text="Timeline" value="section_timeline" />
+          <listitem text="Cursors" value="section_cursors" />
+          <listitem text="Grid &amp;&amp; Background" value="section_grid" />
+          <listitem text="Undo" value="section_undo" />
+          <listitem text="Theme" value="section_theme" />
+          <listitem text="Experimental" value="section_experimental" />
+        </listbox>
+      </view>
+
+      <panel id="panel" expansive="true">
+        <vbox id="section_general">
+          <separator text="General" horizontal="true" />
+          <hbox>
+            <grid columns="2">
+              <label text="Screen Scaling:" />
+              <combobox id="screen_scale">
+                <listitem text="100%" value="1" />
+                <listitem text="200%" value="2" />
+                <listitem text="300%" value="3" />
+                <listitem text="400%" value="4" />
+              </combobox>
+              <label text="UI Elements Scaling:" />
+              <combobox id="ui_scale">
+                <listitem text="100%" value="1" />
+                <listitem text="200%" value="2" />
+                <listitem text="300%" value="3" />
+                <listitem text="400%" value="4" />
+              </combobox>
+            </grid>
+          </hbox>
+          <check text="GPU acceleration" id="gpu_acceleration" tooltip="Check this option to enable hardware acceleration" />
+          <check text="Expand menu bar items on mouseover" id="expand_menubar_on_mouseover" tooltip="Check this option to get&#10;this old menus behavior." />
+          <hbox>
+            <check text="Automatically save recovery data every" id="enable_data_recovery" tooltip="With this option you can recover your documents&#10;if the program finalizes unexpectedly." />
+            <combobox id="data_recovery_period">
+              <listitem text="2 Minutes" value="2" />
+              <listitem text="5 Minutes" value="5" />
+              <listitem text="10 Minutes" value="10" />
+              <listitem text="15 Minutes" value="15" />
+              <listitem text="30 Minutes" value="30" />
+            </combobox>
+          </hbox>
+          <check text="Show full file name path" id="show_full_path" tooltip="Uncheck this option if you would prefer to hide&#10;full path on UI (e.g. useful for live streaming)" />
+          <separator horizontal="true" />
+          <link id="locate_file" text="Locate Configuration File" />
+          <link id="locate_crash_folder" text="Locate Crash Folder" />
+        </vbox>
+
+        <!-- Editor -->
+        <vbox id="section_editor">
+          <separator text="Editor" horizontal="true" />
+          <check text="Zoom with scroll wheel" id="wheel_zoom" />
+          <check text="Zoom sliding two fingers up or down" id="slide_zoom" />
+          <check text="Zoom from center with scroll wheel" id="zoom_from_center_with_wheel" />
+          <check text="Zoom from center with keys" id="zoom_from_center_with_keys" />
+          <check text="Show scroll-bars in sprite editor" id="show_scrollbars" tooltip="Show scroll-bars in all sprite editors." />
+          <hbox>
+            <label text="Right-click:" />
+            <combobox id="right_click_behavior" expansive="true" />
+          </hbox>
+
+          <separator text="Selection" horizontal="true" />
+          <check text="Adjust opaque/transparent mode automatically" id="auto_opaque" tooltip="Depending on the layer (background/transparent),&#10;the pasted selection will be adjusted&#10;automatically (opaque/transparent)" />
+          <check text="Keep selection after &quot;Edit &gt; Clear&quot; command" id="keep_selection_after_clear" tooltip="Check this if you want to keep the selection&#10;after deleting it." />
+        </vbox>
+
+        <!-- Timeline -->
+        <vbox id="section_timeline">
+          <separator text="Timeline" horizontal="true" />
+          <check text="Show timeline automatically" id="autotimeline" tooltip="Show the timeline automatically&#10;when a new frame or layer is added." />
+          <check text="Rewind on Stop" id="rewind_on_stop" tooltip="The 'Stop' button should rewind the animation&#10;where it was started." />
+	</vbox>
+
+        <!-- Cursors -->
+        <vbox id="section_cursors">
+        <separator text="Cursor" horizontal="true" />
+        <check id="native_cursor" text="Use native mouse cursor" />
+          <separator text="Painting Cursors" horizontal="true" />
+          <label text="Precise Cursor Color:" />
+	  <hbox>
+	    <combobox group="1" id="cursor_color_type">
+	      <listitem text="Negative Black and White" value="0" />
+	      <listitem text="Specific Color" value="1" />
+	    </combobox>
+	    <box id="cursor_color_placeholder" /><!-- custom widget -->
+	  </hbox>
+
+	  <label text="Brush Preview:" />
+          <combobox id="brush_preview">
+            <listitem text="None" value="0" />
+            <listitem text="Brush Edges" value="1" />
+            <listitem text="Full Real-time Brush Preview" value="2" />
+          </combobox>
+        </vbox>
+
+        <!-- Grid & background -->
+        <vbox id="section_grid">
+          <combobox id="grid_scope" />
+          <separator text="Grid" horizontal="true" />
+          <grid columns="3">
+            <label text="Grid Color:" />
+            <box id="grid_color_placeholder" /><!-- custom widget -->
+	    <hbox />
+
+	    <label text="Grid Opacity:" />
+            <slider grid_hspan="1" id="grid_opacity" min="1" max="255" width="128" />
+            <check id="grid_auto_opacity" text="Auto" />
+
+            <label text="Pixel Grid Color:" />
+            <box id="pixel_grid_color_placeholder" /><!-- custom widget -->
+	    <hbox />
+
+	    <label text="Pixel Grid Opacity:" />
+            <slider id="pixel_grid_opacity" min="1" max="255" width="128" />
+            <check id="pixel_grid_auto_opacity" text="Auto" />
+          </grid>
+
+          <separator text="Checked Background" horizontal="true" />
+          <hbox>
+            <label text="Size:" />
+            <combobox id="checked_bg_size" expansive="true" />
+          </hbox>
+          <check text="Apply Zoom" id="checked_bg_zoom" />
+          <hbox>
+            <label text="Colors:" />
+            <box horizontal="true" id="checked_bg_color1_box" />
+            <box horizontal="true" id="checked_bg_color2_box" />
+          </hbox>
+
+	  <hbox>
+	    <hbox expansive="true" />
+            <button id="reset" text="Reset" width="60" />
+	  </hbox>
+        </vbox>
+
+        <!-- Undo -->
+        <vbox id="section_undo">
+          <separator text="Undo" horizontal="true" />
+          <hbox>
+            <label text="Undo Limit:" />
+            <entry id="undo_size_limit" maxsize="4" tooltip="Limit of memory to be used&#10;for undo information per sprite.&#10;Specified in megabytes." />
+            <label text="MB" />
+          </hbox>
+
+          <vbox>
+            <check id="undo_goto_modified" text="Go to modified frame/layer" tooltip="When it's enabled each time you undo/redo&#10;the current frame &amp; layer will be modified&#10;to focus the undid/redid change." />
+            <check id="undo_allow_nonlinear_history" text="Allow non-linear history" />
+          </vbox>
+        </vbox>
+
+        <!-- Theme -->
+        <vbox id="section_theme">
+          <separator text="Available Themes" horizontal="true" />
+          <view expansive="true" maxsize="true">
+            <listbox id="theme_list" />
+	  </view>
+          <hbox>
+	    <button id="select_theme" text="&amp;Select" width="60" />
+	    <boxfiller />
+	    <button id="open_theme_folder" text="Open &amp;Folder" width="100" />
+          </hbox>
+        </vbox>
+
+        <!-- Experimental -->
+        <vbox id="section_experimental">
+          <separator text="User Interface" horizontal="true" />
+          
+          <check id="native_file_dialog" text="Use native file dialog" />
+          <check id="flash_layer" text="Flash layer when it is selected" />
+        </vbox>
+
+      </panel>
+    </hbox>
+    <separator horizontal="true" />
+    <hbox>
+      <boxfiller />
+      <hbox homogeneous="true">
+        <button text="&amp;OK" closewindow="true" id="button_ok" magnet="true" width="60" />
+        <button text="&amp;Apply" id="button_apply" />
+        <button text="&amp;Cancel" closewindow="true" />
+      </hbox>
+    </hbox>
+  </vbox>
+  </window>
+</gui>

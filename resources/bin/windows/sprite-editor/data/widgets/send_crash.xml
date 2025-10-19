@@ -1,0 +1,27 @@
+<!-- Aseprite    | Copyright (C) 2014-2016  David Capello -->
+<!-- LibreSprite | Copyright (C) 2018       LibreSprite contributors -->
+<gui>
+<window text="Crash Report" id="send_crash">
+  <vbox>
+
+    <vbox id="official">
+      <label text="Please attach the following file:" />
+      <link id="filename" text="" url="" />
+      <label text="to a bug report on:" />
+      <entry readonly="true" text="https://github.com/LibreSprite/LibreSprite/issues" maxsize="256" />
+      <label text="explaining what you was doing when the program crashed." />
+    </vbox>
+
+    <vbox id="dev">
+      <label text="You are using a development version." />
+      <label text="Open the following file to debug your compilation:" />
+      <link id="dev_filename" text="" url="" />
+    </vbox>
+
+    <separator horizontal="true" />
+
+    <button text="Do it later" closewindow="true" />
+    <button id="delete_file" text="Delete file, I've already sent it" closewindow="true" />
+  </vbox>
+</window>
+</gui>

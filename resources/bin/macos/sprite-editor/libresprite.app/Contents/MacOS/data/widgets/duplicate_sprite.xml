@@ -1,0 +1,23 @@
+<!-- LibreSprite -->
+<!-- Copyright (C) 2001-2013 by David Capello -->
+<gui>
+<window text="Duplicate Sprite" id="duplicate_sprite">
+  <box vertical="true">
+    <box horizontal="true" expansive="true">
+      <box vertical="true" homogeneous="true">
+        <label text="Duplicate:" />
+        <label text="As:" />
+      </box>
+      <box vertical="true" homogeneous="true" expansive="true">
+        <label text="" id="src_name" />
+        <entry maxsize="256" id="dst_name" magnet="true" />
+      </box>
+    </box>
+    <check text="Duplicate merged layers only" id="flatten" />
+    <box horizontal="true" homogeneous="true">
+      <button text="&amp;OK" closewindow="true" id="ok" magnet="true" />
+      <button text="&amp;Cancel" closewindow="true" />
+    </box>
+  </box>
+</window>
+</gui>
