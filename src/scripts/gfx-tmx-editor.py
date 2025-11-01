@@ -63,10 +63,10 @@ def get_home_path() -> str:
 def main() -> NoReturn:
     """Main logic to init tiled -> default tmx_editor"""
 
-    tmx_editor: "Path|str"
+    tmx_editor: Path
     
     if platform.system().lower() == "windows":
-        tmx_editor = "tiled"
+        tmx_editor = Path(get_home_path()) / "bin" / "tmx-editor" / "tiled.exe"
     
     elif platform.system().lower() == "darwin":
         tmx_editor = Path(get_home_path()) / "bin" / "tmx-editor" / "Tiled.app"
@@ -74,12 +74,7 @@ def main() -> NoReturn:
     else:
         tmx_editor = Path(get_home_path()) / "bin" / "tmx-editor" / "tiled.AppImage"
 
-    if isinstance(tmx_editor, str):
-        if not check_if_path(tmx_editor):
-            print(f"Failed, tiled does not exist in system's PATH")
-            exit(-1)
-         
-    elif not tmx_editor or not tmx_editor.exists():
+    if not tmx_editor or not tmx_editor.exists():
         print(f"Failed, tiled does not exist in: {tmx_editor}")
         exit(-1)
 

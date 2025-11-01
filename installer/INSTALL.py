@@ -356,7 +356,7 @@ class WebSocketManager:
         self.server_thread.start()
         
         max_wait: int = 150
-        for i in range(max_wait):
+        for _ in range(max_wait):
             if self.loop and self.loop.is_running():
                 time.sleep(0.1)
             else:
@@ -372,10 +372,12 @@ class WebSocketManager:
     def stop_with_error(self, reason: str = "Unknown installation error") -> None:
         """Stop WebSocket server with code 1101, error"""
         
+        future: Any = None
+
         if self.running and self.loop:
             self.running = False
         
-            future: Any = asyncio.run_coroutine_threadsafe(
+            future = asyncio.run_coroutine_threadsafe(
                 self._close_all_with_error(reason), 
                 self.loop
             )
