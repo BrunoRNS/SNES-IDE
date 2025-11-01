@@ -140,7 +140,6 @@ def main() -> NoReturn:
         exit(-1)
 
     pvsneslib_home: Path = Path(output.stdout.strip()) / "bin" / "pvsneslib"
-    javasnes_jar: Path = Path(output.stdout.strip()) / "libs" / "javasnes" / "lib" / "javasnes.jar"
     java_home: Path
 
     if platform.system().lower() == "darwin":
@@ -153,96 +152,63 @@ def main() -> NoReturn:
     os.environ["PVSNESLIB_HOME"] = str(pvsneslib_home)
     os.environ["JAVA_HOME"] = str(java_home)
 
-    javasnes_proj: Path = Path(str(get_file_path(
-        "Select JavaSnes project directory", file_types=[("Directories", "*")],
-        multiple=False, directory=True
+    javasnes_proj_jar: Path = Path(str(get_file_path(
+        "Select JavaSnes project's JAR output file",
+        file_types=[("JAR files", "*.jar")],
+        multiple=False, directory=False
     )))
 
-    if not (javasnes_proj / "Main.java").exists():
-        print("No Main.java to build project found, exiting...")
+    javasnes_proj: Path = javasnes_proj_jar.parent
+
+    if not (javasnes_proj_jar).exists():
+        print("No JAR file to build project found, exiting...")
         exit(-1)
 
     try:
-        os.makedirs(javasnes_proj / "out", exist_ok=False)
-    except Exception as e:
-        print(f"Failed to create out directory: {e}, exiting...")
-        exit(-1)
-
-    try:
-        javac_output: CompletedProcess[bytes]
-        java_output: CompletedProcess[bytes]
-
-        if platform.system().lower() == "windows":
-
-            javac_output = subprocess.run(
-                [str(java_home / "javac.exe"), "-cp", ".;" + str(javasnes_jar),
-                "-d", "out", "*.java"
-                ],
-                cwd=javasnes_proj, shell=True, capture_output=True,
-                env=os.environ, check=True
-            )
-
-            java_output = subprocess.run(
-                [str(java_home / "java.exe"), "-cp", "out;" + str(javasnes_jar),
-                "Main"
-                ],
-                cwd=javasnes_proj, shell=True, capture_output=True,
-                env=os.environ, check=True
-            )
-    
-        else:
-        
-            javac_output = subprocess.run(
-                [str(java_home / "javac"), "-cp", ".:" + str(javasnes_jar),
-                "-d", "out", "*.java"
-                ],
-                cwd=javasnes_proj, shell=True, capture_output=True,
-                env=os.environ, check=True
-            )
-
-            java_output = subprocess.run(
-                [str(java_home / "java"), "-cp", "out:" + str(javasnes_jar),
-                "Main"
-                ],
-                cwd=javasnes_proj, shell=True, capture_output=True,
-                env=os.environ, check=True
-            )
-        
-        if java_output.returncode != 0 or javac_output.returncode != 0:
-            print(f"Failed to generate Makefile, exiting...")
-            exit(-1)
+        subprocess.run(
+            [
+                str(java_home / ("java") if os.name == "posix" else ("java.exe")),
+                "-jar", javasnes_proj_jar
+            ],
+            shell=True, env=os.environ, check=True
+        )
 
     except subprocess.CalledProcessError as e:
-        print(f"Failed to generate Makefile: {e}, exiting...")
+        print(f"Error while building javasnes project: {e}")
         exit(-1)
-
+    
     except Exception as e:
-        print(f"Unknown error in java compiling: {e}, exiting...")
+        print(f"Unknown error while building java project: {e}")
         exit(-1)
 
-    if not (javasnes_proj / "Makefile").exists():
+    if not (javasnes_proj / "output").exists():
+        print("No output path found, exiting...")
+        exit(-1)
+
+    if not (javasnes_proj / "output" / "Makefile").exists():
         print("No Makefile to build project found, exiting...")
         exit(-1)
 
     if not check_if_path("make") and not platform.system().lower() == "darwin":
         print("Make not found in PATH, exiting...")
         exit(-1)
+
     elif not check_if_path("gmake") and platform.system().lower() == "darwin":
         print("Gmake not found in PATH, exiting...")
         exit(-1)
 
-    make_output: CompletedProcess[bytes]
+    make_output: CompletedProcess[str]
 
     if platform.system().lower() == "darwin":
         make_output = subprocess.run(
-            ["gmake"], cwd=javasnes_proj, shell=True, capture_output=True,
-            env=os.environ
+            ["gmake"], cwd=javasnes_proj / "output", shell=True, capture_output=True,
+            env=os.environ, text=True
         )
         
     else:
         make_output = subprocess.run(
-            ["make"], cwd=javasnes_proj, shell=True, capture_output=True,
-            env=os.environ
+            ["make"], cwd=javasnes_proj / "output", shell=True, capture_output=True,
+            env=os.environ, text=True
         )
 
     if make_output.returncode != 0:
