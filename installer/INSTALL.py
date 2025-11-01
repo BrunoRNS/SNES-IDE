@@ -152,19 +152,26 @@ class LZMAZipExtractor:
             raise RuntimeError(f"Extraction error: {e}")
     
     def _extract_single_file(self, zip_ref: ZipFile, file_info: ZipInfo, extract_path: Path) -> None:
-        """
-        Extracts a single file from ZIP, handling LZMA compression.
-        """
-
-        target_path: Path = extract_path / file_info.filename
-        target_path.parent.mkdir(parents=True, exist_ok=True)
+        """Extracts a single file from ZIP, handling LZMA compression."""
+    
+        file_path = Path(file_info.filename)
+        if file_path.is_absolute() or ".." in file_path.parts:
+            print(f"Security warning: Skipping suspicious path {file_info.filename}")
+            return
         
+        target_path: Path = extract_path / file_info.filename
+    
+        try:
+            target_path.resolve().relative_to(extract_path.resolve())
+        except ValueError:
+            print(f"Security warning: Path traversal attempt blocked: {file_info.filename}")
+            return
+        
+        target_path.parent.mkdir(parents=True, exist_ok=True)
+    
         if file_info.compress_type == zipfile.ZIP_LZMA:
-
             self._extract_lzma_file(zip_ref, file_info, target_path)
-
         else:
-
             zip_ref.extract(file_info, extract_path)
     
     def _extract_lzma_file(self, zip_ref: ZipFile, file_info: ZipInfo, target_path: Path) -> None:
@@ -341,18 +348,19 @@ class WebSocketManager:
     
     def start(self) -> None:
         """Start WebSocket server"""
-
         if self.running:
             return
-            
+        
         self.running = True
         self.server_thread = threading.Thread(target=self._run_in_thread, daemon=True)
         self.server_thread.start()
-
-        # Wait 3 seconds to estabilish websocket connection
-        time.sleep(3)
-
-        print("WebSocket running in background...")
+        
+        max_wait: int = 150
+        for i in range(max_wait):
+            if self.loop and self.loop.is_running():
+                time.sleep(0.1)
+            else:
+                break
     
     def stop(self) -> None:
         """Stop WebSocket server"""
@@ -363,16 +371,21 @@ class WebSocketManager:
     
     def stop_with_error(self, reason: str = "Unknown installation error") -> None:
         """Stop WebSocket server with code 1101, error"""
-
+        
         if self.running and self.loop:
             self.running = False
-            
-            asyncio.run_coroutine_threadsafe(
+        
+            future: Any = asyncio.run_coroutine_threadsafe(
                 self._close_all_with_error(reason), 
                 self.loop
             )
-            
+        
+        try:
+            future.result(timeout=5.0)
             print(f"WebSocket server stopped with error: {reason}")
+            
+        except Exception as e:
+            print(f"WebSocket stop timeout: {e}")
 
     async def _close_all_with_error(self, reason: str) -> None:
         """Close all connections with error code 1101"""
@@ -751,18 +764,20 @@ class SystemRequirementsChecker:
                 return True, "Homebrew is installed"
             
             print("Installing x-code...")
-            xcode: CompletedProcess[str] = subprocess.run(["xcode-select", "--install"], shell=True, capture_output=True, text=True)
+            xcode: CompletedProcess[str] = subprocess.run(["xcode-select", "--install"], capture_output=True, text=True)
 
             print("Installing Homebrew...")
             install_script: str = (
                 '/bin/bash -c "$(curl -fsSL https://raw.githubusercontent.com/'
                 'Homebrew/install/HEAD/install.sh)"'
             )
+
+            xcode_success: bool = xcode.returncode in [0, 1]
             
             result = subprocess.run(install_script, shell=True,
                                   capture_output=True, text=True)
             
-            if result.returncode == 0 and xcode.returncode == 0:
+            if result.returncode == 0 and xcode_success:
                 return True, "Homebrew installed successfully"
 
             else:
@@ -1210,6 +1225,9 @@ class ApplicationInstaller:
         if self.system_info['os'].lower() == 'linux':
 
             schism_installer_path: Path = self.app_dir / "bin" / "schismtracker" / "install.sh"
+
+            if not schism_installer_path.exists():
+                return False
             
             if not self._run_command([str(schism_installer_path)], shell=True)[0]:
                 return False
@@ -1218,10 +1236,16 @@ class ApplicationInstaller:
                 return False
 
             sprite_editor: Path = self.app_dir / "bin" / "sprite-editor"
+            if not sprite_editor.exists():
+                return False
+            
             if not self._run_command(["chmod", "-R", "+x", str(sprite_editor)], shell=True)[0]:
                 return False
 
             tmx_editor: Path = self.app_dir / "bin" / "tmx-editor"
+            if not tmx_editor.exists():
+                return False
+                
             if not self._run_command(["chmod", "-R", "+x", str(tmx_editor)], shell=True)[0]:
                 return False
 
@@ -1502,73 +1526,138 @@ def install(
 def main() -> None:
     """Main Logic of the INSTALL application"""
     app: "None|PyQtWebApp" = None
+    temp_dir: "str|None" = None
+    ws: "WebSocketManager|None" = None
 
     if not check_if_admin():
+        print("Error: Administrator privileges required")
         exit(-1)
-
+        
     if os.name == 'posix':
-        subprocess.run(
-            ["chmod", "-R", "+x", "./SNES-IDE"],
-            shell=True, check=True, cwd=get_executable_path()
-        )
+        try:
+            subprocess.run(
+                ["chmod", "-R", "+x", "./SNES-IDE"],
+                shell=False, check=True, cwd=get_executable_path()
+            )
+        except subprocess.CalledProcessError as e:
+            print(f"Warning: Failed to set permissions: {e}")
 
     checker: SystemRequirementsChecker = SystemRequirementsChecker()
     print("System Requirements Checker")
     print("=" * 30)
 
     requirements_met: bool = checker.check_all_requirements()
-
+    
     zip_extractor: LZMAZipExtractor = LZMAZipExtractor()
-    ws: WebSocketManager = WebSocketManager()
+    ws = WebSocketManager()
     
     try:
         ws.start()
+        print("WebSocket server started")
 
-        with tempfile.TemporaryDirectory() as temp_dir:
+        temp_dir = tempfile.mkdtemp(prefix="snes_ide_installer_")
+        print(f"Created temp directory: {temp_dir}")
 
-            web_path: str = zip_extractor.extract_zip(
-                get_executable_path() / "gui" / "installer-gui.zip", temp_dir, create_subdir=True
-            )
+        web_path: str = zip_extractor.extract_zip(
+            get_executable_path() / "gui" / "installer-gui.zip", 
+            temp_dir, 
+            create_subdir=True
+        )
+        print(f"Web interface extracted to: {web_path}")
 
-            app = PyQtWebApp(
-                str(Path(web_path) / "installer-gui"), window_title="SNES-IDE Installer"
-            )
+        if not requirements_met:
+            print("System requirements not met")
+            checker.show_error_dialog()
+            time.sleep(5)
+            exit(-1)
 
-            app.start()
+        app = PyQtWebApp(
+            str(Path(web_path) / "installer-gui"), 
+            window_title="SNES-IDE Installer"
+        )
+        app.start()
+        app.show()
+        print("PyQt application started")
 
-            if not requirements_met:
-
-                checker.show_error_dialog()
-                time.sleep(5)
-                exit(-1)
-
-            app.show()
-
-            while True:
-
-                if ws.get_connection_count() > 0:
-                    break
-                else:
-                    time.sleep(0.5)
+        print("Waiting for WebSocket connection...")
+        max_wait_seconds: int = 30
+        wait_interval: float = 0.5
+        max_attempts = int(max_wait_seconds / wait_interval)
+        
+        connected = False
+        for attempt in range(max_attempts):
+            if ws.get_connection_count() > 0:
+                connected = True
+                print("WebSocket client connected")
+                break
+            time.sleep(wait_interval)
             
-            return_install: "Tuple[Literal[False], str] | Literal[True]"
-            return_install = install(ws, zip_extractor, get_executable_path())
+            if attempt % 10 == 0:
+                elapsed = attempt * wait_interval
+                print(f"Still waiting... ({elapsed:.1f}s / {max_wait_seconds}s)")
+
+        if not connected:
+            print("Timeout: No WebSocket connection established")
+            ws.stop_with_error("Connection timeout - no client connected")
+            exit(-1)
+
+        print("Starting installation process...")
+        return_install: "Tuple[Literal[False], str] | Literal[True]"
+        return_install = install(ws, zip_extractor, get_executable_path())
+        
+        if return_install != True:
+            error_msg = return_install[1]
+            print(f"Installation failed: {error_msg}")
+            ws.stop_with_error(error_msg)
+            exit(-1)
             
-            if return_install != True:
-                ws.stop_with_error(return_install[1])
+        else:
+            print("Installation completed successfully")
+            ws.send_message("Installation completed successfully")
+            time.sleep(3)
 
     except Exception as e:
+        print(f"Critical error during installation: {e}")
+        if ws:
+            try:
+                ws.stop_with_error(f"Unexpected error: {str(e)}")
+            except:
+                pass
+        try:
+            msg_box = QMessageBox()
+            msg_box.setIcon(QMessageBox.Icon.Critical)
+            msg_box.setWindowTitle("Installation Error")
+            msg_box.setText(f"An unexpected error occurred:\n{str(e)}")
+            msg_box.exec()
+        except:
+            print("Could not display error dialog")
 
-        print(f"Error while executing installer: {e}")
-    
     finally:
-
-        if app is None:
-            ws.stop()
-
-        else:
-            app.close()
-            ws.stop()
+        print("Cleaning up resources...")
+        
+        try:
+            if app:
+                print("Closing application...")
+                app.close()
+        except Exception as e:
+            print(f"Error closing application: {e}")
+        
+        try:
+            if ws:
+                print("Stopping WebSocket...")
+                ws.stop()
+        except Exception as e:
+            print(f"Error stopping WebSocket: {e}")
+        
+        try:
+            if temp_dir and os.path.exists(temp_dir):
+                print(f"Cleaning temp directory: {temp_dir}")
+                shutil.rmtree(temp_dir, ignore_errors=True)
+        except Exception as e:
+            print(f"Error cleaning temp directory: {e}")
+        
+        print("Cleanup completed")
 
 if __name__ == "__main__":
     main()
+
