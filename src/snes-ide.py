@@ -28,9 +28,20 @@ import subprocess
 import sys
 
 class ScriptRunner(QObject):
+    
     scriptExecuted: Signal = Signal(str, str)
     
     def __init__(self) -> None:
+        """
+        Initializes the ScriptRunner object.
+
+        Sets the path of the scripts directory to the directory containing the
+        executable or script, depending on whether the script is frozen (PyInstaller)
+        or not.
+
+        :return: None
+        """
+        
         super().__init__()
         self.scripts_dir: Path = self.get_executable_path() / "scripts"
 
@@ -52,6 +63,7 @@ class ScriptRunner(QObject):
     @Slot(str)
     def run_script(self, script_name: str) -> None:
         """Execute a Python script from the scripts directory"""
+        
         try:
             script_path: Path = self.scripts_dir / script_name
             if script_path.exists():
@@ -73,7 +85,18 @@ class ScriptRunner(QObject):
             self.scriptExecuted.emit(script_name, f"Exception: {str(e)}")
 
 class MainWindow(QMainWindow):
+    
     def __init__(self) -> None:
+        """
+        Initializes the main window of the SNES IDE.
+
+        Sets the window title to "SNES IDE - Super Nintendo Development Environment",
+        sets the window size to 1200x800, and sets the layout to a vertical box layout.
+        Creates a QWebEngineView and sets it as the central widget of the main window.
+        Creates a QWebChannel and registers a ScriptRunner object with it.
+        Loads the index.html file from the assets directory into the QWebEngineView.
+        """
+        
         super().__init__()
         self.setWindowTitle("SNES IDE - Super Nintendo Development Environment")
         self.setGeometry(100, 100, 1200, 800)
@@ -96,6 +119,12 @@ class MainWindow(QMainWindow):
         layout.addWidget(self.web_view)
 
 def main() -> NoReturn:
+    """
+    Main entry point of the application. Initializes QApplication,
+    sets the style to Fusion if possible, creates a MainWindow,
+    shows it and starts the application event loop.
+    """
+    
     app: QApplication = QApplication(sys.argv)
     
     try:

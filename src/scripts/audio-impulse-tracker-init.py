@@ -20,21 +20,8 @@ from subprocess import run, CalledProcessError
 from typing_extensions import Literal
 from pathlib import Path
 import platform
-import shutil
 import sys
 import os
-
-def check_if_path(program: str) -> bool:
-    """
-    Check if a program is available in the system PATH.
-    
-    Args:
-        program (str): The name of the program to check (e.g., 'make', 'tiled')
-        
-    Returns:
-        bool: True if the program is found in PATH, False otherwise
-    """
-    return shutil.which(program) is not None
 
 def get_executable_path() -> str:
     """Get the path of the executable or script based on whether the script is frozen 
@@ -63,7 +50,7 @@ def get_home_path() -> str:
 def convert() -> Literal[-1, 0]:
     """Init schismtracker."""
 
-    schism: "Path|str"
+    schism: Path
     
     if platform.system().lower() == "windows":
         schism = Path(get_home_path()) / "bin" / "schismtracker" / "schismtracker.exe"
@@ -72,14 +59,9 @@ def convert() -> Literal[-1, 0]:
         schism = Path(get_home_path()) / "bin" / "schismtracker" / "Schism Tracker.app"
 
     else:
-        schism = "schismtracker"
+        schism = Path(get_home_path()) / "bin" / "schismtracker" / "Schism_Tracker-x86_64.AppImage"
 
-    if isinstance(schism, str):
-        if not check_if_path(schism):
-            print(f"Failed, schism tracker does not exist in system's PATH")
-            return -1
-
-    elif not schism or not schism.exists():
+    if not schism or not schism.exists():
 
         print(f"Failed, schism tracker does not exist in: {schism}")
         return -1
