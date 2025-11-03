@@ -1,4 +1,3 @@
-/* Dracula Soft Theme - Purple Variant */
 :root {
     --bg-primary: #282a36;
     --bg-secondary: #343746;
@@ -101,7 +100,6 @@ body {
     color: var(--accent-cyan);
 }
 
-/* Script Buttons */
 .script-list {
     display: flex;
     flex-direction: column;
@@ -156,7 +154,6 @@ body {
     opacity: 1;
 }
 
-/* Status Bar */
 .status-bar {
     position: fixed;
     bottom: 0;
@@ -202,7 +199,6 @@ body {
     50% { opacity: 0.5; }
 }
 
-/* Responsive Design */
 @media (max-width: 768px) {
     .category-grid {
         grid-template-columns: 1fr;

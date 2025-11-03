@@ -22,21 +22,8 @@ from tkinter import Tk, filedialog
 from pathlib import Path
 import subprocess
 import platform
-import shutil
 import sys
 import os
-
-def check_if_path(program: str) -> bool:
-    """
-    Check if a program is available in the system PATH.
-    
-    Args:
-        program (str): The name of the program to check (e.g., 'make', 'tiled')
-        
-    Returns:
-        bool: True if the program is found in PATH, False otherwise
-    """
-    return shutil.which(program) is not None
 
 def get_file_path(
     title: str = "Select file",
@@ -156,13 +143,6 @@ def main() -> NoReturn:
 
     if not (dotsnes_proj_path / "Makefile").exists():
         print("No Makefile to build project found, exiting...")
-        exit(-1)
-
-    if not check_if_path("make") and not platform.system().lower() == "darwin":
-        print("Make not found in PATH, exiting...")
-        exit(-1)
-    elif not check_if_path("gmake") and platform.system().lower() == "darwin":
-        print("Gmake not found in PATH, exiting...")
         exit(-1)
 
     make_output: CompletedProcess[bytes]
