@@ -82,9 +82,6 @@ nosetests.xml
 # VsCode files
 .vscode/
 
-# JSON configuration files
-*.json
-
 # META-INF files
 META-INF/
 

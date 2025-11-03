@@ -3,25 +3,23 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>SNES IDE - Super Nintendo Development Environment</title>
+    <title>SNES IDE - Super Nintendo Development Integrated Development Environment</title>
     <link rel="stylesheet" href="styles.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <script src="qrc:///qtwebchannel/qwebchannel.js"></script>
 </head>
 <body>
     <div class="container">
-        <!-- Header Section -->
         <header class="header">
             <h1 class="main-title">SNES IDE</h1>
             <p class="subtitle">Super Nintendo Development Environment</p>
         </header>
 
-        <!-- Main Content Grid -->
         <div class="category-grid">
 
-            <!-- Project Creation -->
             <div class="category-card">
                 <div class="category-header">
-                    <div class="category-icon">🚀</div>
+                    <div class="category-icon"><i class="fas fa-project-diagram"></i></div>
                     <h2 class="category-title">Project Creation</h2>
                 </div>
                 <div class="script-list">
@@ -30,29 +28,28 @@
                             <div class="script-name">.NET Snes Project</div>
                             <div class="script-desc">Create new .NET Snes project</div>
                         </div>
-                        <span class="run-icon">▶️</span>
+                        <span class="run-icon"><i class="fas fa-play"></i></span>
                     </button>
                     <button class="script-btn" onclick="runScript('create-javasnes-proj.py')">
                         <div>
                             <div class="script-name">Java Snes Project</div>
                             <div class="script-desc">Create new Java Snes project</div>
                         </div>
-                        <span class="run-icon">▶️</span>
+                        <span class="run-icon"><i class="fas fa-play"></i></span>
                     </button>
                     <button class="script-btn" onclick="runScript('create-pvsneslib-proj.py')">
                         <div>
                             <div class="script-name">PVSnesLib Project</div>
                             <div class="script-desc">Create new PVSnesLib project</div>
                         </div>
-                        <span class="run-icon">▶️</span>
+                        <span class="run-icon"><i class="fas fa-play"></i></span>
                     </button>
                 </div>
             </div>
 
-            <!-- Compilation Tools -->
             <div class="category-card">
                 <div class="category-header">
-                    <div class="category-icon">⚙️</div>
+                    <div class="category-icon"><i class="fas fa-code"></i></div>
                     <h2 class="category-title">Compilation</h2>
                 </div>
                 <div class="script-list">
@@ -61,21 +58,21 @@
                             <div class="script-name">.NET Snes Compile</div>
                             <div class="script-desc">Compile .NET Snes projects</div>
                         </div>
-                        <span class="run-icon">▶️</span>
+                        <span class="run-icon"><i class="fas fa-play"></i></span>
                     </button>
                     <button class="script-btn" onclick="runScript('compile-javasnes-proj.py')">
                         <div>
                             <div class="script-name">Java Snes Compile</div>
                             <div class="script-desc">Compile Java Snes projects</div>
                         </div>
-                        <span class="run-icon">▶️</span>
+                        <span class="run-icon"><i class="fas fa-play"></i></span>
                     </button>
                     <button class="script-btn" onclick="runScript('compile-pvsneslib-proj.py')">
                         <div>
                             <div class="script-name">PVSnesLib Compile</div>
                             <div class="script-desc">Compile PVSnesLib projects</div>
                         </div>
-                        <span class="run-icon">▶️</span>
+                        <span class="run-icon"><i class="fas fa-play"></i></span>
                     </button>
                 </div>
             </div>
@@ -83,7 +80,7 @@
             <!-- Graphics Tools -->
             <div class="category-card">
                 <div class="category-header">
-                    <div class="category-icon">🎨</div>
+                    <div class="category-icon"><i class="fas fa-palette"></i></div>
                     <h2 class="category-title">Graphics Tools</h2>
                 </div>
                 <div class="script-list">
@@ -92,36 +89,35 @@
                             <div class="script-name">PNG/BMP Editor</div>
                             <div class="script-desc">Edit PNG and BMP graphics files</div>
                         </div>
-                        <span class="run-icon">▶️</span>
+                        <span class="run-icon"><i class="fas fa-play"></i></span>
                     </button>
                     <button class="script-btn" onclick="runScript('gfx-png-bmp-snes-converter.py')">
                         <div>
                             <div class="script-name">SNES Graphics Converter</div>
                             <div class="script-desc">Convert PNG/BMP to SNES format</div>
                         </div>
-                        <span class="run-icon">▶️</span>
+                        <span class="run-icon"><i class="fas fa-play"></i></span>
                     </button>
                     <button class="script-btn" onclick="runScript('gfx-tmx-editor.py')">
                         <div>
                             <div class="script-name">TMX Editor</div>
                             <div class="script-desc">Edit Tiled Map Editor files</div>
                         </div>
-                        <span class="run-icon">▶️</span>
+                        <span class="run-icon"><i class="fas fa-play"></i></span>
                     </button>
                     <button class="script-btn" onclick="runScript('gfx-tmx-tmj-converter.py')">
                         <div>
-                            <div class="script-name">TMX/TMJ Converter</div>
-                            <div class="script-desc">Convert between TMX and TMJ formats</div>
+                            <div class="script-name">TMX/TMJ Tileset Extractor</div>
+                            <div class="script-desc">Tileset Extractor from PvSnesLib</div>
                         </div>
-                        <span class="run-icon">▶️</span>
+                        <span class="run-icon"><i class="fas fa-play"></i></span>
                     </button>
                 </div>
             </div>
 
-            <!-- Audio Tools Category -->
             <div class="category-card">
                 <div class="category-header">
-                    <div class="category-icon">🎵</div>
+                    <div class="category-icon"><i class="fas fa-music"></i></div>
                     <h2 class="category-title">Audio Tools</h2>
                 </div>
                 <div class="script-list">
@@ -130,36 +126,35 @@
                             <div class="script-name">BRR ↔ WAV Converter</div>
                             <div class="script-desc">Convert between BRR and WAV audio formats</div>
                         </div>
-                        <span class="run-icon">▶️</span>
+                        <span class="run-icon"><i class="fas fa-play"></i></span>
                     </button>
                     <button class="script-btn" onclick="runScript('audio-impulse-tracker-init.py')">
                         <div>
                             <div class="script-name">Impulse Tracker Init</div>
                             <div class="script-desc">Initialize Impulse Tracker modules</div>
                         </div>
-                        <span class="run-icon">▶️</span>
+                        <span class="run-icon"><i class="fas fa-play"></i></span>
                     </button>
                     <button class="script-btn" onclick="runScript('audio-sample-generator.py')">
                         <div>
                             <div class="script-name">Sample Generator</div>
                             <div class="script-desc">Generate audio samples for SNES</div>
                         </div>
-                        <span class="run-icon">▶️</span>
+                        <span class="run-icon"><i class="fas fa-play"></i></span>
                     </button>
                     <button class="script-btn" onclick="runScript('audio-wav-brr-converter.py')">
                         <div>
                             <div class="script-name">WAV to BRR Converter</div>
                             <div class="script-desc">Convert WAV files to BRR format</div>
                         </div>
-                        <span class="run-icon">▶️</span>
+                        <span class="run-icon"><i class="fas fa-play"></i></span>
                     </button>
                 </div>
             </div>
 
-            <!-- Utilities -->
             <div class="category-card">
                 <div class="category-header">
-                    <div class="category-icon">🔧</div>
+                    <div class="category-icon"><i class="fas fa-tools"></i></div>
                     <h2 class="category-title">Utilities</h2>
                 </div>
                 <div class="script-list">
@@ -168,7 +163,7 @@
                             <div class="script-name">Open Emulator</div>
                             <div class="script-desc">Launch SNES emulator</div>
                         </div>
-                        <span class="run-icon">▶️</span>
+                        <span class="run-icon"><i class="fas fa-play"></i></span>
                     </button>
                 </div>
             </div>
@@ -176,7 +171,6 @@
         </div>
     </div>
 
-    <!-- Status Bar -->
     <div class="status-bar">
         <div class="status-message" id="statusMessage">Ready to develop SNES games!</div>
         <div class="status-indicator">
@@ -186,19 +180,25 @@
     </div>
 
     <script>
-        // Initialize Qt WebChannel
+
         var scriptRunner = null;
         new QWebChannel(qt.webChannelTransport, function(channel) {
             scriptRunner = channel.objects.scriptRunner;
-            
-            // Connect to the scriptExecuted signal
             scriptRunner.scriptExecuted.connect(function(scriptName, result) {
                 updateStatus(`Completed: ${scriptName} - ${result}`);
                 setIndicator('idle');
             });
         });
 
-        // Function to run scripts
+        /**
+         * Run a Python script from the scripts directory.
+         *
+         * @param {string} scriptName - The name of the script to run.
+         *
+         * If the script runner is available, this function will execute the script and
+         * update the status bar and indicator accordingly. If the script runner is not
+         * available, it will update the status bar with an error message.
+         */
         function runScript(scriptName) {
             if (scriptRunner) {
                 updateStatus(`Running: ${scriptName}...`);
@@ -209,16 +209,26 @@
             }
         }
 
-        // Update status message
+        /**
+         * Update the status bar with the given message.
+         *
+         * @param {string} message - The message to display in the status bar.
+         */
         function updateStatus(message) {
             document.getElementById('statusMessage').textContent = message;
         }
 
-        // Set status indicator
+        /**
+         * Update the status indicator with the given state.
+         *
+         * @param {string} state - The state to set the indicator to.
+         *     Possible values are 'idle' and 'running'.
+         */
         function setIndicator(state) {
             const indicator = document.getElementById('statusIndicator');
             indicator.className = 'indicator ' + state;
         }
+
     </script>
 </body>
 </html>
