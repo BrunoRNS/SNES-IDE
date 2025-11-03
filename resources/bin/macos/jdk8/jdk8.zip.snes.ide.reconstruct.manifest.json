@@ -1,19 +1,19 @@
 {
-  "original_filename": "/save/SNES-IDE/resources/bin/macos/jdk8/jdk8.zip",
+  "original_filename": "jdk8.zip",
   "total_size": 100741269,
   "chunk_size": 94371840,
   "checksum": "e43cdf390fafaf7ede93d9c7cc441366",
   "chunks": [
     {
       "index": 0,
-      "filename": "/save/SNES-IDE/resources/bin/macos/jdk8/jdk8.zip.chunk000",
+      "filename": "jdk8.zip.chunk000",
       "start_byte": 0,
       "end_byte": 94371839,
       "size": 94371840
     },
     {
       "index": 1,
-      "filename": "/save/SNES-IDE/resources/bin/macos/jdk8/jdk8.zip.chunk001",
+      "filename": "jdk8.zip.chunk001",
       "start_byte": 94371840,
       "end_byte": 100741268,
       "size": 6369429
