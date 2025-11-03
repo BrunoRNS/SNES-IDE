@@ -41,7 +41,7 @@ class FileSplitter:
         self.file_path = file_path
         self.chunk_size = chunk_size
         self.manifest_data: Dict[str, 'int|str|List[Dict[str, str|int]]'] = {
-            'original_filename': str(Path(file_path).absolute()),
+            'original_filename': str(Path(file_path).absolute().name),
             'total_size': 0,
             'chunk_size': chunk_size,
             'checksum': '',
@@ -111,7 +111,7 @@ class FileSplitter:
                     
                     chunk_info: Dict[str, 'str|int'] = {
                         'index': chunk_index,
-                        'filename': chunk_filename,
+                        'filename': chunk_filename.name,
                         'start_byte': start_byte,
                         'end_byte': end_byte,
                         'size': current_chunk_size,
