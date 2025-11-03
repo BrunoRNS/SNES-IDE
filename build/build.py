@@ -400,7 +400,7 @@ class FileJoiner:
             sorted_chunks = sorted(self.manifest_data['chunks'], key=lambda x: x['index'])
             
             with open(
-                Path(self.output_path) / self.manifest_data['original_filename'],
+                str(Path(self.output_path) / self.manifest_data['original_filename']),
                 'wb'
             ) as output_file:
                 
@@ -416,6 +416,7 @@ class FileJoiner:
                         output_file.write(chunk_data)
                     
                     progress = ((i + 1) / len(sorted_chunks)) * 100
+                    
                     print(f"Processed chunk {chunk_info['index']:03d}:"
                           f" {Path(self.manifest_path).parent / chunk_path} "
                           f"({chunk_info['size'] / (1024 * 1024):.2f} MB) "
@@ -477,6 +478,9 @@ def restore_big_files() -> None:
     """
     
     for file in (ROOT / 'resources').rglob("*.snes.ide.reconstruct.manifest.json"):
+        
+        if file.is_dir():
+            continue
         
         joiner: FileJoiner = FileJoiner(str(file), str(file.parent))
         
