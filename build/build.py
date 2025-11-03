@@ -437,7 +437,7 @@ class FileJoiner:
                 return False
             
             actual_checksum = self.calculate_checksum(str(Path(
-                self.output_path / self.manifest_data['original_filename']
+                Path(self.output_path) / self.manifest_data['original_filename']
             )))
             expected_checksum = self.manifest_data['checksum']
             
