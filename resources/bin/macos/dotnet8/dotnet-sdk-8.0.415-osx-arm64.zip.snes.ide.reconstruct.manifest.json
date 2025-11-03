@@ -1,26 +1,26 @@
 {
-  "original_filename": "/save/SNES-IDE/resources/bin/macos/dotnet8/dotnet-sdk-8.0.415-osx-arm64.zip",
+  "original_filename": "dotnet-sdk-8.0.415-osx-arm64.zip",
   "total_size": 221990955,
   "chunk_size": 94371840,
   "checksum": "c9275d5fc4bc17c019d236bd896f0c55",
   "chunks": [
     {
       "index": 0,
-      "filename": "/save/SNES-IDE/resources/bin/macos/dotnet8/dotnet-sdk-8.0.415-osx-arm64.zip.chunk000",
+      "filename": "dotnet-sdk-8.0.415-osx-arm64.zip.chunk000",
       "start_byte": 0,
       "end_byte": 94371839,
       "size": 94371840
     },
     {
       "index": 1,
-      "filename": "/save/SNES-IDE/resources/bin/macos/dotnet8/dotnet-sdk-8.0.415-osx-arm64.zip.chunk001",
+      "filename": "dotnet-sdk-8.0.415-osx-arm64.zip.chunk001",
       "start_byte": 94371840,
       "end_byte": 188743679,
       "size": 94371840
     },
     {
       "index": 2,
-      "filename": "/save/SNES-IDE/resources/bin/macos/dotnet8/dotnet-sdk-8.0.415-osx-arm64.zip.chunk002",
+      "filename": "dotnet-sdk-8.0.415-osx-arm64.zip.chunk002",
       "start_byte": 188743680,
       "end_byte": 221990954,
       "size": 33247275
