@@ -168,7 +168,7 @@ def main() -> None:
         if file.is_dir():
             continue
         
-        if file.stat().st_size >= 100 * 1024 * 1024:
+        if file.stat().st_size >= 100 * 1000 * 1000:
             
             chunker = FileSplitter(str(file.resolve()))
             chunker.split()
