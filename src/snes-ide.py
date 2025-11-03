@@ -83,6 +83,20 @@ class ScriptRunner(QObject):
 
         except Exception as e:
             self.scriptExecuted.emit(script_name, f"Exception: {str(e)}")
+            
+    @Slot(str)
+    def runScript(self, scriptName: str) -> None:
+        """
+        Execute a Python script from the scripts directory.
+
+        This slot is connected to the run_script method which takes a script name
+        as a parameter and executes it using the subprocess module.
+
+        :param scriptName: The name of the script to execute.
+        :return: None
+        """
+        
+        self.run_script(scriptName)
 
 class MainWindow(QMainWindow):
     

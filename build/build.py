@@ -469,32 +469,22 @@ def clean_all() -> None:
 
 def restore_big_files() -> None:
     """
-    Reconstructs large files from smaller chunks, using a JSON manifest file containing
-    information about the original file and its chunks.
-
-    The manifest file contains information about the original file, including its
-    filename, total size, checksum, and a list of chunks with their respective
-    filenames, start and end bytes, and sizes.
-
-    The function will delete the manifest file and all chunks after successful 
-    reconstruction.
-
-    :raises: Exception if the reconstruction fails
+    Restore all files that were previously split into chunks and stored in the resources directory.
+    
+    This function goes through all files with the extension "*.snes.ide.reconstruct.manifest.json" in the resources directory,
+    and uses the FileJoiner class to join the chunks back into a single file. If the joining process is successful,
+    it prints a message indicating the file that was reconstructed. If the joining process fails, it raises an exception.
     """
     
     for file in (ROOT / 'resources').rglob("*.snes.ide.reconstruct.manifest.json"):
         
-        rel_path: Path = file.relative_to(ROOT / 'resources')
-        dest_path: Path = SNESIDEOUT / rel_path
-        dest_path.parent.mkdir(parents=True, exist_ok=True)
-        
-        joiner: FileJoiner = FileJoiner(str(file), str(dest_path.parent))
+        joiner: FileJoiner = FileJoiner(str(file), str(file.parent))
         
         if joiner.join():
-            print(f"Reconstructed file: {dest_path}")
+            print(f"Reconstructed file: {file}")
             
         else:
-            raise Exception(f"Failed to reconstruct file: {dest_path}")
+            raise Exception(f"Failed to reconstruct file: {file}")
         
     return
     
@@ -573,6 +563,18 @@ def copy_bin() -> None:
     for file in (ROOT / 'resources' / 'bin' / system).rglob("*"):
 
         if file.is_dir():
+            continue
+        
+        if len(file.suffixes) == 6:
+            if \
+                file.suffixes[1] == ".snes" and file.suffixes[2] == ".ide" and \
+                file.suffixes[3] == ".reconstruct" and \
+                file.suffixes[4] == ".manifest" and \
+                file.suffixes[5] == ".json":
+                    
+                    continue
+        
+        if ".chunk" in file.suffix:
             continue
 
         rel_path: Path = file.relative_to(ROOT / 'resources' / 'bin' / system)
