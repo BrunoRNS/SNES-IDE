@@ -307,17 +307,17 @@ class FileJoiner:
             
             chunk_path: str = str(chunk_info['filename'])
             
-            if not os.path.exists(self.manifest_path.parent / chunk_path):
+            if not os.path.exists(str(Path(self.manifest_path).parent / chunk_path)):
                 
-                print(f"Error: Chunk file {self.manifest_path.parent / chunk_path} not found")
+                print(f"Error: Chunk file {Path(self.manifest_path).parent / chunk_path} not found")
                 return False
             
-            actual_size: int = os.path.getsize(self.manifest_path.parent / chunk_path)
+            actual_size: int = os.path.getsize(str(Path(self.manifest_path).parent / chunk_path))
             expected_size: str = str(chunk_info['size'])
             
             if actual_size != int(expected_size):
                 
-                print(f"Error: Chunk {self.manifest_path.parent / chunk_path} has incorrect size "
+                print(f"Error: Chunk {Path(self.manifest_path).parent / chunk_path} has incorrect size "
                       f"(expected: {expected_size}, actual: {actual_size})")
                 
                 return False
@@ -363,30 +363,30 @@ class FileJoiner:
             if not self.manifest_data:
                 return False
             
-            print(f"Reconstructing: {self.manifest_path.parent / self.manifest_data['original_filename']}")
-            print(f"Target: {self.output_path / self.manifest_data['original_filename']}")
+            print(f"Reconstructing: {Path(self.manifest_path).parent / self.manifest_data['original_filename']}")
+            print(f"Target: {Path(self.output_path) / self.manifest_data['original_filename']}")
             print(f"Total chunks: {len(self.manifest_data['chunks'])}")
             
             sorted_chunks = sorted(self.manifest_data['chunks'], key=lambda x: x['index'])
             
-            with open(self.output_path / self.manifest_data['original_filename'], 'wb') as output_file:
+            with open(Path(self.output_path) / self.manifest_data['original_filename'], 'wb') as output_file:
                 
                 for i, chunk_info in enumerate(sorted_chunks):
                     
                     chunk_path = chunk_info['filename']
                     
-                    with open(self.manifest_path.parent / chunk_path, 'rb') as chunk_file:
+                    with open(Path(self.manifest_path).parent / chunk_path, 'rb') as chunk_file:
                         chunk_data = chunk_file.read()
                         output_file.write(chunk_data)
                     
                     progress = ((i + 1) / len(sorted_chunks)) * 100
-                    print(f"Processed chunk {chunk_info['index']:03d}: {self.manifest_path.parent / chunk_path} "
+                    print(f"Processed chunk {chunk_info['index']:03d}: {Path(self.manifest_path).parent / chunk_path} "
                           f"({chunk_info['size'] / (1024 * 1024):.2f} MB) "
                           f"[{chunk_info['start_byte']}-{chunk_info['end_byte']}] - "
                           f"{progress:.1f}%")
             
             print("\nVerifying file integrity...")
-            reconstructed_size = os.path.getsize(self.output_path / self.manifest_data['original_filename'])
+            reconstructed_size = os.path.getsize(str(Path(self.output_path) / self.manifest_data['original_filename']))
             expected_size = self.manifest_data['total_size']
             
             if reconstructed_size != expected_size:
