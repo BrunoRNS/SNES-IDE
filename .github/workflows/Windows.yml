@@ -45,15 +45,6 @@ jobs:
           )
         shell: cmd
 
-      - name: Verify INSTALL.exe exists
-        run: |
-          cd "${{ github.workspace }}"
-          if not exist "SNES-IDE-out\INSTALL.exe" (
-            echo "INSTALL.exe not found in build output!"
-            exit 1
-          )
-        shell: cmd
-
       - name: Compress
         run: |
           cd "${{ github.workspace }}"
@@ -82,7 +73,7 @@ jobs:
           powershell Expand-Archive -Path sneside-windows.zip -DestinationPath sneside-windows -Force
         shell: pwsh
 
-      - name: Check expected `SNES-IDE\libs` folders
+      - name: Check expected `libs` folders
         run: |
           $ErrorActionPreference = "Stop"
           $expected = @(
@@ -95,7 +86,7 @@ jobs:
           )
           $missing = @()
           foreach ($lib in $expected) {
-            if (-not (Test-Path "sneside-windows\SNES-IDE\libs\$lib")) {
+            if (-not (Test-Path "sneside-windows\libs\$lib")) {
               Write-Host "Missing: $lib"
               $missing += $lib
             }
@@ -108,7 +99,7 @@ jobs:
           }
         shell: pwsh
       
-      - name: Check expected `SNES-IDE\bin` folders
+      - name: Check expected `bin` folders
         run: |
           $ErrorActionPreference = "Stop"
           $expected = @(
@@ -122,7 +113,7 @@ jobs:
           )
           $missing = @()
           foreach ($binary in $expected) {
-            if (-not (Test-Path "sneside-windows\SNES-IDE\bin\$binary")) {
+            if (-not (Test-Path "sneside-windows\bin\$binary")) {
               Write-Host "Missing: $binary"
               $missing += $binary
             }
@@ -135,7 +126,7 @@ jobs:
           }
         shell: pwsh
 
-      - name: Check expected `SNES-IDE\scripts` files
+      - name: Check expected `scripts` files
         run: |
           $ErrorActionPreference = "Stop"
           $expected = @(
@@ -155,7 +146,7 @@ jobs:
           )
           $missing = @()
           foreach ($exe in $expected) {
-            if (-not (Test-Path "sneside-windows\SNES-IDE\scripts\$exe")) {
+            if (-not (Test-Path "sneside-windows\scripts\$exe")) {
               Write-Host "Missing: $exe"
               $missing += $exe
             }

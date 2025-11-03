@@ -44,14 +44,6 @@ jobs:
             exit 1
           fi
 
-      - name: Verify INSTALL exists
-        run: |
-          cd "${{ github.workspace }}"
-          if [ ! -f "SNES-IDE-out/INSTALL" ]; then
-            echo "INSTALL not found in build output!"
-            exit 1
-          fi
-
       - name: Give Execution permission
         run: |
           cd "${{ github.workspace }}"
@@ -84,7 +76,7 @@ jobs:
           mkdir sneside-ubuntu
           tar -xzf sneside-ubuntu-x64.tar.gz -C sneside-ubuntu
 
-      - name: Check expected `SNES-IDE/libs` folders
+      - name: Check expected `libs` folders
         run: |
           cd sneside-ubuntu
           expected=(
@@ -96,14 +88,14 @@ jobs:
             "COPYING.md"
           )
           for lib in "${expected[@]}"; do
-            if [ ! -e "SNES-IDE/libs/$lib" ]; then
+            if [ ! -e "libs/$lib" ]; then
               echo "Missing: $lib"
               exit 1
             fi
           done
           echo "All expected lib files found."
 
-      - name: Check expected `SNES-IDE/bin` folders
+      - name: Check expected `bin` folders
         run: |
           cd sneside-ubuntu
           expected=(
@@ -116,14 +108,14 @@ jobs:
             "COPYING.md"
           )
           for binary in "${expected[@]}"; do
-            if [ ! -e "SNES-IDE/bin/$binary" ]; then
+            if [ ! -e "bin/$binary" ]; then
               echo "Missing: $binary"
               exit 1
             fi
           done
           echo "All expected bin files found."
 
-      - name: Check expected `SNES-IDE/scripts` files
+      - name: Check expected `scripts` files
         run: |
           cd sneside-ubuntu
           expected=(
@@ -142,7 +134,7 @@ jobs:
             "open-emulator"
           )
           for exe in "${expected[@]}"; do
-            if [ ! -f "SNES-IDE/scripts/$exe" ]; then
+            if [ ! -f "scripts/$exe" ]; then
               echo "Missing: $exe"
               exit 1
             fi
@@ -151,7 +143,7 @@ jobs:
 
       - name: Check file permissions
         run: |
-          cd sneside-ubuntu/SNES-IDE/scripts
+          cd sneside-ubuntu/scripts
           chmod +x *
 
   ubuntu-tests-redlight:

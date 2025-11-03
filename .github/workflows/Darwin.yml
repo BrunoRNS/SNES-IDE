@@ -39,14 +39,6 @@ jobs:
             exit 1
           fi
 
-      - name: Verify INSTALL.app exists
-        run: |
-          cd "${{ github.workspace }}"
-          if [ ! -d "SNES-IDE-out/INSTALL.app" ]; then
-            echo "INSTALL.app not found in build output!"
-            exit 1
-          fi
-
       - name: Compress (zip)
         run: |
           cd "${{ github.workspace }}"
@@ -73,15 +65,7 @@ jobs:
         run: |
           unzip -q sneside-macos-arm64.zip
 
-      - name: Check INSTALL.app exists
-        run: |
-          if [ ! -d "SNES-IDE-out/INSTALL.app" ]; then
-            echo "Missing INSTALL.app at the root of the extracted folder"
-            exit 1
-          fi
-          echo "INSTALL.app found."
-
-      - name: Check expected `SNES-IDE/libs` folders
+      - name: Check expected `libs` folders
         run: |
           expected_libs=(
             "DntcTranspiler"
@@ -92,14 +76,14 @@ jobs:
             "COPYING.md"
           )
           for lib in "${expected_libs[@]}"; do
-            if [ ! -e "SNES-IDE-out/SNES-IDE/libs/$lib" ]; then
+            if [ ! -e "SNES-IDE-out/libs/$lib" ]; then
               echo "Missing: $lib"
               exit 1
             fi
           done
           echo "All expected lib files found."
 
-      - name: Check expected `SNES-IDE/bin` folders
+      - name: Check expected `bin` folders
         run: |
           expected_bins=(
             "jdk8"
@@ -111,14 +95,14 @@ jobs:
             "COPYING.md"
           )
           for binary in "${expected_bins[@]}"; do
-            if [ ! -e "SNES-IDE-out/SNES-IDE/bin/$binary" ]; then
+            if [ ! -e "SNES-IDE-out/bin/$binary" ]; then
               echo "Missing: $binary"
               exit 1
             fi
           done
           echo "All expected bin files found."
 
-      - name: Check expected `SNES-IDE/scripts` files
+      - name: Check expected `scripts` files
         run: |
           expected_scripts=(
             "audio-brr-wav-converter"
@@ -136,7 +120,7 @@ jobs:
             "open-emulator"
           )
           for script in "${expected_scripts[@]}"; do
-            if [ ! -f "SNES-IDE-out/SNES-IDE/scripts/$script" ]; then
+            if [ ! -f "SNES-IDE-out/scripts/$script" ]; then
               echo "Missing: $script"
               exit 1
             fi
@@ -145,16 +129,16 @@ jobs:
 
       - name: Check file permissions
         run: |
-          cd SNES-IDE-out/SNES-IDE/scripts
+          cd SNES-IDE-out/scripts
           chmod +x *
 
       - name: Verify SNES-IDE.app exists
         run: |
-          if [ ! -d "SNES-IDE-out/SNES-IDE/snes-ide.app" ]; then
+          if [ ! -d "SNES-IDE-out/snes-ide.app" ]; then
             echo "snes-ide.app not found in SNES-IDE folder (for post-installation use)"
             exit 1
           fi
-          echo "snes-ide.app found for post-installation use."
+          echo "snes-ide.app found."
 
   macos-tests-redlight:
     if: github.ref_name == 'macos/red'
