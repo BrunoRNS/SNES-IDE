@@ -452,8 +452,7 @@ class FileJoiner:
                 
         except Exception as e:
             print(f"Error during file joining: {str(e)}")
-            return False
-
+            raise e
 """
 Build Steps
 """
@@ -483,11 +482,17 @@ def restore_big_files() -> None:
             continue
         
         joiner: FileJoiner = FileJoiner(str(file), str(file.parent))
-        
-        if joiner.join():
-            print(f"Reconstructed file: {file}")
+
+        try:
+            if joiner.join():
+                print(f"Reconstructed file: {file}")
             
-        else:
+            else:
+                raise Exception(f"Failed to reconstruct file: {file}")
+            
+        except Exception as e:
+            
+            traceback.print_exception(Exception, e, None)
             raise Exception(f"Failed to reconstruct file: {file}")
         
     return
