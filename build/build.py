@@ -152,7 +152,9 @@ def compile_python(
     
     try:
         print(f"Running PyInstaller with command: {' '.join(cmd)}")
-        result: CompletedProcess[str] = subprocess.run(cmd, capture_output=True, text=True)
+        result: CompletedProcess[str] = subprocess.run(
+            cmd, capture_output=True, text=True
+        )
         
         if result.returncode != 0:
             print(f"PyInstaller failed with return code: {result.returncode}")
@@ -200,12 +202,19 @@ def compile_python(
         print(f"{item_type.capitalize()} created at: {file_path}")
         
         if do_chmod_x and system != "Windows":
+            
             if system == "Darwin" and windowed:
+                
                 actual_executable: Path = file_path / "Contents" / "MacOS" / exec_name
+                
                 if actual_executable.exists():
-                    actual_executable.chmod(actual_executable.stat().st_mode | stat.S_IEXEC)
+                    
+                    actual_executable.chmod(
+                        actual_executable.stat().st_mode | stat.S_IEXEC
+                    )
                     print(f"Set executable permissions on: {actual_executable}")
             else:
+                
                 file_path.chmod(file_path.stat().st_mode | stat.S_IEXEC)
                 print(f"Set executable permissions on: {file_path}")
         
@@ -309,15 +318,22 @@ class FileJoiner:
             
             if not os.path.exists(str(Path(self.manifest_path).parent / chunk_path)):
                 
-                print(f"Error: Chunk file {Path(self.manifest_path).parent / chunk_path} not found")
+                print(
+                    "Error: "
+                    f"Chunk file {Path(self.manifest_path).parent / chunk_path}"
+                    " not found"
+                )
                 return False
             
-            actual_size: int = os.path.getsize(str(Path(self.manifest_path).parent / chunk_path))
+            actual_size: int = os.path.getsize(
+                str(Path(self.manifest_path).parent / chunk_path)
+            )
             expected_size: str = str(chunk_info['size'])
             
             if actual_size != int(expected_size):
                 
-                print(f"Error: Chunk {Path(self.manifest_path).parent / chunk_path} has incorrect size "
+                print(f"Error: Chunk {Path(self.manifest_path).parent / chunk_path}"
+                      " has incorrect size "
                       f"(expected: {expected_size}, actual: {actual_size})")
                 
                 return False
@@ -363,34 +379,60 @@ class FileJoiner:
             if not self.manifest_data:
                 return False
             
-            print(f"Reconstructing: {Path(self.manifest_path).parent / self.manifest_data['original_filename']}")
-            print(f"Target: {Path(self.output_path) / self.manifest_data['original_filename']}")
+            print(
+                "Reconstructing: "
+                f"{
+                    Path(self.manifest_path).parent /
+                    self.manifest_data['original_filename']
+                }"
+            )
+            
+            print(
+                "Target: "
+                f"{
+                    Path(self.output_path) /
+                    self.manifest_data['original_filename']
+                }"
+            )
+            
             print(f"Total chunks: {len(self.manifest_data['chunks'])}")
             
             sorted_chunks = sorted(self.manifest_data['chunks'], key=lambda x: x['index'])
             
-            with open(Path(self.output_path) / self.manifest_data['original_filename'], 'wb') as output_file:
+            with open(
+                Path(self.output_path) / self.manifest_data['original_filename'],
+                'wb'
+            ) as output_file:
                 
                 for i, chunk_info in enumerate(sorted_chunks):
                     
                     chunk_path = chunk_info['filename']
                     
-                    with open(Path(self.manifest_path).parent / chunk_path, 'rb') as chunk_file:
+                    with open(
+                        Path(self.manifest_path).parent / chunk_path, 'rb'
+                    ) as chunk_file:
+                        
                         chunk_data = chunk_file.read()
                         output_file.write(chunk_data)
                     
                     progress = ((i + 1) / len(sorted_chunks)) * 100
-                    print(f"Processed chunk {chunk_info['index']:03d}: {Path(self.manifest_path).parent / chunk_path} "
+                    print(f"Processed chunk {chunk_info['index']:03d}:"
+                          f" {Path(self.manifest_path).parent / chunk_path} "
                           f"({chunk_info['size'] / (1024 * 1024):.2f} MB) "
                           f"[{chunk_info['start_byte']}-{chunk_info['end_byte']}] - "
                           f"{progress:.1f}%")
             
             print("\nVerifying file integrity...")
-            reconstructed_size = os.path.getsize(str(Path(self.output_path) / self.manifest_data['original_filename']))
+            reconstructed_size = os.path.getsize(
+                str(Path(self.output_path) / self.manifest_data['original_filename'])
+            )
             expected_size = self.manifest_data['total_size']
             
             if reconstructed_size != expected_size:
-                print(f"Error: Size mismatch (expected: {expected_size}, actual: {reconstructed_size})")
+                print(
+                    f"Error: Size mismatch (expected:"
+                    f" {expected_size}, actual: {reconstructed_size})"
+                )
                 return False
             
             actual_checksum = self.calculate_checksum(self.output_path)
@@ -446,7 +488,7 @@ def restore_big_files() -> None:
         dest_path: Path = SNESIDEOUT / rel_path
         dest_path.parent.mkdir(parents=True, exist_ok=True)
         
-        joiner: FileJoiner = FileJoiner(str(file), str(dest_path))
+        joiner: FileJoiner = FileJoiner(str(file), str(dest_path.parent))
         
         if joiner.join():
             print(f"Reconstructed file: {dest_path}")
