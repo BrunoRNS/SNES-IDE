@@ -1,33 +1,33 @@
 {
-  "original_filename": "/save/SNES-IDE/resources/bin/windows/dotnet8/dotnet-sdk-8.0.415-win-x64.zip",
+  "original_filename": "dotnet-sdk-8.0.415-win-x64.zip",
   "total_size": 286074508,
   "chunk_size": 94371840,
   "checksum": "83f6052b37b16f94348775fa9d815905",
   "chunks": [
     {
       "index": 0,
-      "filename": "/save/SNES-IDE/resources/bin/windows/dotnet8/dotnet-sdk-8.0.415-win-x64.zip.chunk000",
+      "filename": "dotnet-sdk-8.0.415-win-x64.zip.chunk000",
       "start_byte": 0,
       "end_byte": 94371839,
       "size": 94371840
     },
     {
       "index": 1,
-      "filename": "/save/SNES-IDE/resources/bin/windows/dotnet8/dotnet-sdk-8.0.415-win-x64.zip.chunk001",
+      "filename": "dotnet-sdk-8.0.415-win-x64.zip.chunk001",
       "start_byte": 94371840,
       "end_byte": 188743679,
       "size": 94371840
     },
     {
       "index": 2,
-      "filename": "/save/SNES-IDE/resources/bin/windows/dotnet8/dotnet-sdk-8.0.415-win-x64.zip.chunk002",
+      "filename": "dotnet-sdk-8.0.415-win-x64.zip.chunk002",
       "start_byte": 188743680,
       "end_byte": 283115519,
       "size": 94371840
     },
     {
       "index": 3,
-      "filename": "/save/SNES-IDE/resources/bin/windows/dotnet8/dotnet-sdk-8.0.415-win-x64.zip.chunk003",
+      "filename": "dotnet-sdk-8.0.415-win-x64.zip.chunk003",
       "start_byte": 283115520,
       "end_byte": 286074507,
       "size": 2958988
