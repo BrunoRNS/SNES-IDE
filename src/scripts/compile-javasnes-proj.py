@@ -22,21 +22,8 @@ from tkinter import Tk, filedialog
 from pathlib import Path
 import subprocess
 import platform
-import shutil
 import sys
 import os
-
-def check_if_path(program: str) -> bool:
-    """
-    Check if a program is available in the system PATH.
-    
-    Args:
-        program (str): The name of the program to check (e.g., 'make', 'tiled')
-        
-    Returns:
-        bool: True if the program is found in PATH, False otherwise
-    """
-    return shutil.which(program) is not None
 
 def get_file_path(
     title: str = "Select file",
@@ -189,27 +176,15 @@ def main() -> NoReturn:
         print("No Makefile to build project found, exiting...")
         exit(-1)
 
-    if not check_if_path("make") and not platform.system().lower() == "darwin":
-        print("Make not found in PATH, exiting...")
-        exit(-1)
-
-    elif not check_if_path("gmake") and platform.system().lower() == "darwin":
-        print("Gmake not found in PATH, exiting...")
-        exit(-1)
+    make: Path = Path(output.stdout.strip()) / "bin" / "make" / \
+        ("make" if os.name == "posix" else "make.exe")
 
     make_output: CompletedProcess[str]
-
-    if platform.system().lower() == "darwin":
-        make_output = subprocess.run(
-            ["gmake"], cwd=javasnes_proj / "output", shell=True, capture_output=True,
-            env=os.environ, text=True
-        )
-        
-    else:
-        make_output = subprocess.run(
-            ["make"], cwd=javasnes_proj / "output", shell=True, capture_output=True,
-            env=os.environ, text=True
-        )
+    
+    make_output = subprocess.run(
+        [str(make)], cwd=javasnes_proj / "output", shell=True, capture_output=True,
+        env=os.environ, text=True
+    )
 
     if make_output.returncode != 0:
         print(f"Error while compiling the software {make_output.stderr}, exiting...")

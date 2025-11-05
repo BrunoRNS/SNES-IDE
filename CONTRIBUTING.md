@@ -25,26 +25,34 @@ SNES-IDE is a development environment for SNES homebrew. The project includes to
 
 1. Install [Python 3.13+](https://www.python.org/downloads/windows/)
 2. Install Dependencies:  
-   ```
+
+   ```sh
    pip install -r build\requirements.txt
    ```
+
 3. Run the build script:
-   ```
+
+   ```sh
    python build\build.py
    ```
+
 4. Output will be in `SNES-IDE-out/`
 
 ### Local Build (UNIX)
 
 1. Install [Python 3.13+](https://www.python.org/downloads/)
-2. Install Dependencies:  
-   ```
+2. Install Dependencies:
+
+   ```sh
    pip3 install -r ./build/requirements.txt
    ```
+
 3. Run the build script:
-   ```
+
+   ```sh
    python3 ./build/build.py
    ```
+
 4. Output will be in `SNES-IDE-out/`
 
 ## Testing

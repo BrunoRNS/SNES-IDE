@@ -1,0 +1,29 @@
+{
+  "original_filename": "dotnet-sdk-8.0.415-linux-x64.zip",
+  "total_size": 227423302,
+  "chunk_size": 94371840,
+  "checksum": "186b4712152bc023f8c6527372860219",
+  "chunks": [
+    {
+      "index": 0,
+      "filename": "dotnet-sdk-8.0.415-linux-x64.zip.chunk000",
+      "start_byte": 0,
+      "end_byte": 94371839,
+      "size": 94371840
+    },
+    {
+      "index": 1,
+      "filename": "dotnet-sdk-8.0.415-linux-x64.zip.chunk001",
+      "start_byte": 94371840,
+      "end_byte": 188743679,
+      "size": 94371840
+    },
+    {
+      "index": 2,
+      "filename": "dotnet-sdk-8.0.415-linux-x64.zip.chunk002",
+      "start_byte": 188743680,
+      "end_byte": 227423301,
+      "size": 38679622
+    }
+  ]
+}

@@ -1,4 +1,4 @@
-# DotnetSnes 
+# DotnetSnes
 
 Allows using .net languages to create real working SNES roms!
 

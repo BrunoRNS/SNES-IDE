@@ -22,21 +22,8 @@ from tkinter import Tk, filedialog
 from pathlib import Path
 import subprocess
 import platform
-import shutil
 import sys
 import os
-
-def check_if_path(program: str) -> bool:
-    """
-    Check if a program is available in the system PATH.
-    
-    Args:
-        program (str): The name of the program to check (e.g., 'make', 'tiled')
-        
-    Returns:
-        bool: True if the program is found in PATH, False otherwise
-    """
-    return shutil.which(program) is not None
 
 def get_file_path(
     title: str = "Select file",
@@ -143,11 +130,25 @@ def main() -> NoReturn:
     dntc_home: Path = Path(output.stdout.strip()) / "libs" / "DntcTranspiler"
     dotnetsnes_home: Path = Path(output.stdout.strip()) / "libs" / "DotnetSnesLib" / "src"
     makefile_defaults: Path = dotnetsnes_home / "Makefile.defaults"
+    
+    dotnet_home: Path = Path(output.stdout.strip()) / "bin" / "dotnet8"
+    make: Path = Path(output.stdout.strip()) / "bin" / "make" / \
+        ("make" if os.name == "posix" else "make.exe")
+    
+    if platform.system().lower() == "darwin":
+        dotnet_home = dotnet_home / "dotnet-sdk-8.0.415-osx-arm64" / "dotnet"
+        
+    elif platform.system().lower() == "windows":
+        dotnet_home = dotnet_home / "dotnet-sdk-8.0.415-win-x64" / "dotnet.exe"
+        
+    else:
+        dotnet_home = dotnet_home / "dotnet-sdk-8.0.415-linux-x64" / "dotnet"
 
     os.environ["PVSNESLIB_HOME"] = str(pvsneslib_home)
     os.environ["DNTC_HOME"] = str(dntc_home)
     os.environ["DOTNETSNES_HOME"] = str(dotnetsnes_home)
     os.environ["MAKEFILE_DEFAULTS"] = str(makefile_defaults)
+    os.environ["DOTNET"] = str(dotnet_home)
 
     dotsnes_proj_path: Path = Path(str(get_file_path(
         "Select DotnetSnes project directory", file_types=[("Directories", "*")],
@@ -158,26 +159,12 @@ def main() -> NoReturn:
         print("No Makefile to build project found, exiting...")
         exit(-1)
 
-    if not check_if_path("make") and not platform.system().lower() == "darwin":
-        print("Make not found in PATH, exiting...")
-        exit(-1)
-    elif not check_if_path("gmake") and platform.system().lower() == "darwin":
-        print("Gmake not found in PATH, exiting...")
-        exit(-1)
+    make_output: CompletedProcess[str]
 
-    make_output: CompletedProcess[bytes]
-
-    if platform.system().lower() == "darwin":
-        make_output = subprocess.run(
-            ["gmake"], cwd=dotsnes_proj_path, shell=True, capture_output=True,
-            env=os.environ
-        )
-        
-    else:
-        make_output = subprocess.run(
-            ["make"], cwd=dotsnes_proj_path, shell=True, capture_output=True,
-            env=os.environ
-        )
+    make_output = subprocess.run(
+        [str(make)], cwd=dotsnes_proj_path, shell=True, capture_output=True,
+        env=os.environ, text=True
+    )
 
     if make_output.returncode != 0:
         print(f"Error while compiling the software {make_output.stderr}, exiting...")

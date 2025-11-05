@@ -1,0 +1,22 @@
+{
+  "original_filename": "jdk8.zip",
+  "total_size": 120026168,
+  "chunk_size": 94371840,
+  "checksum": "d900e19ae6e210a21c5c1bba628d250a",
+  "chunks": [
+    {
+      "index": 0,
+      "filename": "jdk8.zip.chunk000",
+      "start_byte": 0,
+      "end_byte": 94371839,
+      "size": 94371840
+    },
+    {
+      "index": 1,
+      "filename": "jdk8.zip.chunk001",
+      "start_byte": 94371840,
+      "end_byte": 120026167,
+      "size": 25654328
+    }
+  ]
+}

@@ -121,7 +121,7 @@ class NoteManager(QMainWindow):
         wave_types: list[str] = ['sine', 'square', 'triangle']
         
         midi_start: int = 33
-        midi_end: int = 104
+        midi_end: int = 116
         
         for midi_note in range(midi_start, midi_end + 1):
             frequency: float = 440.0 * math.pow(2, (midi_note - 69) / 12.0)
@@ -484,8 +484,14 @@ def main() -> None:
     """
 
     app: QApplication = QApplication([])
-    window: NoteManager = NoteManager()
+    
+    try:
+        app.setStyle('Fusion') # type: ignore
+    except: ...
+    
+    window: NoteManager = NoteManager() 
     window.show()
+    
     app.exec()
 
 

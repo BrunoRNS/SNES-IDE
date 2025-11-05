@@ -13,7 +13,7 @@ It works natively on Windows, Linux Ubuntu and macOS, and provides tools, templa
 
 - **Languages:** C, C#, Assembly and Java.
 - **Compilers:** [816-tcc](https://github.com/alekmaul/tcc) and [wla-dx](https://github.com/vhelin/wla-dx) from pvsneslib. [Dntc](https://github.com/KallDrexx/dntc) from DotnetSnes. [JavaSnes](https://github.com/BrunoRNS/javasnes) from javasnes.
-- **Main Library:** [pvsneslib](https://github.com/alekmaul/pvsneslib) version 4.4. [DotnetSnes](https://github.com/KallDrexx/DotnetSnes) version 0.2. [Javasnes](https://github.com/BrunoRNS/javasnes) version 1.0.
+- **Main Library:** [pvsneslib](https://github.com/alekmaul/pvsneslib) version 4.4. [DotnetSnes](https://github.com/KallDrexx/DotnetSnes) version 0.2. [Javasnes](https://github.com/BrunoRNS/javasnes) rolling release.
 - **Emulator:** [bsnes](https://github.com/bsnes-emu/bsnes) and [lakesnes](https://github.com/angelo-wf/lakesnes) for testing.
 - **Cross-platform:** Works natively on Windows, Linux Ubuntu and macOS.
 - **Build from Source:** Full support for building all tools and the IDE itself from source.
@@ -40,14 +40,10 @@ First, check the system requirements:
 - **Memory**
   - Minimum: 1 GiB
   - Recommended: 4 GiB
-- **Package Manager (IDE tries to install it automatically, recommended to install the package manager before the IDE)**
-  - Chocolatey (Windows)
-  - Homebrew (MacOS)
-  - APT-GET (Ubuntu)
 
 Download the latest release from [SNES-IDE releases](https://github.com/BrunoRNS/SNES-IDE/releases/latest) for your specific OS.
 
-Decompress the ZIP or TAR.GZ archive and run the INSTALL(.exe(windows)/.app(mac)) executable. It will init the installation process, After init the INSTALL and successfully installing SNES-IDE it will be in the Applications of MacOS, in the Program Files of Windows and in the /usr/share/Applications and in the PATH in Linux Ubuntu systems. Now you can execute the application and start developing SNES Games!
+Decompress the ZIP or TAR.GZ archive and run the SNES-IDE executable, as SNES-IDE now comes with a full precompiled version of its dependencies. Now you're ready to create your first game!
 
 ## Tutorials and Documentation
 
