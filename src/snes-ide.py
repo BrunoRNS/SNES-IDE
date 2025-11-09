@@ -65,7 +65,7 @@ class ScriptRunner(QObject):
         """Execute a Python script from the scripts directory"""
         
         try:
-            script_path: Path = self.scripts_dir / script_name
+            script_path: Path = self.scripts_dir / (script_name.stem + (".exe" if os.name == "nt" else ""))
             if script_path.exists():
                 result: CompletedProcess[str] = subprocess.run(
                     [sys.executable, str(script_path)],
@@ -152,3 +152,4 @@ def main() -> NoReturn:
 
 if __name__ == "__main__":
     main()
+
