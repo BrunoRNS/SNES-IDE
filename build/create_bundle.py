@@ -490,7 +490,6 @@ class BundleCreator:
             
             os.environ["ARCH"] = "x86_64"
             os.environ["SOURCE"] = str(appdir_path.resolve() / 'SNES-IDE.AppDir')
-            os.environ["DESTINATION"] = str(appdir_path.resolve() / 'SNES-IDE.AppImage')
             
             if (appdir_path / 'SNES-IDE.AppDir').resolve().exists():
                 for file in (appdir_path / 'SNES-IDE.AppDir').rglob("*"):
