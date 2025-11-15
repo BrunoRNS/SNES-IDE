@@ -467,7 +467,7 @@ class BundleCreator:
         Creates an AppImage from the given application directory.
 
         Parameters:
-            appdir_path (Path): The path to the application directory.
+            appdir_path (Path): The parent path to the application directory.
 
         Returns:
             Path: The path to the created AppImage, if successful; otherwise, None.
@@ -489,8 +489,9 @@ class BundleCreator:
             os.environ["ARCH"] = "x86_64"
             
             subprocess.run([
-                str(linux_appimage_creator),
-                'SNES-IDE.AppDir', 'SNES-IDE.AppImage'
+                str(linux_appimage_creator.resolve()),
+                str((appdir_path / 'SNES-IDE.AppDir').resolve()),
+                str((appdir_path / 'SNES-IDE.AppImage').resolve())
             ], cwd=appdir_path, check=True, capture_output=True, text=True, shell=True, env=os.environ)
 
             for file in appdir_path.glob("*.AppImage"):
