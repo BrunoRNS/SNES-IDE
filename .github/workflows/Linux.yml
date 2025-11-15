@@ -34,7 +34,7 @@ jobs:
 
       - name: Build
         run: |
-          python build/build.py
+          sudo python build/build.py
 
       - name: Verify Bundle
         run: |
