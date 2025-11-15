@@ -498,7 +498,7 @@ class BundleCreator:
                 raise FileNotFoundError("SNES-IDE.AppDir not found")
             
             print(subprocess.run([
-                linux_appimage_creator, '-g', '--verbose', '--comp',
+                linux_appimage_creator, '--verbose',
                 str(appdir_path.resolve() / 'SNES-IDE.AppDir')
             ], cwd=appdir_path.resolve(), check=True, capture_output=True, text=True, env=os.environ).stderr)
 
