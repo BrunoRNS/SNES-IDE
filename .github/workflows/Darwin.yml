@@ -2,10 +2,10 @@ name: MacOS (Build and Test)
 
 on:
   push:
-    branches: [ main, develop, macos/** ]
-    tags: [ 'v*' ]
+    branches: [main, develop, macos/**]
+    tags: ["v*"]
   pull_request:
-    branches: [ main, develop ]
+    branches: [main, develop]
 
 jobs:
   macos-build:
@@ -30,24 +30,24 @@ jobs:
       - name: Build
         run: |
           python build/build.py
-          
+
       - name: Verify Bundle
         run: |
           if [ ! -d "dist" ]; then
             echo "Bundle directory not found!"
             exit 1
           fi
-          
+
           if [ ! -d "dist/SNES-IDE.app" ]; then
             echo "macOS app bundle not found!"
             exit 1
           fi
-          
+
           if [ ! -f "dist/SNES-IDE.app/Contents/MacOS/SNES-IDE" ]; then
             echo "macOS launcher not found!"
             exit 1
           fi
-          
+
           echo "macOS bundle verified successfully"
 
       - name: Compress Bundle
@@ -75,33 +75,33 @@ jobs:
       - name: Extract and Verify Bundle
         run: |
           unzip -q sneside-macos-arm64.zip
-          
+
           if [ ! -d "SNES-IDE.app" ]; then
             echo "App bundle not found after extraction!"
             exit 1
           fi
-          
+
           if [ ! -x "SNES-IDE.app/Contents/MacOS/SNES-IDE" ]; then
             echo "Launcher is not executable!"
             exit 1
           fi
-          
+
           if [ ! -d "SNES-IDE.app/Contents/Resources/venv" ]; then
             echo "Virtual environment not found in bundle!"
             exit 1
           fi
-          
+
           if [ ! -d "SNES-IDE.app/Contents/Resources/src" ]; then
             echo "Source code not found in bundle!"
             exit 1
           fi
-          
+
           echo "macOS bundle structure verified"
 
       - name: Test Launcher Permissions
         run: |
           chmod +x SNES-IDE.app/Contents/MacOS/SNES-IDE
-          
+
           if ! SNES-IDE.app/Contents/MacOS/SNES-IDE --help 2>/dev/null; then
             echo "Launcher execution test inconclusive (expected for GUI apps)"
           else

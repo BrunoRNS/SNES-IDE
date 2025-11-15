@@ -2,10 +2,10 @@ name: Ubuntu (Build and Test)
 
 on:
   push:
-    branches: [ main, develop, ubuntu/** ]
-    tags: [ 'v*' ]
+    branches: [main, develop, ubuntu/**]
+    tags: ["v*"]
   pull_request:
-    branches: [ main, develop ]
+    branches: [main, develop]
 
 jobs:
   ubuntu-build:
@@ -42,22 +42,22 @@ jobs:
             echo "Bundle directory not found!"
             exit 1
           fi
-          
+
           if ! ls dist/*.AppImage 1> /dev/null 2>&1; then
             echo "AppImage not found!"
             exit 1
           fi
-          
+
           APPIMAGE=$(ls dist/*.AppImage | head -1)
           echo "Found AppImage: $APPIMAGE"
-          
+
           if [ ! -x "$APPIMAGE" ]; then
             echo "AppImage is not executable!"
             exit 1
           fi
-          
+
           file "$APPIMAGE"
-          
+
           echo "Linux bundle verified successfully"
 
       - name: Make AppImage Executable
@@ -86,25 +86,25 @@ jobs:
         run: |
           APPIMAGE=$(ls *.AppImage | head -1)
           echo "Testing AppImage: $APPIMAGE"
-          
+
           if [ ! -f "$APPIMAGE" ]; then
             echo "AppImage not found!"
             exit 1
           fi
-          
+
           if [ ! -x "$APPIMAGE" ]; then
             echo "AppImage is not executable!"
             exit 1
           fi
-          
+
           file "$APPIMAGE"
-          
+
           if ! ./"$APPIMAGE" --help 2>/dev/null; then
             echo "AppImage execution test inconclusive (expected for GUI apps)"
           else
             echo "AppImage executed successfully"
           fi
-          
+
           echo "Linux AppImage verified"
 
   ubuntu-tests-redlight:

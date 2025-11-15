@@ -22,17 +22,19 @@ from pathlib import Path
 import platform
 import shutil
 
+
 def check_if_path(program: str) -> bool:
     """
     Check if a program is available in the system PATH.
-    
+
     Args:
         program (str): The name of the program to check (e.g., 'make', 'tiled')
-        
+
     Returns:
         bool: True if the program is found in PATH, False otherwise
     """
     return shutil.which(program) is not None
+
 
 def get_executable_path() -> str:
     """
@@ -47,29 +49,31 @@ def get_home_path() -> str:
 
     return str(Path(get_executable_path()).parent)
 
+
 def main() -> NoReturn:
     """Main logic to init tiled -> default tmx_editor"""
 
     tmx_editor: Path
-    
+
     if platform.system().lower() == "windows":
         tmx_editor = Path(get_home_path()) / "bin" / "tmx-editor" / "tiled.exe"
-    
+
     elif platform.system().lower() == "darwin":
         tmx_editor = Path(get_home_path()) / "bin" / "tmx-editor" / "Tiled.app"
 
     else:
-        tmx_editor = Path(get_home_path()) / "bin" / "tmx-editor" / "tiled.AppImage"
+        tmx_editor = Path(get_home_path()) / "bin" / \
+            "tmx-editor" / "tiled.AppImage"
 
     if not tmx_editor or not tmx_editor.exists():
         print(f"Failed, tiled does not exist in: {tmx_editor}")
         exit(-1)
 
     try:
-        
+
         if platform.system().lower() == "darwin":
             run(["open", "-a", str(tmx_editor)], shell=True, check=True)
-        
+
         else:
             run([str(tmx_editor)], shell=True, check=True)
 
@@ -80,6 +84,7 @@ def main() -> NoReturn:
 
     print("Success")
     exit(0)
+
 
 if __name__ == "__main__":
     main()

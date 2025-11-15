@@ -21,6 +21,7 @@ from typing_extensions import Literal
 from pathlib import Path
 import platform
 
+
 def get_executable_path() -> str:
     """Get Script Path, by using the path of the script itself."""
 
@@ -32,19 +33,23 @@ def get_home_path() -> str:
 
     return str(Path(get_executable_path()).parent)
 
+
 def convert() -> Literal[-1, 0]:
     """Init libresprite png/bmp sprite/map editor."""
 
     libresprite: Path
-    
+
     if platform.system().lower() == "windows":
-        libresprite = Path(get_home_path()) / "bin" / "sprite-editor" / "libresprite.exe"
-    
+        libresprite = Path(get_home_path()) / "bin" / \
+            "sprite-editor" / "libresprite.exe"
+
     elif platform.system().lower() == "darwin":
-        libresprite = Path(get_home_path()) / "bin" / "sprite-editor" / "libresprite.app"
+        libresprite = Path(get_home_path()) / "bin" / \
+            "sprite-editor" / "libresprite.app"
 
     else:
-        libresprite = Path(get_home_path()) / "bin" / "sprite-editor" / "libresprite.AppImage"
+        libresprite = Path(get_home_path()) / "bin" / \
+            "sprite-editor" / "libresprite.AppImage"
 
     if not libresprite or not libresprite.exists():
 
@@ -52,10 +57,10 @@ def convert() -> Literal[-1, 0]:
         return -1
 
     try:
-        
+
         if platform.system().lower() == "darwin":
             run(["open", "-a", str(libresprite)], shell=True, check=True)
-        
+
         else:
             run([str(libresprite)], shell=True, check=True)
 
@@ -66,6 +71,7 @@ def convert() -> Literal[-1, 0]:
 
     print("Success")
     return 0
+
 
 if __name__ == "__main__":
     exit(convert())

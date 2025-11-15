@@ -28,10 +28,11 @@ import subprocess
 import sys
 import os
 
+
 class ScriptRunner(QObject):
-    
+
     scriptExecuted: Signal = Signal(str, str)
-    
+
     def __init__(self) -> None:
         """
         Initializes the ScriptRunner object.
@@ -42,11 +43,11 @@ class ScriptRunner(QObject):
 
         :return: None
         """
-        
+
         super().__init__()
         self.scripts_dir: Path = self.get_executable_path() / "scripts"
 
-    @staticmethod 
+    @staticmethod
     def get_executable_path() -> Path:
         """Get the path of the executable or script based on whether the script is frozen 
         (PyInstaller) or not."""
@@ -55,19 +56,19 @@ class ScriptRunner(QObject):
 
             print("executable path mode chosen")
             return Path(sys.executable).resolve().parent
-        
+
         else:
 
             print("Python script path mode chosen")
             return Path(__file__).resolve().parent
-    
+
     @Slot(str)
     def run_script(self, script_name: str) -> None:
         """Execute a Python script from the scripts directory"""
-        
+
         try:
-            script_path: Path = self.scripts_dir / (Path(script_name).stem + 
-                                    (".exe" if os.name == "nt" else ""))
+            script_path: Path = self.scripts_dir / (Path(script_name).stem +
+                                                    (".exe" if os.name == "nt" else ""))
             if script_path.exists():
                 result: CompletedProcess[str] = subprocess.run(
                     [sys.executable, str(script_path)],
@@ -75,17 +76,20 @@ class ScriptRunner(QObject):
                     text=True,
                     cwd=self.scripts_dir
                 )
-                
+
                 if result.returncode == 0:
-                    self.scriptExecuted.emit(script_name, "Script executed successfully!")
+                    self.scriptExecuted.emit(
+                        script_name, "Script executed successfully!")
                 else:
-                    self.scriptExecuted.emit(script_name, f"Error: {result.stderr}")
+                    self.scriptExecuted.emit(
+                        script_name, f"Error: {result.stderr}")
             else:
-                self.scriptExecuted.emit(script_name, f"Script not found: {script_path}")
+                self.scriptExecuted.emit(
+                    script_name, f"Script not found: {script_path}")
 
         except Exception as e:
             self.scriptExecuted.emit(script_name, f"Exception: {str(e)}")
-            
+
     @Slot(str)
     def runScript(self, scriptName: str) -> None:
         """
@@ -97,11 +101,12 @@ class ScriptRunner(QObject):
         :param scriptName: The name of the script to execute.
         :return: None
         """
-        
+
         self.run_script(scriptName)
 
+
 class MainWindow(QMainWindow):
-    
+
     def __init__(self) -> None:
         """
         Initializes the main window of the SNES IDE.
@@ -112,30 +117,32 @@ class MainWindow(QMainWindow):
         Creates a QWebChannel and registers a ScriptRunner object with it.
         Loads the index.html file from the assets directory into the QWebEngineView.
         """
-        
+
         super().__init__()
-        self.setWindowTitle("SNES IDE - Super Nintendo Development Environment")
+        self.setWindowTitle(
+            "SNES IDE - Super Nintendo Development Environment")
         self.setGeometry(100, 100, 1200, 800)
-        
+
         central_widget: QWidget = QWidget()
         self.setCentralWidget(central_widget)
         layout: QVBoxLayout = QVBoxLayout(central_widget)
         layout.setContentsMargins(0, 0, 0, 0)
-        
+
         self.web_view: QWebEngineView = QWebEngineView()
-        
+
         self.channel: QWebChannel = QWebChannel()
         self.script_runner: ScriptRunner = ScriptRunner()
         self.channel.registerObject("scriptRunner", self.script_runner)
         self.web_view.page().setWebChannel(self.channel)
-        
+
         html_path: Path = ScriptRunner.get_executable_path() / "assets" / "index.html"
-        
+
         url: QUrl = QUrl.fromLocalFile(str(html_path.resolve()))
-        
+
         self.web_view.load(url)
-        
+
         layout.addWidget(self.web_view)
+
 
 def main() -> NoReturn:
     """
@@ -143,18 +150,19 @@ def main() -> NoReturn:
     sets the style to Fusion if possible, creates a MainWindow,
     shows it and starts the application event loop.
     """
-    
+
     app: QApplication = QApplication(sys.argv)
-    
+
     try:
-        app.setStyle('Fusion') # type: ignore
-    except: ...
-    
+        app.setStyle('Fusion')  # type: ignore
+    except:
+        ...
+
     window: MainWindow = MainWindow()
     window.show()
-    
+
     sys.exit(app.exec())
+
 
 if __name__ == "__main__":
     main()
-

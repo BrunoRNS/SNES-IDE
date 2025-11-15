@@ -9,12 +9,12 @@
  * @param path The path to check for file existence.
  * @return true if the file exists, false otherwise.
  */
-bool FileExists(const std::string& path) {
+bool FileExists(const std::string &path)
+{
 
     DWORD attrib = GetFileAttributesA(path.c_str());
-    
-    return (attrib != INVALID_FILE_ATTRIBUTES && !(attrib & FILE_ATTRIBUTE_DIRECTORY));
 
+    return (attrib != INVALID_FILE_ATTRIBUTES && !(attrib & FILE_ATTRIBUTE_DIRECTORY));
 }
 
 /**
@@ -22,27 +22,27 @@ bool FileExists(const std::string& path) {
  *
  * @return The directory of the current executable as a string, or an empty string if the executable path cannot be determined.
  */
-std::string GetExecutableDirectory() {
+std::string GetExecutableDirectory()
+{
 
     char exePath[MAX_PATH];
 
-    if (GetModuleFileNameA(NULL, exePath, MAX_PATH) == 0) {
+    if (GetModuleFileNameA(NULL, exePath, MAX_PATH) == 0)
+    {
 
         return "";
-
     }
-    
+
     std::string exeDir(exePath);
     size_t lastSlash = exeDir.find_last_of("\\");
 
-    if (lastSlash != std::string::npos) {
+    if (lastSlash != std::string::npos)
+    {
 
         return exeDir.substr(0, lastSlash);
-
     }
 
     return "";
-
 }
 
 /**
@@ -51,12 +51,12 @@ std::string GetExecutableDirectory() {
  * @param message The error message to display.
  * @return -1 to indicate an error.
  */
-int ShowError(const std::string& message) {
+int ShowError(const std::string &message)
+{
 
     MessageBoxA(NULL, message.c_str(), "SNES IDE - Error", MB_ICONERROR | MB_OK);
 
     return -1;
-
 }
 
 /**
@@ -70,59 +70,60 @@ int ShowError(const std::string& message) {
  *
  * @return The exit code of the launched process, or -1 if an error occurred.
  */
-int main() {
+int main()
+{
 
     std::string exeDir = GetExecutableDirectory();
 
-    if (exeDir.empty()) {
+    if (exeDir.empty())
+    {
 
         return ShowError("Cannot determine executable directory");
-
     }
-    
+
     std::string venvPython = exeDir + "\\venv\\Scripts\\python.exe";
     std::string scriptPath = exeDir + "\\src\\snes-ide.py";
-    
-    if (!FileExists(venvPython)) {
+
+    if (!FileExists(venvPython))
+    {
 
         return ShowError("Python virtual environment not found: " + venvPython);
-
     }
 
-    if (!FileExists(scriptPath)) {
+    if (!FileExists(scriptPath))
+    {
 
         return ShowError("Main script not found: " + scriptPath);
-
     }
-    
+
     std::string command = "\"" + venvPython + "\" \"" + scriptPath + "\"";
-    
+
     SetEnvironmentVariableA("QT_QUICK_BACKEND", "software");
     SetEnvironmentVariableA("QMLSCENE_DEVICE", "softwarecontext");
     SetEnvironmentVariableA("QT_QPA_PLATFORM", "windows");
     SetEnvironmentVariableA("LIBGL_ALWAYS_SOFTWARE", "1");
-    
+
     STARTUPINFOA si = {sizeof(si)};
     PROCESS_INFORMATION pi;
-    
-    if (CreateProcessA(NULL, (LPSTR)command.c_str(), NULL, NULL, FALSE, 
-                      CREATE_NO_WINDOW, NULL, NULL, &si, &pi)) {
+
+    if (CreateProcessA(NULL, (LPSTR)command.c_str(), NULL, NULL, FALSE,
+                       CREATE_NO_WINDOW, NULL, NULL, &si, &pi))
+    {
         WaitForSingleObject(pi.hProcess, INFINITE);
-        
+
         DWORD exitCode;
         GetExitCodeProcess(pi.hProcess, &exitCode);
-        
+
         CloseHandle(pi.hProcess);
         CloseHandle(pi.hThread);
-        
-        return exitCode;
 
-    } else {
+        return exitCode;
+    }
+    else
+    {
 
         return ShowError(
-            "Failed to start SNES IDE. Error code: " + std::to_string(GetLastError())
-        );
-    
+            "Failed to start SNES IDE. Error code: " + std::to_string(GetLastError()));
     }
-
+    
 }

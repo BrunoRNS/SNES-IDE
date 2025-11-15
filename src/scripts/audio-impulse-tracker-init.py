@@ -21,12 +21,14 @@ from typing_extensions import Literal
 from pathlib import Path
 import platform
 
+
 def get_executable_path() -> str:
     """
     Get Script Path, by using the path of the script itself.
     """
 
     return str(Path(__file__).resolve().parent)
+
 
 def get_home_path() -> str:
     """Get snes-ide home directory"""
@@ -38,15 +40,18 @@ def convert() -> Literal[-1, 0]:
     """Init schismtracker."""
 
     schism: Path
-    
+
     if platform.system().lower() == "windows":
-        schism = Path(get_home_path()) / "bin" / "schismtracker" / "schismtracker.exe"
-    
+        schism = Path(get_home_path()) / "bin" / \
+            "schismtracker" / "schismtracker.exe"
+
     elif platform.system().lower() == "darwin":
-        schism = Path(get_home_path()) / "bin" / "schismtracker" / "Schism Tracker.app"
+        schism = Path(get_home_path()) / "bin" / \
+            "schismtracker" / "Schism Tracker.app"
 
     else:
-        schism = Path(get_home_path()) / "bin" / "schismtracker" / "Schism_Tracker-x86_64.AppImage"
+        schism = Path(get_home_path()) / "bin" / \
+            "schismtracker" / "Schism_Tracker-x86_64.AppImage"
 
     if not schism or not schism.exists():
 
@@ -54,10 +59,10 @@ def convert() -> Literal[-1, 0]:
         return -1
 
     try:
-        
+
         if platform.system().lower() == "darwin":
             run(["open", "-a", str(schism)], check=True)
-        
+
         else:
             run([str(schism)], check=True)
 
@@ -68,6 +73,7 @@ def convert() -> Literal[-1, 0]:
 
     print("Success")
     return 0
+
 
 if __name__ == "__main__":
 

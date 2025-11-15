@@ -24,6 +24,7 @@ from pathlib import Path
 import sys
 import os
 
+
 class MainWindow(QMainWindow):
     def __init__(self, web_app: "Path|str") -> None:
 
@@ -31,7 +32,8 @@ class MainWindow(QMainWindow):
         self.setWindowTitle("App PySide6 com HTML")
 
         html_path: Path = (
-            Path(web_app) if isinstance(web_app, str) else web_app / 'index.html'
+            Path(web_app) if isinstance(
+                web_app, str) else web_app / 'index.html'
         )
 
         self.webview: QWebEngineView = QWebEngineView()
@@ -47,6 +49,7 @@ class MainWindow(QMainWindow):
 
         self.showMaximized()
 
+
 def get_executable_path() -> str:
     """
     Get Script Path, by using the path of the script itself.
@@ -54,26 +57,30 @@ def get_executable_path() -> str:
 
     return str(Path(__file__).resolve().parent)
 
+
 def get_home_path() -> str:
     """Get snes-ide home directory"""
 
     return str(Path(get_executable_path()).parent)
 
+
 def main() -> NoReturn:
     """Init TileSetExtractor from pvsneslib to convert TMX to TMJ"""
 
     home_path: str = get_home_path()
-    
+
     pvsneslib_home: Path = Path(home_path) / "bin" / "pvsneslib"
     os.environ["PVSNESLIB_HOME"] = str(pvsneslib_home)
 
-    pvsneslib_tmx_tmj_converter: Path = Path(home_path) / "libs" / "pvsneslib" / "tilesetextractor"
+    pvsneslib_tmx_tmj_converter: Path = Path(
+        home_path) / "libs" / "pvsneslib" / "tilesetextractor"
 
     app: QApplication = QApplication(sys.argv)
     window: MainWindow = MainWindow(pvsneslib_tmx_tmj_converter)
 
     window.show()
     sys.exit(app.exec())
+
 
 if __name__ == "__main__":
     main()

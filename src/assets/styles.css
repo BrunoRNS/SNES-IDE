@@ -195,19 +195,26 @@ body {
 }
 
 @keyframes pulse {
-    0%, 100% { opacity: 1; }
-    50% { opacity: 0.5; }
+
+    0%,
+    100% {
+        opacity: 1;
+    }
+
+    50% {
+        opacity: 0.5;
+    }
 }
 
 @media (max-width: 768px) {
     .category-grid {
         grid-template-columns: 1fr;
     }
-    
+
     .main-title {
         font-size: 2.5em;
     }
-    
+
     .container {
         padding: 15px;
     }

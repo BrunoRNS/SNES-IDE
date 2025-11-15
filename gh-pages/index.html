@@ -18,14 +18,15 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
 <!DOCTYPE html>
 <html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>SNES-IDE | Your Journey into SNES Game Development</title>
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
-    <meta http-equiv="X-UA-Compatible" content="IE=edge">
-    <link rel="icon" href="./assets/icons/icon.png" type="image/png">
-    <style>
+    <head>
+        <meta charset="UTF-8">
+        <meta name="viewport" content="width=device-width, initial-scale=1.0">
+        <title>SNES-IDE | Your Journey into SNES Game Development</title>
+        <link rel="stylesheet"
+            href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+        <meta http-equiv="X-UA-Compatible" content="IE=edge">
+        <link rel="icon" href="./assets/icons/icon.png" type="image/png">
+        <style>
         :root {
             --snes-purple: #5A3A7E;
             --snes-dark-purple: #3D275F;
@@ -420,354 +421,467 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
             }
         }
     </style>
-    
-</head>
-<body>
-    <header>
-        <div class="container">
-            <div class="header-content">
-                <div class="logo">
-                    <a href="#" data-page="home"><img src="./assets/icons/icon.png" alt="SNES-IDE Icon" style="width: 100; height: 100; border-radius: 50%;box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1); cursor: pointer; transition: transform 0.3s ease;display: block; margin: 0 auto; align-self: center;"></a>
-                    <h1>SNES-IDE</h1>
-                </div>
-                <button class="mobile-menu-btn">
-                    <i class="fas fa-bars"></i>
-                </button>
-                <nav>
-                    <ul>
-                        <li><a href="#" class="nav-link active" data-page="home">Home</a></li>
-                        <li><a href="#" class="nav-link" data-page="features">Features</a></li>
-                        <li><a href="#" class="nav-link" data-page="getting-started">Getting Started</a></li>
-                        <li><a href="#" class="nav-link" data-page="documentation">Documentation</a></li>
-                        <li><a href="#" class="nav-link" data-page="community">Community</a></li>
-                        <li><a href="#" class="nav-link" data-page="download">Download</a></li>
-                    </ul>
-                </nav>
-            </div>
-        </div>
-    </header>
 
-    <section class="hero">
-        <div class="container">
-            <h2>Your Journey into SNES Game Development</h2>
-            <p>An open-source, cross-platform IDE for creating SNES games using C, assembly, C# and Java. Build, compile, and test your retro games with ease.</p>
-            <a href="#" class="btn" data-page="download">Download Now</a>
-            <a href="#" class="btn btn-secondary" data-page="getting-started">Get Started</a>
-        </div>
-    </section>
-
-    <main class="main-content">
-        <div class="container">
-            <section id="home" class="page-content active">
-                <h2 class="section-title">Why Choose SNES-IDE?</h2>
-                <div class="features-grid">
-                    <div class="feature-card">
-                        <i class="fas fa-desktop"></i>
-                        <h3>Cross-Platform</h3>
-                        <p>Develop on Windows, macOS or Linux with a consistent experience across all platforms.</p>
+    </head>
+    <body>
+        <header>
+            <div class="container">
+                <div class="header-content">
+                    <div class="logo">
+                        <a href="#" data-page="home"><img
+                                src="./assets/icons/icon.png"
+                                alt="SNES-IDE Icon"
+                                style="width: 100; height: 100; border-radius: 50%;box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1); cursor: pointer; transition: transform 0.3s ease;display: block; margin: 0 auto; align-self: center;"></a>
+                        <h1>SNES-IDE</h1>
                     </div>
-                    <div class="feature-card">
-                        <i class="fas fa-toolbox"></i>
-                        <h3>All-in-One</h3>
-                        <p>Integrated toolchain, asset converters, and project templates to get you started quickly.</p>
-                    </div>
-                    <div class="feature-card">
-                        <i class="fas fa-rocket"></i>
-                        <h3>Easy Start</h3>
-                        <p>One-click project creation and build scripts make development straightforward.</p>
-                    </div>
-                    <div class="feature-card">
-                        <i class="fas fa-code-branch"></i>
-                        <h3>Open Source</h3>
-                        <p>Free, extensible, and community-driven with active development and support.</p>
-                    </div>
-                    <div class="feature-card">
-                        <i class="fas fa-graduation-cap"></i>
-                        <h3>Learn & Create</h3>
-                        <p>Ideal for learning C and SNES hardware, with examples and documentation.</p>
-                    </div>
-                    <div class="feature-card">
-                        <i class="fas fa-gamepad"></i>
-                        <h3>Emulator Integration</h3>
-                        <p>Built-in support for bsnes and lakesnes emulators for testing your games.</p>
-                    </div>
-                </div>
-
-                <div style="text-align: center; margin-top: 3rem;">
-                    <h2 style="margin-bottom: 1.5rem;">Supported Languages & Tools</h2>
-                    <div style="display: flex; justify-content: center; flex-wrap: wrap; gap: 20px;">
-                        <div style="background: var(--snes-dark-gray); padding: 15px 25px; border-radius: 8px;">
-                            <i class="fas fa-copyright" style="color: var(--snes-blue);"></i> C Language
-                        </div>
-                        <div style="background: var(--snes-dark-gray); padding: 15px 25px; border-radius: 8px;">
-                            <i class="fas fa-microchip" style="color: var(--snes-green);"></i> Assembly (65816)
-                        </div>
-                        <div style="background: var(--snes-dark-gray); padding: 15px 25px; border-radius: 8px;">
-                            <i class="fab fa-microsoft" style="color: var(--snes-yellow);"></i> C#
-                        </div>
-                        <div style="background: var(--snes-dark-gray); padding: 15px 25px; border-radius: 8px;">
-                            <i class="fab fa-java" style="color: var(--snes-red);"></i> Java
-                        </div>
-                    </div>
-                </div>
-            </section>
-
-            <section id="features" class="page-content">
-                <h2 class="section-title">SNES-IDE Features</h2>
-                
-                <div class="features-grid">
-                    <div class="feature-card">
-                        <i class="fas fa-code"></i>
-                        <h3>Multiple Compilers</h3>
-                        <p>Support for 816-tcc, wla-dx, Dntc, and JavaSnes compilers for flexible development.</p>
-                    </div>
-                    <div class="feature-card">
-                        <i class="fas fa-book"></i>
-                        <h3>Comprehensive Libraries</h3>
-                        <p>Pvsneslib, DotnetSnes, and JavaSnes libraries for different development approaches.</p>
-                    </div>
-                    <div class="feature-card">
-                        <i class="fas fa-play-circle"></i>
-                        <h3>Built-in Emulators</h3>
-                        <p>Integrated bsnes and lakesnes emulators for immediate testing of your ROMs.</p>
-                    </div>
-                    <div class="feature-card">
-                        <i class="fas fa-puzzle-piece"></i>
-                        <h3>Asset Pipeline</h3>
-                        <p>Convert images, sounds, and maps to SNES-compatible formats with included tools.</p>
-                    </div>
-                    <div class="feature-card">
-                        <i class="fas fa-file-code"></i>
-                        <h3>Project Templates</h3>
-                        <p>Start quickly with templates for different game types and development approaches.</p>
-                    </div>
-                    <div class="feature-card">
-                        <i class="fas fa-terminal"></i>
-                        <h3>Build Automation</h3>
-                        <p>Automated build scripts handle compilation, linking, and ROM creation seamlessly.</p>
-                    </div>
-                </div>
-            </section>
-
-            <section id="getting-started" class="page-content">
-                <h2 class="section-title">Getting Started with SNES-IDE</h2>
-                
-                <h3 style="margin-bottom: 1.5rem; text-align: center;">System Requirements</h3>
-                <div class="features-grid" style="margin-bottom: 3rem;">
-                    <div class="feature-card">
-                        <i class="fab fa-windows"></i>
-                        <h3>Windows</h3>
-                        <p>Windows 10+ x64 with Chocolatey package manager</p>
-                    </div>
-                    <div class="feature-card">
-                        <i class="fab fa-apple"></i>
-                        <h3>macOS</h3>
-                        <p>MacOS BigSur+ arm64 with Homebrew package manager</p>
-                    </div>
-                    <div class="feature-card">
-                        <i class="fab fa-ubuntu"></i>
-                        <h3>Linux</h3>
-                        <p>Ubuntu 22.04+ x64 with APT-GET package manager</p>
-                    </div>
-                </div>
-                
-                <h3 style="margin-bottom: 1.5rem; text-align: center;">Installation Steps</h3>
-                <div class="steps">
-                    <div class="step">
-                        <div class="step-number">1</div>
-                        <div class="step-content">
-                            <h3>Download</h3>
-                            <p>Get the latest release for your OS from the <a href="#" data-page="download">Download page</a>.</p>
-                        </div>
-                    </div>
-                    <div class="step">
-                        <div class="step-number">2</div>
-                        <div class="step-content">
-                            <h3>Extract</h3>
-                            <p>Decompress the ZIP or TAR.GZ archive to your preferred location.</p>
-                        </div>
-                    </div>
-                    <div class="step">
-                        <div class="step-number">3</div>
-                        <div class="step-content">
-                            <h3>Launch</h3>
-                            <p>Find SNES-IDE executable in the extracted folder and start developing!</p>
-                        </div>
-                    </div>
-                </div>
-            </section>
-
-            <section id="documentation" class="page-content">
-                <h2 class="section-title">Documentation & Tutorials</h2>
-                
-                <div class="doc-categories">
-                    <div class="doc-category">
-                        <i class="fas fa-copyright"></i>
-                        <h3>C Language</h3>
-                        <p>Learn C programming with our curated tutorials and resources.</p>
-                    </div>
-                    <div class="doc-category">
-                        <i class="fas fa-microchip"></i>
-                        <h3>SNES Hardware</h3>
-                        <p>Understand the SNES architecture and hardware capabilities.</p>
-                    </div>
-                    <div class="doc-category">
-                        <i class="fas fa-gamepad"></i>
-                        <h3>Game Development</h3>
-                        <p>Create complete games with our step-by-step guides.</p>
-                    </div>
-                    <div class="doc-category">
-                        <i class="fas fa-tools"></i>
-                        <h3>Tools & Assets</h3>
-                        <p>Master the asset pipeline and development tools.</p>
-                    </div>
-                </div>
-                
-                <h3 style="margin-bottom: 1.5rem; text-align: center;">Recommended Tutorials</h3>
-                <div class="features-grid">
-                    <div class="feature-card">
-                        <i class="fab fa-youtube" style="color: var(--snes-red);"></i>
-                        <h3>Giraffe Academy C Tutorial</h3>
-                        <p>Comprehensive C programming course perfect for beginners.</p>
-                        <a target="_blank" href="https://youtu.be/KJgsSFOSQv0" class="btn" style="margin-top: 15px; padding: 8px 15px; font-size: 0.9rem;">Watch</a>
-                    </div>
-                    <div class="feature-card">
-                        <i class="fab fa-youtube" style="color: var(--snes-red);"></i>
-                        <h3>C in 10 Minutes</h3>
-                        <p>Quick introduction to C programming concepts.</p>
-                        <a target="_blank" href="https://youtu.be/dTp0c41XnrQ" class="btn" style="margin-top: 15px; padding: 8px 15px; font-size: 0.9rem;">Watch</a>
-                    </div>
-                    <div class="feature-card">
-                        <i class="fas fa-globe" style="color: var(--snes-blue);"></i>
-                        <h3>SNES Hardware Explained</h3>
-                        <p>Detailed explanation of SNES hardware architecture.</p>
-                        <a target="_blank" href="https://retrovgames.com/snes-hardware-explained/" class="btn" style="margin-top: 15px; padding: 8px 15px; font-size: 0.9rem;">Visit</a>
-                    </div>
-                </div>
-            </section>
-
-            <section id="community" class="page-content">
-                <h2 class="section-title">Community & Contributions</h2>
-                
-                <p style="text-align: center; max-width: 800px; margin: 0 auto 3rem;">SNES-IDE is a community-driven project. We welcome contributions from developers of all skill levels.</p>
-                
-                <h3 style="margin-bottom: 1.5rem; text-align: center;">Key Contributors</h3>
-                <div class="contributors">
-                    <div class="contributor">
-                        <img src="data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='100' height='100' viewBox='0 0 100 100'><circle cx='50' cy='50' r='45' fill='%235A3A7E'/><text x='50' y='55' font-family='Arial' font-size='40' text-anchor='middle' fill='white'>B</text></svg>" alt="BrunoRNS">
-                        <h4>BrunoRNS</h4>
-                        <p>Project Maintainer</p>
-                    </div>
-                    <div class="contributor">
-                        <img src="data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='100' height='100' viewBox='0 0 100 100'><circle cx='50' cy='50' r='45' fill='%2350B850'/><text x='50' y='55' font-family='Arial' font-size='40' text-anchor='middle' fill='white'>L</text></svg>" alt="LucianoCSiqueira">
-                        <h4>LucianoCSiqueira</h4>
-                        <p>Project Maintainer</p>
-                    </div>
-                    <div class="contributor">
-                        <img src="data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='100' height='100' viewBox='0 0 100 100'><circle cx='50' cy='50' r='45' fill='%23E85050'/><text x='50' y='55' font-family='Arial' font-size='40' text-anchor='middle' fill='white'>A</text></svg>" alt="Atomic-Germ">
-                        <h4>Atomic-Germ</h4>
-                        <p>Contribuitor, make Workflows and Tests</p>
-                    </div>
-                </div>
-                
-                <div style="text-align: center; margin-top: 3rem;">
-                    <h3 style="margin-bottom: 1.5rem;">Want to Contribute?</h3>
-                    <p style="margin-bottom: 2rem;">Check out our GitHub repository and join the community!</p>
-                    <a target="_blank" href="https://github.com/BrunoRNS/SNES-IDE" class="btn">View on GitHub</a>
-                </div>
-            </section>
-
-            <section id="download" class="page-content">
-                <h2 class="section-title">Download SNES-IDE</h2>
-                
-                <div class="features-grid">
-                    <div class="feature-card">
-                        <i class="fab fa-windows"></i>
-                        <h3>Windows</h3>
-                        <p>Download for Windows 10+ x64</p>
-                        <a target="_blank" href="https://github.com/BrunoRNS/SNES-IDE/releases/latest" class="btn" style="margin-top: 15px;">Download .zip</a>
-                    </div>
-                    <div class="feature-card">
-                        <i class="fab fa-apple"></i>
-                        <h3>macOS</h3>
-                        <p>Download for macOS BigSur+ arm64</p>
-                        <a target="_blank" href="https://github.com/BrunoRNS/SNES-IDE/releases/latest" class="btn" style="margin-top: 15px;">Download .zip</a>
-                    </div>
-                    <div class="feature-card">
-                        <i class="fab fa-ubuntu"></i>
-                        <h3>Linux</h3>
-                        <p>Download for Ubuntu 22.04+ x64</p>
-                        <a target="_blank" href="https://github.com/BrunoRNS/SNES-IDE/releases/latest" class="btn" style="margin-top: 15px;">Download .tar.gz</a>
-                    </div>
-                </div>
-                
-                <div style="background: var(--snes-dark-gray); padding: 30px; border-radius: 8px; margin-top: 3rem;">
-                    <h3 style="text-align: center; margin-bottom: 1.5rem;">System Requirements</h3>
-                    <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(250px, 1fr)); gap: 20px;">
-                        <div>
-                            <h4>Operating System</h4>
-                            <ul style="margin-left: 20px; margin-top: 10px;">
-                                <li>Windows 10+ x64</li>
-                                <li>MacOS BigSur+ arm64</li>
-                                <li>Linux Ubuntu 22.04+ x64</li>
-                            </ul>
-                        </div>
-                        <div>
-                            <h4>Hardware</h4>
-                            <ul style="margin-left: 20px; margin-top: 10px;">
-                                <li>Minimum: 1 GiB RAM</li>
-                                <li>Recommended: 4 GiB RAM</li>
-                                <li>Minimum: 10 GiB disk space</li>
-                                <li>Recommended: 30 GiB disk space</li>
-                            </ul>
-                        </div>
-                    </div>
-                </div>
-            </section>
-        </div>
-    </main>
-
-    <footer>
-        <div class="container">
-            <div class="footer-content">
-                <div class="footer-section">
-                    <h3>SNES-IDE</h3>
-                    <p>An open-source, cross-platform IDE for SNES game development using C and assembly.</p>
-                </div>
-                <div class="footer-section">
-                    <h3>Quick Links</h3>
-                    <ul class="footer-links">
-                        <li><a href="#" data-page="home">Home</a></li>
-                        <li><a href="#" data-page="features">Features</a></li>
-                        <li><a href="#" data-page="getting-started">Getting Started</a></li>
-                        <li><a href="#" data-page="documentation">Documentation</a></li>
-                    </ul>
-                </div>
-                <div class="footer-section">
-                    <h3>Resources</h3>
-                    <ul class="footer-links">
-                        <li><a href="#" data-page="download">Download</a></li>
-                        <li><a href="#" data-page="community">Community</a></li>
-                        <li><a target="_blank" href="https://github.com/BrunoRNS/SNES-IDE">GitHub</a></li>
-                        <li><a target="_blank" href="https://github.com/BrunoRNS/SNES-IDE/issues">Issues</a></li>
-                    </ul>
-                </div>
-                <div class="footer-section">
-                    <h3>Legal</h3>
-                    <ul class="footer-links">
-                        <li><a target="_blank" href="https://github.com/BrunoRNS/SNES-IDE/blob/main/LICENSE.txt">License (GPL v3)</a></li>
-                        <li><a target="_blank" href="https://github.com/BrunoRNS/SNES-IDE/blob/main/CODE_OF_CONDUCT.md">Code of Conduct</a></li>
-                    </ul>
+                    <button class="mobile-menu-btn">
+                        <i class="fas fa-bars"></i>
+                    </button>
+                    <nav>
+                        <ul>
+                            <li><a href="#" class="nav-link active"
+                                    data-page="home">Home</a></li>
+                            <li><a href="#" class="nav-link"
+                                    data-page="features">Features</a></li>
+                            <li><a href="#" class="nav-link"
+                                    data-page="getting-started">Getting
+                                    Started</a></li>
+                            <li><a href="#" class="nav-link"
+                                    data-page="documentation">Documentation</a></li>
+                            <li><a href="#" class="nav-link"
+                                    data-page="community">Community</a></li>
+                            <li><a href="#" class="nav-link"
+                                    data-page="download">Download</a></li>
+                        </ul>
+                    </nav>
                 </div>
             </div>
-            <div class="copyright">
-                <p>SNES-IDE is released under the GNU GPL v3 license. This IDE is not affiliated with, nor authorized, endorsed or licensed by Nintendo Corporation or its subsidiaries.</p>
-                <p style="margin-top: 1rem;">&copy; <span id="current-year">2025</span> SNES-IDE Project. All rights reserved.</p>
-            </div>
-        </div>
-    </footer>
+        </header>
 
-    <script type="text/javascript">
+        <section class="hero">
+            <div class="container">
+                <h2>Your Journey into SNES Game Development</h2>
+                <p>An open-source, cross-platform IDE for creating SNES games
+                    using C, assembly, C# and Java. Build, compile, and test
+                    your retro games with ease.</p>
+                <a href="#" class="btn" data-page="download">Download Now</a>
+                <a href="#" class="btn btn-secondary"
+                    data-page="getting-started">Get Started</a>
+            </div>
+        </section>
+
+        <main class="main-content">
+            <div class="container">
+                <section id="home" class="page-content active">
+                    <h2 class="section-title">Why Choose SNES-IDE?</h2>
+                    <div class="features-grid">
+                        <div class="feature-card">
+                            <i class="fas fa-desktop"></i>
+                            <h3>Cross-Platform</h3>
+                            <p>Develop on Windows, macOS or Linux with a
+                                consistent experience across all platforms.</p>
+                        </div>
+                        <div class="feature-card">
+                            <i class="fas fa-toolbox"></i>
+                            <h3>All-in-One</h3>
+                            <p>Integrated toolchain, asset converters, and
+                                project templates to get you started
+                                quickly.</p>
+                        </div>
+                        <div class="feature-card">
+                            <i class="fas fa-rocket"></i>
+                            <h3>Easy Start</h3>
+                            <p>One-click project creation and build scripts make
+                                development straightforward.</p>
+                        </div>
+                        <div class="feature-card">
+                            <i class="fas fa-code-branch"></i>
+                            <h3>Open Source</h3>
+                            <p>Free, extensible, and community-driven with
+                                active development and support.</p>
+                        </div>
+                        <div class="feature-card">
+                            <i class="fas fa-graduation-cap"></i>
+                            <h3>Learn & Create</h3>
+                            <p>Ideal for learning C and SNES hardware, with
+                                examples and documentation.</p>
+                        </div>
+                        <div class="feature-card">
+                            <i class="fas fa-gamepad"></i>
+                            <h3>Emulator Integration</h3>
+                            <p>Built-in support for bsnes and lakesnes emulators
+                                for testing your games.</p>
+                        </div>
+                    </div>
+
+                    <div style="text-align: center; margin-top: 3rem;">
+                        <h2 style="margin-bottom: 1.5rem;">Supported Languages &
+                            Tools</h2>
+                        <div
+                            style="display: flex; justify-content: center; flex-wrap: wrap; gap: 20px;">
+                            <div
+                                style="background: var(--snes-dark-gray); padding: 15px 25px; border-radius: 8px;">
+                                <i class="fas fa-copyright"
+                                    style="color: var(--snes-blue);"></i> C
+                                Language
+                            </div>
+                            <div
+                                style="background: var(--snes-dark-gray); padding: 15px 25px; border-radius: 8px;">
+                                <i class="fas fa-microchip"
+                                    style="color: var(--snes-green);"></i>
+                                Assembly (65816)
+                            </div>
+                            <div
+                                style="background: var(--snes-dark-gray); padding: 15px 25px; border-radius: 8px;">
+                                <i class="fab fa-microsoft"
+                                    style="color: var(--snes-yellow);"></i> C#
+                            </div>
+                            <div
+                                style="background: var(--snes-dark-gray); padding: 15px 25px; border-radius: 8px;">
+                                <i class="fab fa-java"
+                                    style="color: var(--snes-red);"></i> Java
+                            </div>
+                        </div>
+                    </div>
+                </section>
+
+                <section id="features" class="page-content">
+                    <h2 class="section-title">SNES-IDE Features</h2>
+
+                    <div class="features-grid">
+                        <div class="feature-card">
+                            <i class="fas fa-code"></i>
+                            <h3>Multiple Compilers</h3>
+                            <p>Support for 816-tcc, wla-dx, Dntc, and JavaSnes
+                                compilers for flexible development.</p>
+                        </div>
+                        <div class="feature-card">
+                            <i class="fas fa-book"></i>
+                            <h3>Comprehensive Libraries</h3>
+                            <p>Pvsneslib, DotnetSnes, and JavaSnes libraries for
+                                different development approaches.</p>
+                        </div>
+                        <div class="feature-card">
+                            <i class="fas fa-play-circle"></i>
+                            <h3>Built-in Emulators</h3>
+                            <p>Integrated bsnes and lakesnes emulators for
+                                immediate testing of your ROMs.</p>
+                        </div>
+                        <div class="feature-card">
+                            <i class="fas fa-puzzle-piece"></i>
+                            <h3>Asset Pipeline</h3>
+                            <p>Convert images, sounds, and maps to
+                                SNES-compatible formats with included tools.</p>
+                        </div>
+                        <div class="feature-card">
+                            <i class="fas fa-file-code"></i>
+                            <h3>Project Templates</h3>
+                            <p>Start quickly with templates for different game
+                                types and development approaches.</p>
+                        </div>
+                        <div class="feature-card">
+                            <i class="fas fa-terminal"></i>
+                            <h3>Build Automation</h3>
+                            <p>Automated build scripts handle compilation,
+                                linking, and ROM creation seamlessly.</p>
+                        </div>
+                    </div>
+                </section>
+
+                <section id="getting-started" class="page-content">
+                    <h2 class="section-title">Getting Started with SNES-IDE</h2>
+
+                    <h3
+                        style="margin-bottom: 1.5rem; text-align: center;">System
+                        Requirements</h3>
+                    <div class="features-grid" style="margin-bottom: 3rem;">
+                        <div class="feature-card">
+                            <i class="fab fa-windows"></i>
+                            <h3>Windows</h3>
+                            <p>Windows 10+ x64 with Chocolatey package
+                                manager</p>
+                        </div>
+                        <div class="feature-card">
+                            <i class="fab fa-apple"></i>
+                            <h3>macOS</h3>
+                            <p>MacOS BigSur+ arm64 with Homebrew package
+                                manager</p>
+                        </div>
+                        <div class="feature-card">
+                            <i class="fab fa-ubuntu"></i>
+                            <h3>Linux</h3>
+                            <p>Ubuntu 22.04+ x64 with APT-GET package
+                                manager</p>
+                        </div>
+                    </div>
+
+                    <h3
+                        style="margin-bottom: 1.5rem; text-align: center;">Installation
+                        Steps</h3>
+                    <div class="steps">
+                        <div class="step">
+                            <div class="step-number">1</div>
+                            <div class="step-content">
+                                <h3>Download</h3>
+                                <p>Get the latest release for your OS from the
+                                    <a href="#" data-page="download">Download
+                                        page</a>.</p>
+                            </div>
+                        </div>
+                        <div class="step">
+                            <div class="step-number">2</div>
+                            <div class="step-content">
+                                <h3>Extract</h3>
+                                <p>Decompress the ZIP or TAR.GZ archive to your
+                                    preferred location.</p>
+                            </div>
+                        </div>
+                        <div class="step">
+                            <div class="step-number">3</div>
+                            <div class="step-content">
+                                <h3>Launch</h3>
+                                <p>Find SNES-IDE executable in the extracted
+                                    folder and start developing!</p>
+                            </div>
+                        </div>
+                    </div>
+                </section>
+
+                <section id="documentation" class="page-content">
+                    <h2 class="section-title">Documentation & Tutorials</h2>
+
+                    <div class="doc-categories">
+                        <div class="doc-category">
+                            <i class="fas fa-copyright"></i>
+                            <h3>C Language</h3>
+                            <p>Learn C programming with our curated tutorials
+                                and resources.</p>
+                        </div>
+                        <div class="doc-category">
+                            <i class="fas fa-microchip"></i>
+                            <h3>SNES Hardware</h3>
+                            <p>Understand the SNES architecture and hardware
+                                capabilities.</p>
+                        </div>
+                        <div class="doc-category">
+                            <i class="fas fa-gamepad"></i>
+                            <h3>Game Development</h3>
+                            <p>Create complete games with our step-by-step
+                                guides.</p>
+                        </div>
+                        <div class="doc-category">
+                            <i class="fas fa-tools"></i>
+                            <h3>Tools & Assets</h3>
+                            <p>Master the asset pipeline and development
+                                tools.</p>
+                        </div>
+                    </div>
+
+                    <h3
+                        style="margin-bottom: 1.5rem; text-align: center;">Recommended
+                        Tutorials</h3>
+                    <div class="features-grid">
+                        <div class="feature-card">
+                            <i class="fab fa-youtube"
+                                style="color: var(--snes-red);"></i>
+                            <h3>Giraffe Academy C Tutorial</h3>
+                            <p>Comprehensive C programming course perfect for
+                                beginners.</p>
+                            <a target="_blank"
+                                href="https://youtu.be/KJgsSFOSQv0" class="btn"
+                                style="margin-top: 15px; padding: 8px 15px; font-size: 0.9rem;">Watch</a>
+                        </div>
+                        <div class="feature-card">
+                            <i class="fab fa-youtube"
+                                style="color: var(--snes-red);"></i>
+                            <h3>C in 10 Minutes</h3>
+                            <p>Quick introduction to C programming concepts.</p>
+                            <a target="_blank"
+                                href="https://youtu.be/dTp0c41XnrQ" class="btn"
+                                style="margin-top: 15px; padding: 8px 15px; font-size: 0.9rem;">Watch</a>
+                        </div>
+                        <div class="feature-card">
+                            <i class="fas fa-globe"
+                                style="color: var(--snes-blue);"></i>
+                            <h3>SNES Hardware Explained</h3>
+                            <p>Detailed explanation of SNES hardware
+                                architecture.</p>
+                            <a target="_blank"
+                                href="https://retrovgames.com/snes-hardware-explained/"
+                                class="btn"
+                                style="margin-top: 15px; padding: 8px 15px; font-size: 0.9rem;">Visit</a>
+                        </div>
+                    </div>
+                </section>
+
+                <section id="community" class="page-content">
+                    <h2 class="section-title">Community & Contributions</h2>
+
+                    <p
+                        style="text-align: center; max-width: 800px; margin: 0 auto 3rem;">SNES-IDE
+                        is a community-driven project. We welcome contributions
+                        from developers of all skill levels.</p>
+
+                    <h3 style="margin-bottom: 1.5rem; text-align: center;">Key
+                        Contributors</h3>
+                    <div class="contributors">
+                        <div class="contributor">
+                            <img
+                                src="data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='100' height='100' viewBox='0 0 100 100'><circle cx='50' cy='50' r='45' fill='%235A3A7E'/><text x='50' y='55' font-family='Arial' font-size='40' text-anchor='middle' fill='white'>B</text></svg>"
+                                alt="BrunoRNS">
+                            <h4>BrunoRNS</h4>
+                            <p>Project Maintainer</p>
+                        </div>
+                        <div class="contributor">
+                            <img
+                                src="data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='100' height='100' viewBox='0 0 100 100'><circle cx='50' cy='50' r='45' fill='%2350B850'/><text x='50' y='55' font-family='Arial' font-size='40' text-anchor='middle' fill='white'>L</text></svg>"
+                                alt="LucianoCSiqueira">
+                            <h4>LucianoCSiqueira</h4>
+                            <p>Project Maintainer</p>
+                        </div>
+                        <div class="contributor">
+                            <img
+                                src="data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='100' height='100' viewBox='0 0 100 100'><circle cx='50' cy='50' r='45' fill='%23E85050'/><text x='50' y='55' font-family='Arial' font-size='40' text-anchor='middle' fill='white'>A</text></svg>"
+                                alt="Atomic-Germ">
+                            <h4>Atomic-Germ</h4>
+                            <p>Contribuitor, make Workflows and Tests</p>
+                        </div>
+                    </div>
+
+                    <div style="text-align: center; margin-top: 3rem;">
+                        <h3 style="margin-bottom: 1.5rem;">Want to
+                            Contribute?</h3>
+                        <p style="margin-bottom: 2rem;">Check out our GitHub
+                            repository and join the community!</p>
+                        <a target="_blank"
+                            href="https://github.com/BrunoRNS/SNES-IDE"
+                            class="btn">View on GitHub</a>
+                    </div>
+                </section>
+
+                <section id="download" class="page-content">
+                    <h2 class="section-title">Download SNES-IDE</h2>
+
+                    <div class="features-grid">
+                        <div class="feature-card">
+                            <i class="fab fa-windows"></i>
+                            <h3>Windows</h3>
+                            <p>Download for Windows 10+ x64</p>
+                            <a target="_blank"
+                                href="https://github.com/BrunoRNS/SNES-IDE/releases/latest"
+                                class="btn" style="margin-top: 15px;">Download
+                                .zip</a>
+                        </div>
+                        <div class="feature-card">
+                            <i class="fab fa-apple"></i>
+                            <h3>macOS</h3>
+                            <p>Download for macOS BigSur+ arm64</p>
+                            <a target="_blank"
+                                href="https://github.com/BrunoRNS/SNES-IDE/releases/latest"
+                                class="btn" style="margin-top: 15px;">Download
+                                .zip</a>
+                        </div>
+                        <div class="feature-card">
+                            <i class="fab fa-ubuntu"></i>
+                            <h3>Linux</h3>
+                            <p>Download for Ubuntu 22.04+ x64</p>
+                            <a target="_blank"
+                                href="https://github.com/BrunoRNS/SNES-IDE/releases/latest"
+                                class="btn" style="margin-top: 15px;">Download
+                                .tar.gz</a>
+                        </div>
+                    </div>
+
+                    <div
+                        style="background: var(--snes-dark-gray); padding: 30px; border-radius: 8px; margin-top: 3rem;">
+                        <h3
+                            style="text-align: center; margin-bottom: 1.5rem;">System
+                            Requirements</h3>
+                        <div
+                            style="display: grid; grid-template-columns: repeat(auto-fit, minmax(250px, 1fr)); gap: 20px;">
+                            <div>
+                                <h4>Operating System</h4>
+                                <ul
+                                    style="margin-left: 20px; margin-top: 10px;">
+                                    <li>Windows 10+ x64</li>
+                                    <li>MacOS BigSur+ arm64</li>
+                                    <li>Linux Ubuntu 22.04+ x64</li>
+                                </ul>
+                            </div>
+                            <div>
+                                <h4>Hardware</h4>
+                                <ul
+                                    style="margin-left: 20px; margin-top: 10px;">
+                                    <li>Minimum: 1 GiB RAM</li>
+                                    <li>Recommended: 4 GiB RAM</li>
+                                    <li>Minimum: 10 GiB disk space</li>
+                                    <li>Recommended: 30 GiB disk space</li>
+                                </ul>
+                            </div>
+                        </div>
+                    </div>
+                </section>
+            </div>
+        </main>
+
+        <footer>
+            <div class="container">
+                <div class="footer-content">
+                    <div class="footer-section">
+                        <h3>SNES-IDE</h3>
+                        <p>An open-source, cross-platform IDE for SNES game
+                            development using C and assembly.</p>
+                    </div>
+                    <div class="footer-section">
+                        <h3>Quick Links</h3>
+                        <ul class="footer-links">
+                            <li><a href="#" data-page="home">Home</a></li>
+                            <li><a href="#"
+                                    data-page="features">Features</a></li>
+                            <li><a href="#" data-page="getting-started">Getting
+                                    Started</a></li>
+                            <li><a href="#"
+                                    data-page="documentation">Documentation</a></li>
+                        </ul>
+                    </div>
+                    <div class="footer-section">
+                        <h3>Resources</h3>
+                        <ul class="footer-links">
+                            <li><a href="#"
+                                    data-page="download">Download</a></li>
+                            <li><a href="#"
+                                    data-page="community">Community</a></li>
+                            <li><a target="_blank"
+                                    href="https://github.com/BrunoRNS/SNES-IDE">GitHub</a></li>
+                            <li><a target="_blank"
+                                    href="https://github.com/BrunoRNS/SNES-IDE/issues">Issues</a></li>
+                        </ul>
+                    </div>
+                    <div class="footer-section">
+                        <h3>Legal</h3>
+                        <ul class="footer-links">
+                            <li><a target="_blank"
+                                    href="https://github.com/BrunoRNS/SNES-IDE/blob/main/LICENSE.txt">License
+                                    (GPL v3)</a></li>
+                            <li><a target="_blank"
+                                    href="https://github.com/BrunoRNS/SNES-IDE/blob/main/CODE_OF_CONDUCT.md">Code
+                                    of Conduct</a></li>
+                        </ul>
+                    </div>
+                </div>
+                <div class="copyright">
+                    <p>SNES-IDE is released under the GNU GPL v3 license. This
+                        IDE is not affiliated with, nor authorized, endorsed or
+                        licensed by Nintendo Corporation or its
+                        subsidiaries.</p>
+                    <p style="margin-top: 1rem;">&copy; <span
+                            id="current-year">2025</span> SNES-IDE Project. All
+                        rights reserved.</p>
+                </div>
+            </div>
+        </footer>
+
+        <script type="text/javascript">
         document.addEventListener('DOMContentLoaded', function() {
             const navLinks = document.querySelectorAll('.nav-link');
             const pageContents = document.querySelectorAll('.page-content');
@@ -855,5 +969,5 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
             });
         });
     </script>
-</body>
+    </body>
 </html>
