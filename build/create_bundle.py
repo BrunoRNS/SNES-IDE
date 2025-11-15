@@ -491,7 +491,7 @@ class BundleCreator:
             subprocess.run([
                 str(linux_appimage_creator),
                 'SNES-IDE.AppDir', 'SNES-IDE.AppImage'
-            ], cwd=appdir_path, check=True, capture_output=True, shell=True, env=os.environ)
+            ], cwd=appdir_path, check=True, capture_output=True, text=True, shell=True, env=os.environ)
 
             for file in appdir_path.glob("*.AppImage"):
 
@@ -499,7 +499,11 @@ class BundleCreator:
                     return file
 
         except subprocess.CalledProcessError as error:
-            print(f"Error creating AppImage: {error}")
+            print(f"subprocess CalledProcessError while creating AppImage: {error}")
+            
+            print(f"stdout: {error.stdout.decode('utf-8')}")
+            print(f"stderr: {error.stderr.decode('utf-8')}")
+            print(f"returncode: {error.returncode}")
 
         except FileNotFoundError:
             print("Error creating AppImage: linux appimage creator not found")
