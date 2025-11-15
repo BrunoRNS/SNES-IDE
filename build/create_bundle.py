@@ -393,12 +393,6 @@ class BundleCreator:
 
             self._copy_linux_apprun(appdir_path / "AppRun")
             self._copy_linux_desktop(appdir_path / "snes-ide.desktop")
-            
-            (appdir_path / "usr" / "share" / "applications").mkdir(parents=True, exist_ok=True)
-            
-            self._copy_linux_desktop(
-                appdir_path / "usr" / "share" / "applications" / "snes-ide.desktop"
-            )
 
             self._set_linux_permissions(appdir_path)
 
@@ -496,8 +490,8 @@ class BundleCreator:
             
             subprocess.run([
                 str(linux_appimage_creator),
-                'SNES-IDE.AppDir'
-            ], cwd=appdir_path, check=True, capture_output=True, env=os.environ)
+                'SNES-IDE.AppDir', 'SNES-IDE.AppImage'
+            ], cwd=appdir_path, check=True, capture_output=True, shell=True, env=os.environ)
 
             for file in appdir_path.glob("*.AppImage"):
 
