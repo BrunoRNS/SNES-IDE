@@ -99,42 +99,31 @@ def get_file_path(
         sys.exit(1)
 
 def get_executable_path() -> str:
-    """Get the path of the executable or script based on whether the script is frozen 
-    (PyInstaller) or not."""
+    """
+    Get Script Path, by using the path of the script itself.
+    """
 
-    if getattr(sys, 'frozen', False):
+    return str(Path(__file__).resolve().parent)
 
-        print("executable path mode chosen")
-        return str(Path(sys.executable).parent)
-        
-    else:
+def get_home_path() -> str:
+    """Get snes-ide home directory"""
 
-        print("Python script path mode chosen")
-        return str(Path(__file__).resolve().parent)
+    return str(Path(get_executable_path()).parent)
 
 def main() -> NoReturn:
     """Main logic of the compilation of the javasnes project"""
 
-    output: CompletedProcess[str] = subprocess.run(
-        [".\\get-snes-ide-home.exe" if os.name == "nt" else "./get-snes-ide-home"],
-        cwd=get_executable_path(), shell=True, capture_output=True, text=True
-    )
+    home_path: str = get_home_path()
 
-    if output.returncode != 0:
-        print(
-            f"get-snes-ide-home failed to execute duel to {output.stderr}, exiting..."
-        )
-        exit(-1)
-
-    pvsneslib_home: Path = Path(output.stdout.strip()) / "bin" / "pvsneslib"
+    pvsneslib_home: Path = Path(home_path) / "bin" / "pvsneslib"
     java_home: Path
 
     if platform.system().lower() == "darwin":
         java_home = (
-            Path(output.stdout.strip()) / "bin" / "jdk8" / "jdk8" / "zulu-8.jdk" / "Contents" / "Home" / "bin"
+            Path(home_path) / "bin" / "jdk8" / "jdk8" / "zulu-8.jdk" / "Contents" / "Home" / "bin"
         )
     else:
-        java_home = Path(output.stdout.strip()) / "bin" / "jdk8" / "jdk8" / "bin"
+        java_home = Path(home_path) / "bin" / "jdk8" / "jdk8" / "bin"
 
     os.environ["PVSNESLIB_HOME"] = str(pvsneslib_home)
     os.environ["JAVA_HOME"] = str(java_home)
@@ -176,7 +165,7 @@ def main() -> NoReturn:
         print("No Makefile to build project found, exiting...")
         exit(-1)
 
-    make: Path = Path(output.stdout.strip()) / "bin" / "make" / \
+    make: Path = Path(home_path) / "bin" / "make" / \
         ("make" if os.name == "posix" else "make.exe")
 
     make_output: CompletedProcess[str]

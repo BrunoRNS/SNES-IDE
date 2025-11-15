@@ -1,0 +1,34 @@
+#!/bin/bash
+
+set -e
+
+HERE="$(dirname "$(readlink -f "$0")")"
+
+export QT_QUICK_BACKEND="software"
+export QMLSCENE_DEVICE="softwarecontext"
+export LIBGL_ALWAYS_SOFTWARE="1"
+
+if [[ "$OSTYPE" == "darwin"* ]]; then
+
+    export QT_QPA_PLATFORM="cocoa"
+    APP_ROOT="$(dirname "$HERE")"
+
+    export PYTHONHOME="$APP_ROOT/Resources/venv"
+    export PYTHONPATH="$APP_ROOT/Resources/src"
+    export DYLD_LIBRARY_PATH="$APP_ROOT/Resources/venv/lib:$DYLD_LIBRARY_PATH"
+
+    cd "$APP_ROOT/Resources"
+    exec "./venv/bin/python" -s "./src/snes-ide.py" "$@"
+
+else
+
+    export QT_QPA_PLATFORM="xcb"
+    export PYTHONHOME="$HERE/usr/venv"
+    export PYTHONPATH="$HERE/usr/src"
+    export PATH="$HERE/usr/venv/bin:$PATH"
+    export LD_LIBRARY_PATH="$HERE/usr/venv/lib:$LD_LIBRARY_PATH"
+
+    cd "$HERE/usr"
+    exec "./venv/bin/python" -s "./src/snes-ide.py" "$@"
+
+fi

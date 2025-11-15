@@ -17,8 +17,8 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 """
 
 from PySide6.QtWidgets import QApplication, QMainWindow, QVBoxLayout, QWidget
+from PySide6.QtCore import QObject, Slot, Signal, QUrl
 from PySide6.QtWebEngineWidgets import QWebEngineView
-from PySide6.QtCore import QObject, Slot, Signal
 from PySide6.QtWebChannel import QWebChannel
 
 from subprocess import CompletedProcess
@@ -26,6 +26,7 @@ from typing_extensions import NoReturn
 from pathlib import Path
 import subprocess
 import sys
+import os
 
 class ScriptRunner(QObject):
     
@@ -65,7 +66,8 @@ class ScriptRunner(QObject):
         """Execute a Python script from the scripts directory"""
         
         try:
-            script_path: Path = self.scripts_dir / (script_name.stem + (".exe" if os.name == "nt" else ""))
+            script_path: Path = self.scripts_dir / (Path(script_name).stem + 
+                                    (".exe" if os.name == "nt" else ""))
             if script_path.exists():
                 result: CompletedProcess[str] = subprocess.run(
                     [sys.executable, str(script_path)],
@@ -128,7 +130,10 @@ class MainWindow(QMainWindow):
         self.web_view.page().setWebChannel(self.channel)
         
         html_path: Path = ScriptRunner.get_executable_path() / "assets" / "index.html"
-        self.web_view.load(f"file:///{html_path.resolve()}")
+        
+        url: QUrl = QUrl.fromLocalFile(str(html_path.resolve()))
+        
+        self.web_view.load(url)
         
         layout.addWidget(self.web_view)
 

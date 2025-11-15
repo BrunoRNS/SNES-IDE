@@ -21,18 +21,17 @@ from colorama import init, Fore, Style
 from typing import Any, List, Tuple, Callable, Dict
 from typing_extensions import Literal
 
-from subprocess import CompletedProcess
 from pathlib import Path
-import subprocess
 import traceback
 import platform
 import hashlib
 import shutil
 import locale
-import stat
 import json
 import sys
 import os
+
+from create_bundle import BundleCreator
 
 """
 Print functions
@@ -86,154 +85,6 @@ STEP_SYMBOL: Literal['==>'] = "==>"
 
 ROOT: Path = Path(__file__).parent.parent.resolve()
 SNESIDEOUT: Path = ROOT / "SNES-IDE-out"
-
-"""
-Build python script
-"""
-
-def compile_python(
-    python_file_path: Path, target_file_path: Path, windowed: bool,
-    icon_path: Path, do_chmod_x: bool, clean_tmp_exec: bool
-) -> int:
-    """
-    Compile a Python script to executable using PyInstaller.
-    
-    Args:
-        python_file_path: Path to the source Python file
-        target_file_path: Path where the executable should be placed
-        windowed: Whether to run without console (windowed mode)
-        icon_path: Path to icon file for the executable
-        do_chmod_x: Whether to make executable with chmod +x (Unix-like systems)
-        clean_tmp_exec: Whether to clean temporary build files
-    
-    Returns:
-        int: Return code (0 for success, non-zero for failure)
-    """
-    
-    if not python_file_path.exists():
-        print(f"Error: Python file not found: {python_file_path}")
-        return 1
-
-    file_path: Path = target_file_path
-    
-    file_path.parent.mkdir(parents=True, exist_ok=True)
-    
-    system: str = platform.system()
-    cmd: List[str] = ["pyinstaller", "--onefile"]
-    
-    if system == "Darwin":
-        if windowed:
-            cmd.remove("--onefile")
-            cmd.append("--windowed")
-            if not file_path.name.endswith(".app"):
-                file_path: Path = file_path.parent / f"{file_path.stem}.app"
-        else:
-            cmd.append("--console")
-            
-    elif system == "Windows":
-        if windowed:
-            cmd.append("--windowed")
-        else:
-            cmd.append("--console")
-
-        if not file_path.name.endswith(".exe"):
-            file_path = file_path.parent / f"{file_path.stem}.exe"
-            
-    else:
-        if windowed:
-            cmd.append("--noconsole")
-        else:
-            cmd.append("--console")
-    
-    if icon_path and icon_path.exists():
-        cmd.extend(["--icon", str(icon_path)])
-    
-    cmd.append(str(python_file_path))
-    
-    try:
-        print(f"Running PyInstaller with command: {' '.join(cmd)}")
-        result: CompletedProcess[str] = subprocess.run(
-            cmd, capture_output=True, text=True
-        )
-        
-        if result.returncode != 0:
-            print(f"PyInstaller failed with return code: {result.returncode}")
-            print(f"Stdout: {result.stdout}")
-            print(f"Stderr: {result.stderr}")
-            return result.returncode
-        
-        dist_dir: Path = Path("dist")
-        if not dist_dir.exists():
-            print("Error: PyInstaller dist directory not found")
-            return 1
-        
-        exec_name: str = python_file_path.stem
-
-        generated_item: Path
-        item_type: str
-
-        if system == "Darwin" and windowed:
-            generated_item = dist_dir / f"{exec_name}.app"
-            item_type = "app bundle"
-            
-        elif system == "Windows":
-            generated_item = dist_dir / f"{exec_name}.exe"
-            item_type = "executable"
-            
-        else:
-            generated_item = dist_dir / exec_name
-            item_type = "executable"
-        
-        if not generated_item.exists():
-            print(f"Error: Generated {item_type} not found: {generated_item}")
-            return 1
-        
-        if generated_item.is_dir():
-            if file_path.exists():
-                if file_path.is_dir():
-                    shutil.rmtree(file_path)
-                else:
-                    file_path.unlink()
-            shutil.copytree(generated_item, file_path)
-            shutil.rmtree(generated_item)
-        else:
-            shutil.move(str(generated_item), str(file_path))
-        
-        print(f"{item_type.capitalize()} created at: {file_path}")
-        
-        if do_chmod_x and system != "Windows":
-            
-            if system == "Darwin" and windowed:
-                
-                actual_executable: Path = file_path / "Contents" / "MacOS" / exec_name
-                
-                if actual_executable.exists():
-                    
-                    actual_executable.chmod(
-                        actual_executable.stat().st_mode | stat.S_IEXEC
-                    )
-                    print(f"Set executable permissions on: {actual_executable}")
-            else:
-                
-                file_path.chmod(file_path.stat().st_mode | stat.S_IEXEC)
-                print(f"Set executable permissions on: {file_path}")
-        
-        if clean_tmp_exec:
-            cleanup_files: List[str] = ["build", "dist", f"{exec_name}.spec"]
-            for item in cleanup_files:
-                path: Path = Path(item)
-                if path.exists():
-                    if path.is_dir():
-                        shutil.rmtree(path)
-                    else:
-                        path.unlink()
-                    print(f"Cleaned up: {item}")
-        
-        return 0
-    
-    except Exception as e:
-        print(f"Error during compilation: {e}")
-        return 1
 
 """
 Reconstruct chunk files
@@ -455,6 +306,14 @@ class FileJoiner:
         except Exception as e:
             print(f"Error during file joining: {str(e)}")
             raise e
+
+def get_executable_path() -> str:
+    """
+    Get Script Path, by using the path of the script itself.
+    """
+
+    return str(Path(__file__).resolve().parent)
+    
 """
 Build Steps
 """
@@ -596,11 +455,11 @@ def copy_bin() -> None:
     
     return
 
-def compile_and_copy_source() -> None:
+def copy_source() -> None:
     """
-    Compile and copy the project's main source code.
+    Copies all files from the src directory to the SNES-IDE-out directory.
     """
-
+    
     for file in (ROOT / 'src').rglob("*"):
 
         if file.is_dir():
@@ -610,24 +469,7 @@ def compile_and_copy_source() -> None:
         dest_path: Path = SNESIDEOUT / rel_path
         dest_path.parent.mkdir(parents=True, exist_ok=True)
 
-        if file.name == "snes-ide.py":
-            compile_python(
-                file, dest_path.parent /
-                (file.stem + ".exe" if os.name == "nt" else file.stem),
-                icon_path=ROOT/"icon.png",
-                windowed=True, do_chmod_x=os.name=="posix", clean_tmp_exec=True
-            )
-            
-        elif file.suffix == ".py":
-            compile_python(
-                file, dest_path.parent /
-                (file.stem + ".exe" if os.name == "nt" else file.stem),
-                icon_path=ROOT/"icon.png",
-                windowed=False, do_chmod_x=os.name=="posix", clean_tmp_exec=True
-            )
-            
-        else:
-            shutil.copy(file, dest_path)
+        shutil.copy(file, dest_path)
     
     return
 
@@ -644,6 +486,37 @@ def decompress_zip_files_in_out():
             os.unlink(file)
             
     return
+
+def generate_bundle() -> None:
+    """
+    Creates a bundle for the SNES-IDE application based on the current platform.
+
+    The bundle is created in the output directory specified during initialization and
+    will contain the required Python packages and platform-specific files.
+
+    If the bundle is created successfully, the function will simply return. Otherwise,
+    an exception will be raised with a message indicating that the bundle creation
+    failed.
+
+    Returns:
+        None
+    Raises:
+        Exception: If the bundle creation fails.
+    """
+    
+    bundleCreator = BundleCreator(
+        str(SNESIDEOUT), str(ROOT / "dist"),
+        str(Path(get_executable_path()) / "requirements.txt"),
+        str(Path(get_executable_path()) / "bundle" / "Info.plist"),
+        str(Path(get_executable_path()) / "bundle" / "snes-ide.desktop"),
+        str(Path(get_executable_path()) / "bundle" / "AppRun"),
+        str(Path(get_executable_path()) / "bundle" / "SNES-IDE.cpp")
+    )
+    
+    if bundleCreator.create_bundle():
+        return
+    
+    raise Exception("Failed to create bundle")
 
 def run_step(step_name: str, func: Callable[..., None]) -> bool:
     """Pretty formatting for CI logs"""
@@ -672,8 +545,9 @@ def main() -> int:
         ("Copying libs", copy_lib),
         ("Copying docs", copy_docs),
         ("Copying binary files", copy_bin),
-        ("Compiling and copying source", compile_and_copy_source),
+        ("Copying source code", copy_source),
         ("Decompressing zip files", decompress_zip_files_in_out),
+        ("Generating bundle", generate_bundle),
     ]
 
     failed_steps: List[str] = []

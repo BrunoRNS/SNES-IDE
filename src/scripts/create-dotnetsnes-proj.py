@@ -17,10 +17,8 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 """
 
 from typing import Union, List, NoReturn, Optional, Tuple
-from subprocess import CompletedProcess
 from tkinter import Tk, filedialog
 from pathlib import Path
-import subprocess
 import shutil
 import sys
 import os
@@ -99,35 +97,24 @@ def get_file_path(
         sys.exit(1)
 
 def get_executable_path() -> str:
-    """Get the path of the executable or script based on whether the script is frozen 
-    (PyInstaller) or not."""
+    """
+    Get Script Path, by using the path of the script itself.
+    """
 
-    if getattr(sys, 'frozen', False):
+    return str(Path(__file__).resolve().parent)
 
-        print("executable path mode chosen")
-        return str(Path(sys.executable).parent)
-        
-    else:
+def get_home_path() -> str:
+    """Get snes-ide home directory"""
 
-        print("Python script path mode chosen")
-        return str(Path(__file__).resolve().parent)
+    return str(Path(get_executable_path()).parent)
 
 def main() -> NoReturn:
     """Main logic to create dotnetsnes project"""
 
-    snes_ide_home: CompletedProcess[str] = subprocess.run(
-        [".\\get-snes-ide-home.exe" if os.name == "nt" else "./get-snes-ide-home"],
-        cwd=get_executable_path(), shell=True, capture_output=True, text=True
-    )
-
-    if snes_ide_home.returncode != 0:
-        print(
-            f"get-snes-ide-home failed to execute duel to {snes_ide_home.stderr}, exiting..."
-        )
-        exit(-1)
+    home_path: str = get_home_path()
 
     dotnetsnes_proj: Path = (
-        Path(snes_ide_home.stdout.strip()) / "libs" / "DotnetSnesLib" / 
+        Path(home_path) / "libs" / "DotnetSnesLib" / 
         "template" / "DotnetSnes.Example.HelloWorld"
     )
 

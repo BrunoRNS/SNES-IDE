@@ -18,10 +18,9 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
 from PySide6.QtWidgets import QApplication, QMainWindow, QVBoxLayout, QWidget
 from PySide6.QtWebEngineWidgets import QWebEngineView
-from subprocess import CompletedProcess
+from PySide6.QtCore import QUrl
 from typing import NoReturn
 from pathlib import Path
-import subprocess
 import sys
 import os
 
@@ -36,7 +35,8 @@ class MainWindow(QMainWindow):
         )
 
         self.webview: QWebEngineView = QWebEngineView()
-        self.webview.load(f"file:///{html_path.resolve()}")
+        self.url: QUrl = QUrl.fromLocalFile(str(html_path.resolve()))
+        self.webview.load(self.url)
 
         layout: QVBoxLayout = QVBoxLayout()
         layout.addWidget(self.webview)
@@ -48,35 +48,26 @@ class MainWindow(QMainWindow):
         self.showMaximized()
 
 def get_executable_path() -> str:
-    """Get the path of the executable or script based on whether the script is frozen 
-    (PyInstaller) or not."""
+    """
+    Get Script Path, by using the path of the script itself.
+    """
 
-    if getattr(sys, 'frozen', False):
-        print("executable path mode chosen")
-        return str(Path(sys.executable).parent)
-        
-    else:
-        print("Python script path mode chosen")
-        return str(Path(__file__).resolve().parent)
+    return str(Path(__file__).resolve().parent)
+
+def get_home_path() -> str:
+    """Get snes-ide home directory"""
+
+    return str(Path(get_executable_path()).parent)
 
 def main() -> NoReturn:
     """Init TileSetExtractor from pvsneslib to convert TMX to TMJ"""
 
-    output: CompletedProcess[str] = subprocess.run(
-        [".\\get-snes-ide-home.exe" if os.name == "nt" else "./get-snes-ide-home"],
-        cwd=get_executable_path(), shell=True, capture_output=True, text=True
-    )
-
-    if output.returncode != 0:
-        print(
-            f"get-snes-ide-home failed to execute duel to {output.stderr}, exiting..."
-        )
-        exit(-1)
-
-    pvsneslib_home: Path = Path(output.stdout.strip()) / "bin" / "pvsneslib"
+    home_path: str = get_home_path()
+    
+    pvsneslib_home: Path = Path(home_path) / "bin" / "pvsneslib"
     os.environ["PVSNESLIB_HOME"] = str(pvsneslib_home)
 
-    pvsneslib_tmx_tmj_converter: Path = Path(output.stdout.strip()) / "libs" / "pvsneslib" / "tilesetextractor"
+    pvsneslib_tmx_tmj_converter: Path = Path(home_path) / "libs" / "pvsneslib" / "tilesetextractor"
 
     app: QApplication = QApplication(sys.argv)
     window: MainWindow = MainWindow(pvsneslib_tmx_tmj_converter)

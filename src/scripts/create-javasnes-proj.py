@@ -114,25 +114,16 @@ class ProjectCreator:
 
     @staticmethod
     def get_executable_path() -> str:
-        """Get the path of the executable or script based on whether the script is frozen 
-        (PyInstaller) or not."""
+        """
+        Get Script Path, by using the path of the script itself.
+        """
 
-        if getattr(sys, 'frozen', False):
-            print("executable path mode chosen")
-            return str(Path(sys.executable).parent)
-        
-        else:
-            print("Python script path mode chosen")
-            return str(Path(__file__).resolve().parent)
+        return str(Path(__file__).resolve().parent)
 
     def get_home_path(self) -> str:
-        """Get snes-ide home directory, can raise subprocess.CalledProcessError"""
+        """Get snes-ide home directory"""
 
-        command: list[str] = ["get-snes-ide-home.exe" if os.name == "nt" else "./get-snes-ide-home"]
-        cwd: str = self.get_executable_path()
-
-        return subprocess.run(command, cwd=cwd, capture_output=True, text=True, check=True).stdout.strip()
-
+        return str(Path(self.get_executable_path()).parent)
 
     def validate(self) -> None:
         """Check class attributes given as terminal parameters"""

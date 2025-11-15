@@ -1,0 +1,9 @@
+[Desktop Entry]
+Name=SNES IDE
+Exec=AppRun
+Icon=snes-ide
+Type=Application
+Categories=Development;
+Comment=SNES Development IDE
+Terminal=false
+StartupWMClass=SNES-IDE

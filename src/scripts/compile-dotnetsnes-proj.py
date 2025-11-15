@@ -99,40 +99,27 @@ def get_file_path(
         sys.exit(1)
 
 def get_executable_path() -> str:
-    """Get the path of the executable or script based on whether the script is frozen 
-    (PyInstaller) or not."""
+    """Get the Script Path, by using the path of the script itself."""
 
-    if getattr(sys, 'frozen', False):
+    return str(Path(__file__).resolve().parent)
 
-        print("executable path mode chosen")
-        return str(Path(sys.executable).parent)
-        
-    else:
-        
-        print("Python script path mode chosen")
-        return str(Path(__file__).resolve().parent)
+def get_home_path() -> str:
+    """Get snes-ide home directory"""
+
+    return str(Path(get_executable_path()).parent)
 
 def main() -> NoReturn:
     """Main logic of the compilation of the dotnetsnes project"""
 
-    output: CompletedProcess[str] = subprocess.run(
-        [".\\get-snes-ide-home.exe" if os.name == "nt" else "./get-snes-ide-home"],
-        cwd=get_executable_path(), shell=True, capture_output=True, text=True
-    )
+    home_path: str = get_home_path()
 
-    if output.returncode != 0:
-        print(
-            f"get-snes-ide-home failed to execute duel to {output.stderr}, exiting..."
-        )
-        exit(-1)
-
-    pvsneslib_home: Path = Path(output.stdout.strip()) / "bin" / "pvsneslib"
-    dntc_home: Path = Path(output.stdout.strip()) / "libs" / "DntcTranspiler"
-    dotnetsnes_home: Path = Path(output.stdout.strip()) / "libs" / "DotnetSnesLib" / "src"
+    pvsneslib_home: Path = Path(home_path) / "bin" / "pvsneslib"
+    dntc_home: Path = Path(home_path) / "libs" / "DntcTranspiler"
+    dotnetsnes_home: Path = Path(home_path) / "libs" / "DotnetSnesLib" / "src"
     makefile_defaults: Path = dotnetsnes_home / "Makefile.defaults"
     
-    dotnet_home: Path = Path(output.stdout.strip()) / "bin" / "dotnet8"
-    make: Path = Path(output.stdout.strip()) / "bin" / "make" / \
+    dotnet_home: Path = Path(home_path) / "bin" / "dotnet8"
+    make: Path = Path(home_path) / "bin" / "make" / \
         ("make" if os.name == "posix" else "make.exe")
     
     if platform.system().lower() == "darwin":

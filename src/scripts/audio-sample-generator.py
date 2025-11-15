@@ -27,11 +27,8 @@ from PySide6.QtCore import Qt
 
 from typing import List, Dict, Any
 from pathlib import Path
-import subprocess
 import shutil
 import math
-import sys
-import os
 
 class MusicalNote:
     """Represents a musical note with its properties."""
@@ -88,27 +85,17 @@ class NoteManager(QMainWindow):
 
     @staticmethod
     def get_executable_path() -> str:
-        """Get the path of the executable or script based on whether the script is frozen 
-        (PyInstaller) or not."""
+        """
+        Get Script Path, by using the path of the script itself.
+        """
 
-        if getattr(sys, 'frozen', False):
-
-            print("executable path mode chosen")
-            return str(Path(sys.executable).parent)
-        
-        else:
-
-            print("Python script path mode chosen")
-            return str(Path(__file__).resolve().parent)
+        return str(Path(__file__).resolve().parent)
 
     def get_home_path(self) -> str:
-        """Get snes-ide home directory, can raise subprocess.CalledProcessError"""
+        """Get snes-ide home directory"""
+        
+        return str(Path(self.get_executable_path()).parent)
 
-        command: list[str] = ["get-snes-ide-home.exe" if os.name == "nt" else "./get-snes-ide-home"]
-        cwd: str = self.get_executable_path()
-
-        return subprocess.run(command, cwd=cwd, capture_output=True, text=True, check=True).stdout.strip()
-    
     def _generate_notes(self) -> List[MusicalNote]:
         """
         Generate all musical notes from A1 to G#7 with MIDI frequencies.

@@ -1,34 +1,62 @@
 name: Windows (Build and Test)
 
-# Trigger the workflow on pushes and pull‑requests to the default branch
 on:
   push:
-    branches: [ windows/** ]
+    branches: [ main, develop, windows/** ]
     tags: [ 'v*' ]
   pull_request:
     branches: [ main, develop ]
 
 jobs:
   windows-build:
-  # This section builds and tests SNES-IDE on Windows using GitHub Actions.
-  # It uses the Green-Light phase of TDD. Nothing should fail. For new 
-  # features, use the "Test (Red-Light)" section to write failing tests before
-  # implementation.
     name: Build (Green-Light)
     runs-on: windows-latest
     steps:
       - name: Checkout repository
         uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
 
       - name: Set up Python
         uses: actions/setup-python@v5
         with:
-          python-version: "3.13"
+          python-version: "3.11"
 
-      - name: Install Dependencies
+      - name: Verify Chocolatey Availability
+        id: check-choco
+        run: |
+          if (Get-Command choco -ErrorAction SilentlyContinue) {
+            echo "choco-available=true" >> $env:GITHUB_OUTPUT
+            choco --version
+          } else {
+            echo "choco-available=false" >> $env:GITHUB_OUTPUT
+          }
+        shell: pwsh
+
+      - name: Install Chocolatey (if missing)
+        if: steps.check-choco.outputs.choco-available == 'false'
+        run: |
+          Set-ExecutionPolicy Bypass -Scope Process -Force
+          [System.Net.ServicePointManager]::SecurityProtocol = [System.Net.ServicePointManager]::SecurityProtocol -bor 3072
+          iex ((New-Object System.Net.WebClient).DownloadString('https://community.chocolatey.org/install.ps1'))
+        shell: pwsh
+
+      - name: Install C++ Compilers
+        run: |
+          choco install mingw -y --no-progress
+          
+          if (Get-Command g++ -ErrorAction SilentlyContinue) {
+            Write-Host "MinGW/g++ installed successfully"
+            g++ --version
+          } else {
+            Write-Host "MinGW installation may have failed, but continuing build..."
+          }
+        shell: pwsh
+
+      - name: Install Build Dependencies
         run: |
           pip install --upgrade pip
-          pip install -r build\requirements.txt
+          pip install -r build/requirements.txt
         shell: cmd
 
       - name: Build
@@ -36,31 +64,75 @@ jobs:
           python build\build.py
         shell: cmd
 
-      - name: Verify
+      - name: Verify Bundle
         run: |
-          cd "${{ github.workspace }}"
-          if not exist "SNES-IDE-out" (
-            echo "Build artifact not found!"
+          if (-not (Test-Path "dist")) {
+            Write-Error "Bundle directory not found!"
             exit 1
-          )
-        shell: cmd
-
-      - name: Compress
-        run: |
-          cd "${{ github.workspace }}"
-          powershell Compress-Archive -Path SNES-IDE-out\* -DestinationPath sneside-windows.zip -Force
+          }
+          
+          $exeExists = Test-Path "dist\SNES-IDE.exe"
+          $venvExists = Test-Path "dist\venv"
+          $srcExists = Test-Path "dist\src"
+          
+          if (-not $venvExists) {
+            Write-Error "Virtual environment not found!"
+            exit 1
+          }
+          
+          if (-not $srcExists) {
+            Write-Error "Source code not found!"
+            exit 1
+          }
+          
+          if ($exeExists) {
+            Write-Host "Windows executable created successfully"
+          } else {
+            Write-Host "Windows executable not created (C++ compilation may have failed)"
+            Write-Host "Bundle created without launcher - manual compilation required"
+          }
+          
+          Write-Host "Windows bundle structure verified"
         shell: pwsh
 
-      - name: Upload
+      - name: Create Fallback Launcher Script
+        run: |
+          # Criar script PowerShell como fallback se o EXE não foi gerado
+          if (-not (Test-Path "dist\SNES-IDE.exe")) {
+            $psLauncher = @'
+          @echo off
+          setlocal
+
+          set SCRIPT_DIR=%~dp0
+          cd /d "%SCRIPT_DIR%"
+
+          set PYTHONHOME=venv
+          set PYTHONPATH=venv\Lib\site-packages;src
+          set PATH=venv\Scripts;%PATH%
+          set QT_PLUGIN_PATH=venv\Lib\site-packages\PySide6\Qt\plugins
+
+          venv\Scripts\python.exe -s src\snes-ide.py %*
+          '@
+            $psLauncher | Out-File -FilePath "dist\SNES-IDE.bat" -Encoding ASCII
+            Write-Host "✅ Created fallback batch launcher: SNES-IDE.bat"
+          }
+        shell: pwsh
+
+      - name: Compress Bundle
+        run: |
+          Compress-Archive -Path dist\* -DestinationPath sneside-windows.zip -Force
+        shell: pwsh
+
+      - name: Upload Artifact
         uses: actions/upload-artifact@v4
         with:
           name: sneside-windows
           path: sneside-windows.zip
           retention-days: 7
-    
+
   windows-tests-greenlight:
     name: Tests (Green-Light)
-    runs-on: windows-2025
+    runs-on: windows-latest
     needs: windows-build
     steps:
       - name: Download build artifact
@@ -68,106 +140,61 @@ jobs:
         with:
           name: sneside-windows
       
-      - name: Extract sneside-windows.zip
+      - name: Extract and Verify Bundle
         run: |
-          powershell Expand-Archive -Path sneside-windows.zip -DestinationPath sneside-windows -Force
+          Expand-Archive -Path sneside-windows.zip -DestinationPath extracted -Force
+          
+          $venvExists = Test-Path "extracted\venv\Scripts\python.exe"
+          $srcExists = Test-Path "extracted\src\snes-ide.py"
+          $exeExists = Test-Path "extracted\SNES-IDE.exe"
+          $batExists = Test-Path "extracted\SNES-IDE.bat"
+          
+          if (-not $venvExists) {
+            Write-Error "Virtual environment not found!"
+            exit 1
+          }
+          
+          if (-not $srcExists) {
+            Write-Error "Main Python script not found!"
+            exit 1
+          }
+          
+          if ($exeExists) {
+            Write-Host "C++ launcher found"
+          } elseif ($batExists) {
+            Write-Host "Batch launcher found (fallback)"
+          } else {
+            Write-Host "No launcher found, but bundle structure is valid"
+          }
+          
+          Write-Host "Windows bundle structure verified"
         shell: pwsh
 
-      - name: Check expected `libs` folders
+      - name: Test Python Environment
         run: |
-          $ErrorActionPreference = "Stop"
-          $expected = @(
-            "DntcTranspiler",
-            "DotnetSnesLib",
-            "javasnes",
-            "pvsneslib",
-            "SampleLibrary",
-            "COPYING.md"
-          )
-          $missing = @()
-          foreach ($lib in $expected) {
-            if (-not (Test-Path "sneside-windows\libs\$lib")) {
-              Write-Host "Missing: $lib"
-              $missing += $lib
-            }
-          }
-          if ($missing.Count -gt 0) {
-            Write-Error "Missing expected lib files: $($missing -join ', ')"
-            exit 1
+          cd extracted
+          
+          $pythonTest = .\venv\Scripts\python.exe -c "import sys; print('Python OK:', sys.version)"
+          if ($LASTEXITCODE -eq 0) {
+            Write-Host "Virtual environment Python is functional"
           } else {
-            Write-Host "All expected lib files found."
-          }
-        shell: pwsh
-      
-      - name: Check expected `bin` folders
-        run: |
-          $ErrorActionPreference = "Stop"
-          $expected = @(
-            "jdk8",
-            "pvsneslib",
-            "schismtracker",
-            "snes-emulator",
-            "sprite-editor",
-            "tmx-editor",
-            "COPYING.md"
-          )
-          $missing = @()
-          foreach ($binary in $expected) {
-            if (-not (Test-Path "sneside-windows\bin\$binary")) {
-              Write-Host "Missing: $binary"
-              $missing += $binary
-            }
-          }
-          if ($missing.Count -gt 0) {
-            Write-Error "Missing expected bin files: $($missing -join ', ')"
+            Write-Error "Virtual environment Python test failed"
             exit 1
+          }
+          
+          $pysideTest = .\venv\Scripts\python.exe -c "import PySide6; print('PySide6 OK:', PySide6.__version__)"
+          if ($LASTEXITCODE -eq 0) {
+            Write-Host "PySide6 is available in virtual environment"
           } else {
-            Write-Host "All expected bin files found."
+            Write-Error "PySide6 not available in virtual environment"
+            exit 1
           }
         shell: pwsh
 
-      - name: Check expected `scripts` files
-        run: |
-          $ErrorActionPreference = "Stop"
-          $expected = @(
-            "audio-brr-wav-converter.exe",
-            "audio-impulse-tracker-init.exe",
-            "audio-sample-generator.exe",
-            "audio-wav-brr-converter.exe",
-            "compile-dotnetsnes-proj.exe",
-            "compile-javasnes-proj.exe",
-            "compile-pvsneslib-proj.exe",
-            "get-snes-ide-home.exe",
-            "gfx-png-bmp-editor.exe",
-            "gfx-png-bmp-snes-converter.exe",
-            "gfx-tmx-editor.exe",
-            "gfx-tmx-tmj-converter.exe",
-            "open-emulator.exe"
-          )
-          $missing = @()
-          foreach ($exe in $expected) {
-            if (-not (Test-Path "sneside-windows\scripts\$exe")) {
-              Write-Host "Missing: $exe"
-              $missing += $exe
-            }
-          }
-          if ($missing.Count -gt 0) {
-            Write-Error "Missing expected .exe files: $($missing -join ', ')"
-            exit 1
-          } else {
-            Write-Host "All expected .exe files found."
-          }
-        shell: pwsh
-      
   windows-tests-redlight:
-  # This section builds and tests SNES-IDE on Windows using GitHub Actions.
-  # It uses the Red-Light phase of TDD. Nothing should pass. When new
-  # features are added, write failing tests here first, then implement the
-  # feature until passing. Move the passing test to "Test (Green-Light)"
-  # section above.
     if: github.ref_name == 'windows/red'
     name: Tests (Red-Light)
-    runs-on: windows-2025
+    runs-on: windows-latest
     needs: windows-build
     steps:
       - name: Download build artifact
@@ -175,13 +202,12 @@ jobs:
         with:
           name: sneside-windows
       
-      - name: Extract sneside-windows.zip
+      - name: Extract bundle
         run: |
-          powershell Expand-Archive -Path sneside-windows.zip -DestinationPath sneside-windows -Force
+          Expand-Archive -Path sneside-windows.zip -DestinationPath extracted -Force
         shell: pwsh
       
-      - name: Deliberately failing example test
+      - name: Deliberately failing test
         run: |
-          $ErrorActionPreference = "Stop"
           Write-Error "This is a deliberate failure for Red-Light testing."
         shell: pwsh

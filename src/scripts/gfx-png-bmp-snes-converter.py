@@ -23,7 +23,6 @@ from typing import List, Tuple, Callable, NoReturn
 from pathlib import Path
 import tkinter as tk
 import subprocess
-import sys
 import os
 
 showinfo: Callable[..., str]
@@ -377,26 +376,18 @@ class TileConverterGUI:
 
     @staticmethod
     def get_executable_path() -> str:
-        """Get the path of the executable or script based on whether the script is frozen 
-        (PyInstaller) or not."""
+        """
+        Get Script Path, by using the path of the script itself.
+        """
 
-        if getattr(sys, 'frozen', False):
-            print("executable path mode chosen")
-            return str(Path(sys.executable).parent)
-        
-        else:
-            print("Python script path mode chosen")
-            return str(Path(__file__).resolve().parent)
+        return str(Path(__file__).resolve().parent)
 
     @classmethod
     def get_home_path(cls) -> str:
-        """Get snes-ide home directory, can raise subprocess.CalledProcessError"""
-
-        command: list[str] = ["get-snes-ide-home.exe" if os.name == "nt" else "./get-snes-ide-home"]
-        cwd: str = cls.get_executable_path()
-
-        return subprocess.run(command, cwd=cwd, capture_output=True, text=True, check=True).stdout.strip()
-    
+        """Get snes-ide home directory"""
+        
+        return str(Path(cls.get_executable_path()).parent)
+        
     def run(self) -> None:
         """Start the GUI application."""
 

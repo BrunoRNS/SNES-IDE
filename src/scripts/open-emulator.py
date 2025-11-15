@@ -101,36 +101,19 @@ def get_file_path(
         sys.exit(1)
 
 def get_executable_path() -> Path:
-        """Get the path of the executable or script based on whether the script is frozen 
-        (PyInstaller) or not."""
+    """Returns the path of the executable"""
 
-        if getattr(sys, 'frozen', False):
-            print("executable path mode chosen")
-            return Path(sys.executable).resolve().parent
-        
-        else:
-            print("Python script path mode chosen")
-            return Path(__file__).resolve().parent
+    return Path(__file__).resolve().parent
+
+def get_home_path() -> str:
+    """Get snes-ide home directory"""
+
+    return str(Path(get_executable_path()).parent)
 
 def main() -> NoReturn:
     """Main logic to open a snes emulator in snes-ide"""
 
-    home_path: Path
-
-    try:
-        home_path = Path(
-            run(
-                ["get-snes-ide-home.exe"] if os.name == "nt" 
-                else ["./get-snes-ide-home"], shell=True, text=True,
-                cwd=get_executable_path(), check=True
-            ).stdout
-        )
-    except CalledProcessError as e:
-        print(f"Error while getting snes-ide home folder: {e}, exiting...")
-        exit(-1)
-    except Exception as e:
-        print(f"Unknown error while getting snes-ide home folder: {e}, exiting...")
-        exit(-1)
+    home_path: Path = Path(get_home_path())
 
     snes_emulator: Path = home_path / "bin" / "snes-emulator"
 
