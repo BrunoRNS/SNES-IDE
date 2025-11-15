@@ -132,6 +132,11 @@ class BundleCreator:
         """
 
         print("Copying project files...")
+
+        target_dir_path: Path = Path(target_dir)
+
+        target_dir_path.parent.mkdir(parents=True, exist_ok=True)
+
         shutil.copytree(self.source_dir, target_dir)
 
     def _create_venv(self, venv_path: Path) -> None:
@@ -178,8 +183,6 @@ class BundleCreator:
 
         venv_path = self.output_dir / config['venv_name']
         src_path = self.output_dir / config['src_dir']
-
-        src_path.mkdir(parents=True)
 
         self._create_venv(venv_path)
 
