@@ -1,7 +1,7 @@
 [Desktop Entry]
-Name=SNES IDE
+Name=SNES-IDE
 Exec=AppRun
-Icon=snes-ide
+Icon=/usr/src/icon.png
 Type=Application
 Categories=Development;
 Comment=SNES Development IDE
