@@ -525,7 +525,8 @@ def generate_bundle() -> None:
         str(Path(get_executable_path()) / "bundle" / "Info.plist"),
         str(Path(get_executable_path()) / "bundle" / "snes-ide.desktop"),
         str(Path(get_executable_path()) / "bundle" / "AppRun"),
-        str(Path(get_executable_path()) / "bundle" / "SNES-IDE.cpp")
+        str(Path(get_executable_path()) / "bundle" / "SNES-IDE.cpp"),
+        str(Path(get_executable_path()) / "bundle" / "appimagetool-x86_64.AppImage"),
     )
 
     if bundleCreator.create_bundle():

@@ -33,10 +33,10 @@ First, check the system requirements:
 - **Operational System**
   - Windows 10+ x64.
   - MacOS BigSur+ arm64.
-  - Linux Ubuntu 22.04+ (or based) x64.
+  - Linux Ubuntu Noble 24.04+ (or based) x64.
 - **Free Disk Space**
-  - Minimum: 10 GiB
-  - Recommended: 30 GiB
+  - Minimum: 800 MiB
+  - Recommended: 5 GiB
 - **Memory**
   - Minimum: 1 GiB
   - Recommended: 4 GiB
