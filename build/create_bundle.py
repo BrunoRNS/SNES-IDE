@@ -499,8 +499,7 @@ class BundleCreator:
             
             print(subprocess.run([
                 linux_appimage_creator, '-g', '--verbose', '--comp',
-                'SNES-IDE.AppDir',
-                'SNES-IDE.AppImage'
+                'SNES-IDE.AppDir'
             ], cwd=appdir_path.resolve(), check=True, capture_output=True, text=True, env=os.environ).stderr)
 
             for file in appdir_path.glob("*.AppImage"):
