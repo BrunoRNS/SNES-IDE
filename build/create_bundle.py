@@ -488,6 +488,12 @@ class BundleCreator:
             
             os.environ["ARCH"] = "x86_64"
             
+            if (appdir_path / 'SNES-IDE.AppDir').resolve().exists():
+                for file in (appdir_path / 'SNES-IDE.AppDir').glob("*"):
+                    print(file)
+            else:
+                raise FileNotFoundError("SNES-IDE.AppDir not found")
+            
             subprocess.run([
                 str(linux_appimage_creator.resolve()),
                 str((appdir_path / 'SNES-IDE.AppDir').resolve()),
