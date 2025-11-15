@@ -383,7 +383,6 @@ class BundleCreator:
             src_path = appdir_path / config['src_dir']
 
             usr_bin_path.mkdir(parents=True)
-            src_path.mkdir(parents=True)
 
             self._create_venv(venv_path)
 
