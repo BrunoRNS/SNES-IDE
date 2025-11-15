@@ -501,8 +501,8 @@ class BundleCreator:
         except subprocess.CalledProcessError as error:
             print(f"subprocess CalledProcessError while creating AppImage: {error}")
             
-            print(f"stdout: {error.stdout.decode('utf-8')}")
-            print(f"stderr: {error.stderr.decode('utf-8')}")
+            print(f"stdout: {error.stdout}")
+            print(f"stderr: {error.stderr}")
             print(f"returncode: {error.returncode}")
 
         except FileNotFoundError:
