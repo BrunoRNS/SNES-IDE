@@ -483,6 +483,8 @@ class BundleCreator:
             linux_appimage_creator = Path(self.linux_appimage_creator_path)
 
             linux_appimage_creator.chmod(0o755)
+            
+            shutil.copy(linux_appimage_creator, appdir_path)
 
             print("Generating AppImage...")
             
@@ -495,9 +497,9 @@ class BundleCreator:
                 raise FileNotFoundError("SNES-IDE.AppDir not found")
             
             subprocess.run([
-                str(linux_appimage_creator.resolve()),
-                str((appdir_path / 'SNES-IDE.AppDir').resolve()),
-                str((appdir_path / 'SNES-IDE.AppImage').resolve())
+                './' + linux_appimage_creator.name,
+                'SNES-IDE.AppDir',
+                'SNES-IDE.AppImage'
             ], cwd=appdir_path, check=True, capture_output=True, text=True, shell=True, env=os.environ)
 
             for file in appdir_path.glob("*.AppImage"):
