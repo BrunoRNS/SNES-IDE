@@ -379,13 +379,13 @@ class BundleCreator:
 
         with tempfile.TemporaryDirectory(prefix="snes_ide_build_") as temp_dir:
             temp_path = Path(temp_dir)
-            appdir_path = temp_path / "SNES-IDE" / "AppDir"
+            appdir_path = temp_path / "SNES-IDE.AppDir"
 
             usr_bin_path = appdir_path / "usr" / "bin"
             venv_path = appdir_path / config['venv_dir']
             src_path = appdir_path / config['src_dir']
 
-            usr_bin_path.mkdir(parents=True)
+            usr_bin_path.mkdir(parents=True, exist_ok=True)
 
             self._create_venv(venv_path)
 
@@ -393,15 +393,23 @@ class BundleCreator:
 
             self._copy_linux_apprun(appdir_path / "AppRun")
             self._copy_linux_desktop(appdir_path / "snes-ide.desktop")
+            
+            (appdir_path / "usr" / "share" / "applications").mkdir(parents=True, exist_ok=True)
+            
+            self._copy_linux_desktop(
+                appdir_path / "usr" / "share" / "applications" / "snes-ide.desktop"
+            )
 
             self._set_linux_permissions(appdir_path)
 
             appimage_path = self._create_appimage(temp_path)
 
             if appimage_path and appimage_path.exists():
+                
                 final_path = self.output_dir / config['appimage_name']
                 shutil.move(str(appimage_path), str(final_path))
                 final_path.chmod(0o755)
+                
                 return final_path.exists()
 
             return False
@@ -476,28 +484,28 @@ class BundleCreator:
         try:
             
             if self.linux_appimage_creator_path is None:
-                raise FileNotFoundError("linuxdeploy not found")
+                raise FileNotFoundError("linux_appimage_creator not found")
             
-            linuxdeploy_path = Path(self.linux_appimage_creator_path)
+            linux_appimage_creator = Path(self.linux_appimage_creator_path)
 
-            linuxdeploy_path.chmod(0o755)
+            linux_appimage_creator.chmod(0o755)
 
             print("Generating AppImage...")
             subprocess.run([
                 'ARCH=x86_64',
-                str(linuxdeploy_path),
+                str(linux_appimage_creator),
                 'SNES-IDE.AppDir'
             ], cwd=appdir_path, check=True, capture_output=True)
 
             for file in appdir_path.glob("*.AppImage"):
 
-                if file != linuxdeploy_path:
+                if file != linux_appimage_creator:
                     return file
 
         except subprocess.CalledProcessError as error:
             print(f"Error creating AppImage: {error}")
 
         except FileNotFoundError:
-            print("Error creating AppImage: linuxdeploy not found")
+            print("Error creating AppImage: linux appimage creator not found")
 
         return None

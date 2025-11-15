@@ -520,13 +520,18 @@ def generate_bundle() -> None:
     """
 
     bundleCreator = BundleCreator(
-        str(SNESIDEOUT), str(ROOT / "dist"),
-        str(Path(get_executable_path()) / "requirements.txt"),
-        str(Path(get_executable_path()) / "bundle" / "Info.plist"),
-        str(Path(get_executable_path()) / "bundle" / "snes-ide.desktop"),
-        str(Path(get_executable_path()) / "bundle" / "AppRun"),
-        str(Path(get_executable_path()) / "bundle" / "SNES-IDE.cpp"),
-        str(Path(get_executable_path()) / "bundle" / "appimagetool-x86_64.AppImage"),
+        source_dir=str(SNESIDEOUT), output_dir=str(ROOT / "dist"),
+        requirements_file=str(
+            Path(get_executable_path()) / "requirements.txt"),
+        plist_template=str(Path(get_executable_path()) /
+                           "bundle" / "Info.plist"),
+        desktop_template=str(Path(get_executable_path()) /
+                             "bundle" / "snes-ide.desktop"),
+        apprun_template=str(Path(get_executable_path()) / "bundle" / "AppRun"),
+        windows_launcher_template=str(
+            Path(get_executable_path()) / "bundle" / "SNES-IDE.cpp"),
+        linux_appimage_creator_path=str(
+            Path(get_executable_path()) / "bundle" / "appimagetool-x86_64.AppImage"),
     )
 
     if bundleCreator.create_bundle():
