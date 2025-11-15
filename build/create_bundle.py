@@ -491,11 +491,13 @@ class BundleCreator:
             linux_appimage_creator.chmod(0o755)
 
             print("Generating AppImage...")
+            
+            os.environ["ARCH"] = "x86_64"
+            
             subprocess.run([
-                'ARCH=x86_64',
                 str(linux_appimage_creator),
                 'SNES-IDE.AppDir'
-            ], cwd=appdir_path, check=True, capture_output=True)
+            ], cwd=appdir_path, check=True, capture_output=True, env=os.environ)
 
             for file in appdir_path.glob("*.AppImage"):
 
