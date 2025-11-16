@@ -17,11 +17,12 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 """
 
 from subprocess import run, CalledProcessError
-from typing_extensions import NoReturn
+from typing_extensions import NoReturn, Dict
+from copy import deepcopy
 from pathlib import Path
 import platform
 import shutil
-
+import os
 
 def check_if_path(program: str) -> bool:
     """
@@ -50,6 +51,32 @@ def get_home_path() -> str:
     return str(Path(get_executable_path()).parent)
 
 
+def setup_qt5_environment() -> Dict[str, str]:
+    """
+    Set up environment variables for Qt5 applications that require XCB.
+    
+    Returns:
+        dict: Environment variables specifically for Qt5/XCB
+    """
+    
+    env = deepcopy(os.environ.copy())
+    
+    env['QT_QPA_PLATFORM'] = 'xcb'
+
+    env.pop('WAYLAND_DISPLAY', None)
+    env.pop('QT_WAYLAND_DISABLE_WINDOWDECORATION', None)
+    env.pop('QT_WAYLAND_FORCE_DPI', None)
+
+    env['QT_AUTO_SCREEN_SCALE_FACTOR'] = '0'
+    env['QT_SCALE_FACTOR'] = '1'
+
+    env.pop('QT_QUICK_BACKEND', None)
+    env.pop('QMLSCENE_DEVICE', None)
+    env.pop('QSG_RENDERER_BACKEND', None)
+    
+    return env
+
+
 def main() -> NoReturn:
     """Main logic to init tiled -> default tmx_editor"""
 
@@ -70,15 +97,21 @@ def main() -> NoReturn:
         exit(-1)
 
     try:
-
         if platform.system().lower() == "darwin":
             run(["open", "-a", str(tmx_editor)], shell=True, check=True)
 
-        else:
+        elif platform.system().lower() == "windows":
             run([str(tmx_editor)], shell=True, check=True)
 
-    except CalledProcessError as e:
+        else:
+            qt5_env = setup_qt5_environment()
+            
+            if not os.access(tmx_editor, os.X_OK):
+                os.chmod(tmx_editor, 0o755)
+            
+            run([str(tmx_editor)], env=qt5_env, check=True)
 
+    except CalledProcessError as e:
         print(f"Error while executing {tmx_editor}: {e}")
         exit(-1)
 

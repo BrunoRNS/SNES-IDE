@@ -16,91 +16,14 @@ You should have received a copy of the GNU General Public License
 along with this program.  If not, see <http://www.gnu.org/licenses/>.
 """
 
-from typing import Union, List, NoReturn, Optional, Tuple
+from typing_extensions import NoReturn
 from subprocess import CompletedProcess
-from tkinter import Tk, filedialog
 from pathlib import Path
 import subprocess
 import platform
-import sys
 import os
 
-
-def get_file_path(
-    title: str = "Select file",
-    file_types: List[Tuple[str, str]] = [("All files", "*.*")],
-    multiple: bool = False,
-    directory: bool = False
-) -> Union[str, List[str], Tuple[str, ...], NoReturn]:
-    """
-    Replaces sys.argv with a graphical file/directory selection interface.
-
-    Args:
-        title: Dialog window title
-        file_types: List of tuples with description and extension [(desc, *.ext)]
-        multiple: Whether to allow multiple file selection
-        directory: Whether to select directories instead of files
-
-    Returns:
-        str or List[str]: Selected path(s)
-        NoReturn: Exits program if user cancels or error occurs
-
-    Raises:
-        SystemExit: Always exits program on cancellation or error
-    """
-    root: Optional[Tk] = None
-
-    try:
-        root = Tk()
-        root.withdraw()
-
-        try:
-            root.attributes('-topmost', True)  # type: ignore
-        except:
-            ...
-
-        selected_path: Union[str, List[str], Tuple[str, ...], None] = None
-
-        if directory:
-            selected_path = filedialog.askdirectory(title=title)
-
-        elif multiple:
-            selected_path = filedialog.askopenfilenames(
-                title=title,
-                filetypes=file_types
-            )
-            if selected_path:
-                selected_path = list(selected_path)
-        else:
-            selected_path = filedialog.askopenfilename(
-                title=title,
-                filetypes=file_types
-            )
-
-        if root:
-            root.destroy()
-            root = None
-
-        if not selected_path or (isinstance(selected_path, list) and len(selected_path) == 0):
-            print("No file/directory selected. Application terminated.")
-            sys.exit(1)
-
-        if isinstance(selected_path, str) and not os.path.exists(selected_path):
-            print(f"Selected path does not exist: {selected_path}")
-            sys.exit(1)
-
-        return selected_path
-
-    except Exception as e:
-        if root:
-            try:
-                root.destroy()
-            except:
-                ...
-
-        print(f"Error in file dialog: {e}")
-        sys.exit(1)
-
+from get_file_path import get_file_path
 
 def get_executable_path() -> str:
     """

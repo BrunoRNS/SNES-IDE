@@ -17,15 +17,14 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 """
 
 from PySide6.QtWidgets import QApplication, QMainWindow, QVBoxLayout, QWidget
-from PySide6.QtCore import QObject, Slot, Signal, QUrl
+from PySide6.QtCore import QObject, Slot, Signal, QUrl, QProcess
 from PySide6.QtWebEngineWidgets import QWebEngineView
 from PySide6.QtWebChannel import QWebChannel
 
-from subprocess import CompletedProcess
-from typing_extensions import NoReturn
+from typing_extensions import NoReturn, Any
 from pathlib import Path
-import subprocess
 import sys
+
 
 class ScriptRunner(QObject):
 
@@ -62,24 +61,31 @@ class ScriptRunner(QObject):
 
     @Slot(str)
     def run_script(self, script_name: str) -> None:
-        """Execute a Python script from the scripts directory"""
+        """
+        Execute a Python script from the scripts directory.
+
+        This slot is connected to the run_script method which takes a script name
+        as a parameter and executes it using the subprocess module.
+
+        :param script_name: The name of the script to execute.
+        :return: None
+        """
 
         try:
             script_path: Path = self.scripts_dir / script_name
-            if script_path.exists():
-                result: CompletedProcess[str] = subprocess.run(
-                    [sys.executable, '-s', str(script_path)],
-                    capture_output=True,
-                    text=True,
-                    cwd=self.scripts_dir
-                )
 
-                if result.returncode == 0:
-                    self.scriptExecuted.emit(
-                        script_name, "Script executed successfully!")
-                else:
-                    self.scriptExecuted.emit(
-                        script_name, f"Error: {result.stderr}")
+            if script_path.exists():
+                self.process = QProcess()
+
+                self.process.readyReadStandardOutput.connect(
+                    self.handle_stdout)
+                self.process.readyReadStandardError.connect(self.handle_stderr)
+                self.process.finished.connect(self.handle_finished)
+
+                self.process.setWorkingDirectory(str(self.scripts_dir))
+                self.process.start(sys.executable, ['-s', str(script_path)])
+                self.current_script = script_name
+
             else:
                 self.scriptExecuted.emit(
                     script_name, f"Script not found: {script_path}")
@@ -100,6 +106,64 @@ class ScriptRunner(QObject):
         """
 
         self.run_script(scriptName)
+
+    def handle_stdout(self):
+        """
+        Handle standard output from the subprocess.
+
+        This slot is connected to the readyReadStandardOutput signal of the
+        QProcess object. It reads the standard output data and prints it to
+        the console.
+
+        :return: None
+        """
+        
+        data: "str|Any" = self.process.readAllStandardOutput().data()
+        print(f"STDOUT: {data}")
+
+
+    def handle_stderr(self):
+        """
+        Handle standard error from the subprocess.
+
+        This slot is connected to the readyReadStandardError signal of the
+        QProcess object. It reads the standard error data and prints it to
+        the console.
+
+        :return: None
+        """
+        
+        data: "str|Any" = self.process.readAllStandardError().data()
+        print(f"STDERR: {data}")
+
+
+    def handle_finished(self, exit_code: int, _: Any):
+        """
+        Handle the finished signal of the QProcess object.
+
+        This slot is connected to the finished signal of the QProcess object.
+        It reads the standard error data and prints it to the console.
+
+        :param exit_code: The exit code of the subprocess.
+        :param _: Unused parameter.
+        :return: None
+        """
+        
+        script_name = getattr(self, 'current_script', 'Unknown')
+
+        if exit_code == 0:
+            self.scriptExecuted.emit(script_name, "Script executed successfully!")
+            
+        else:
+            error_msg: "str|Any" = self.process.readAllStandardError().data()
+            
+            if isinstance(error_msg, str):
+                error_msg = f"Error: {error_msg}"
+                self.scriptExecuted.emit(script_name, error_msg)
+            
+            else:
+                error_msg = f"Error: {error_msg}"
+                self.scriptExecuted.emit(script_name, error_msg)
 
 
 class MainWindow(QMainWindow):

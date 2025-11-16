@@ -128,8 +128,8 @@ div[stage] div[io] div[console] p {
   line-height: 1.25em;
 }
 div[stage] div[io] div[console] p span:last-child {
-  float: right;
-  display: inline-block;
+  float: right !important;
+  display: block !important;
 }
 div[stage] div[io] div[console] p[fine] {
   color: rgba(0, 0, 0, 0.4);

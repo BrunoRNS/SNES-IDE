@@ -16,22 +16,20 @@ You should have received a copy of the GNU General Public License
 along with this program.  If not, see <http://www.gnu.org/licenses/>.
 """
 
-from tkinter import Tk, filedialog, ttk, StringVar, BooleanVar
-from subprocess import CompletedProcess, CalledProcessError
-from tkinter.messagebox import showinfo, showerror  # type: ignore
-from typing import List, Tuple, Callable, NoReturn
+from PySide6.QtWidgets import (QApplication, QMainWindow, QWidget, QVBoxLayout, QHBoxLayout, 
+                               QGridLayout, QTabWidget, QGroupBox, QLabel, QLineEdit, 
+                               QPushButton, QCheckBox, QComboBox, QMessageBox, QFileDialog)
+from PySide6.QtCore import Qt, QProcess
+from subprocess import CalledProcessError
+from typing import List
 from pathlib import Path
-import tkinter as tk
-import subprocess
 import os
-
-showinfo: Callable[..., str]
-showerror: Callable[..., str]
+import sys
 
 
-class TileConverterGUI:
+class TileConverterGUI(QMainWindow):
     """
-    A Tkinter-based GUI for converting images to tile formats with various conversion options.
+    A PySide6-based GUI for converting images to tile formats with various conversion options.
 
     This class provides a graphical interface for configuring tile conversion parameters
     including tile size, compression, palette options, and output formats.
@@ -39,208 +37,238 @@ class TileConverterGUI:
 
     def __init__(self) -> None:
         """Initialize the main application window and UI components."""
+        super().__init__()
+        self.setWindowTitle("Tile Converter")
+        self.setGeometry(100, 100, 600, 700)
+        
+        # Initialize variables
+        self.input_file: str = ""
+        self.file_type: str = "png"
+        
+        # Create central widget and main layout
+        central_widget = QWidget()
+        self.setCentralWidget(central_widget)
+        main_layout = QVBoxLayout(central_widget)
+        
+        self.setup_ui(main_layout)
+        
+        # Initialize process for running commands
+        self.process = QProcess()
+        self.process.finished.connect(self.on_process_finished)
 
-        self.root: Tk = tk.Tk()
-        self.root.title("Tile Converter")
-        self.root.geometry("600x700")
-
-        self.input_file: StringVar = tk.StringVar()
-        self.file_type: StringVar = tk.StringVar(value="png")
-
-        self.add_blank_tile: BooleanVar = tk.BooleanVar()
-        self.block_size: StringVar = tk.StringVar(value="8")
-        self.packed_format: BooleanVar = tk.BooleanVar()
-        self.lz77_compressed: BooleanVar = tk.BooleanVar()
-        self.block_width: StringVar = tk.StringVar(value="8")
-        self.block_height: StringVar = tk.StringVar(value="8")
-
-        self.tile_offset: StringVar = tk.StringVar(value="0")
-        self.include_map: BooleanVar = tk.BooleanVar()
-        self.high_priority_bit: BooleanVar = tk.BooleanVar()
-        self.generate_pages: BooleanVar = tk.BooleanVar()
-        self.no_tile_reduction: BooleanVar = tk.BooleanVar()
-        self.mode_format: StringVar = tk.StringVar(value="1")
-
-        self.rearrange_palette: BooleanVar = tk.BooleanVar()
-        self.palette_rounding: BooleanVar = tk.BooleanVar()
-        self.palette_entry: StringVar = tk.StringVar(value="0")
-        self.colors_output: StringVar = tk.StringVar(value="16")
-        self.include_palette: BooleanVar = tk.BooleanVar()
-        self.colors_used: StringVar = tk.StringVar(value="16")
-
-        self.quiet_mode: BooleanVar = tk.BooleanVar()
-
-        self.setup_ui()
-
-    def setup_ui(self) -> None:
+    def setup_ui(self, main_layout: QVBoxLayout) -> None:
         """Set up all UI components and layout."""
+        self.create_file_section(main_layout)
 
-        main_frame: ttk.Frame = ttk.Frame(self.root, padding="10")
-        main_frame.pack(fill=tk.BOTH, expand=True)
+        # Create notebook (tab widget)
+        self.notebook = QTabWidget()
+        main_layout.addWidget(self.notebook)
 
-        self.create_file_section(main_frame)
+        self.create_tiles_tab()
+        self.create_map_tab()
+        self.create_palette_tab()
+        self.create_misc_tab()
 
-        notebook: ttk.Notebook = ttk.Notebook(main_frame)
-        notebook.pack(fill=tk.BOTH, expand=True, pady=10)
+        # Convert button
+        convert_btn = QPushButton("Convert")
+        convert_btn.clicked.connect(self.convert)
+        main_layout.addWidget(convert_btn)
 
-        self.create_tiles_tab(notebook)
-        self.create_map_tab(notebook)
-        self.create_palette_tab(notebook)
-        self.create_misc_tab(notebook)
-
-        convert_btn: ttk.Button = ttk.Button(
-            main_frame, text="Convert", command=self.convert)
-        convert_btn.pack(pady=10)
-
-    def create_file_section(self, parent: ttk.Frame) -> None:
+    def create_file_section(self, parent_layout: QVBoxLayout) -> None:
         """Create file input section."""
+        file_group = QGroupBox("File Options")
+        file_layout = QGridLayout(file_group)
 
-        file_frame: ttk.Labelframe = ttk.LabelFrame(
-            parent, text="File Options", padding="5")
-        file_frame.pack(fill=tk.X, pady=5)
+        # Input file selection
+        file_layout.addWidget(QLabel("Input File:"), 0, 0)
+        self.file_entry = QLineEdit()
+        self.file_entry.setPlaceholderText("Select input file...")
+        file_layout.addWidget(self.file_entry, 0, 1)
+        
+        browse_btn = QPushButton("Browse")
+        browse_btn.clicked.connect(self.browse_file)
+        file_layout.addWidget(browse_btn, 0, 2)
 
-        ttk.Label(file_frame, text="Input File:").grid(
-            row=0, column=0, sticky=tk.W, pady=2)
-        ttk.Entry(file_frame, textvariable=self.input_file,
-                  width=50).grid(row=0, column=1, padx=5, pady=2)
-        ttk.Button(file_frame, text="Browse", command=self.browse_file).grid(
-            row=0, column=2, pady=2)
+        # File type selection
+        file_layout.addWidget(QLabel("File Type:"), 1, 0)
+        self.file_type_combo = QComboBox()
+        self.file_type_combo.addItems(["bmp", "png"])
+        self.file_type_combo.setCurrentText("png")
+        file_layout.addWidget(self.file_type_combo, 1, 1, Qt.AlignmentFlag.AlignLeft)
 
-        ttk.Label(file_frame, text="File Type:").grid(
-            row=1, column=0, sticky=tk.W, pady=2)
-        file_type_combo: ttk.Combobox = ttk.Combobox(file_frame, textvariable=self.file_type,
-                                                     values=["bmp", "png"], state="readonly", width=10)
-        file_type_combo.grid(row=1, column=1, sticky=tk.W, padx=5, pady=2)
+        parent_layout.addWidget(file_group)
 
-    def create_tiles_tab(self, notebook: ttk.Notebook) -> None:
+    def create_tiles_tab(self) -> None:
         """Create tiles options tab."""
+        tiles_widget = QWidget()
+        tiles_layout = QVBoxLayout(tiles_widget)
 
-        tiles_frame: ttk.Frame = ttk.Frame(notebook, padding="10")
-        notebook.add(tiles_frame, text="Tiles Options")
+        self.add_blank_tile = QCheckBox("Add blank tile management (for multiple backgrounds)")
+        tiles_layout.addWidget(self.add_blank_tile)
 
-        ttk.Checkbutton(tiles_frame, text="Add blank tile management (for multiple backgrounds)",
-                        variable=self.add_blank_tile).grid(row=0, column=0, sticky=tk.W, pady=2)
+        # Block size
+        size_layout = QHBoxLayout()
+        size_layout.addWidget(QLabel("Size of image blocks in pixels:"))
+        self.block_size_combo = QComboBox()
+        self.block_size_combo.addItems(["8", "16", "32", "64"])
+        self.block_size_combo.setCurrentText("8")
+        size_layout.addWidget(self.block_size_combo)
+        size_layout.addStretch()
+        tiles_layout.addLayout(size_layout)
 
-        ttk.Label(tiles_frame, text="Size of image blocks in pixels:").grid(
-            row=1, column=0, sticky=tk.W, pady=2)
-        size_combo: ttk.Combobox = ttk.Combobox(tiles_frame, textvariable=self.block_size,
-                                                values=["8", "16", "32", "64"], state="readonly", width=10)
-        size_combo.grid(row=1, column=1, sticky=tk.W, pady=2)
+        self.packed_format = QCheckBox("Output in packed pixel format")
+        tiles_layout.addWidget(self.packed_format)
 
-        ttk.Checkbutton(tiles_frame, text="Output in packed pixel format",
-                        variable=self.packed_format).grid(row=2, column=0, sticky=tk.W, pady=2)
-        ttk.Checkbutton(tiles_frame, text="Output in LZ77 compressed pixel format",
-                        variable=self.lz77_compressed).grid(row=3, column=0, sticky=tk.W, pady=2)
+        self.lz77_compressed = QCheckBox("Output in LZ77 compressed pixel format")
+        tiles_layout.addWidget(self.lz77_compressed)
 
-        ttk.Label(tiles_frame, text="Custom block dimensions (override -s):").grid(
-            row=4, column=0, sticky=tk.W, pady=5)
+        # Custom block dimensions
+        tiles_layout.addWidget(QLabel("Custom block dimensions (override -s):"))
+        
+        width_layout = QHBoxLayout()
+        width_layout.addWidget(QLabel("Width:"))
+        self.block_width_edit = QLineEdit("8")
+        self.block_width_edit.setMaximumWidth(80)
+        width_layout.addWidget(self.block_width_edit)
+        width_layout.addStretch()
+        tiles_layout.addLayout(width_layout)
+        
+        height_layout = QHBoxLayout()
+        height_layout.addWidget(QLabel("Height:"))
+        self.block_height_edit = QLineEdit("8")
+        self.block_height_edit.setMaximumWidth(80)
+        height_layout.addWidget(self.block_height_edit)
+        height_layout.addStretch()
+        tiles_layout.addLayout(height_layout)
 
-        ttk.Label(tiles_frame, text="Width:").grid(
-            row=5, column=0, sticky=tk.W, pady=2)
-        ttk.Entry(tiles_frame, textvariable=self.block_width, width=10).grid(
-            row=5, column=1, sticky=tk.W, pady=2)
+        tiles_layout.addStretch()
+        self.notebook.addTab(tiles_widget, "Tiles Options")
 
-        ttk.Label(tiles_frame, text="Height:").grid(
-            row=6, column=0, sticky=tk.W, pady=2)
-        ttk.Entry(tiles_frame, textvariable=self.block_height,
-                  width=10).grid(row=6, column=1, sticky=tk.W, pady=2)
-
-    def create_map_tab(self, notebook: ttk.Notebook) -> None:
+    def create_map_tab(self) -> None:
         """Create map options tab."""
+        map_widget = QWidget()
+        map_layout = QVBoxLayout(map_widget)
 
-        map_frame: ttk.Frame = ttk.Frame(notebook, padding="10")
-        notebook.add(map_frame, text="Map Options")
+        # Tile offset
+        offset_layout = QHBoxLayout()
+        offset_layout.addWidget(QLabel("Tile number offset (0-2047):"))
+        self.tile_offset_edit = QLineEdit("0")
+        self.tile_offset_edit.setMaximumWidth(80)
+        offset_layout.addWidget(self.tile_offset_edit)
+        offset_layout.addStretch()
+        map_layout.addLayout(offset_layout)
 
-        ttk.Label(map_frame, text="Tile number offset (0-2047):").grid(row=0,
-                                                                       column=0, sticky=tk.W, pady=2)
-        ttk.Entry(map_frame, textvariable=self.tile_offset, width=10).grid(
-            row=0, column=1, sticky=tk.W, pady=2)
+        self.include_map = QCheckBox("Include map for output")
+        map_layout.addWidget(self.include_map)
 
-        ttk.Checkbutton(map_frame, text="Include map for output",
-                        variable=self.include_map).grid(row=1, column=0, sticky=tk.W, pady=2)
-        ttk.Checkbutton(map_frame, text="Include high priority bit in map",
-                        variable=self.high_priority_bit).grid(row=2, column=0, sticky=tk.W, pady=2)
-        ttk.Checkbutton(map_frame, text="Generate map in pages of 32x32 blocks",
-                        variable=self.generate_pages).grid(row=3, column=0, sticky=tk.W, pady=2)
-        ttk.Checkbutton(map_frame, text="No tile reduction (not advised)",
-                        variable=self.no_tile_reduction).grid(row=4, column=0, sticky=tk.W, pady=2)
+        self.high_priority_bit = QCheckBox("Include high priority bit in map")
+        map_layout.addWidget(self.high_priority_bit)
 
-        ttk.Label(map_frame, text="Output mode format:").grid(
-            row=5, column=0, sticky=tk.W, pady=2)
-        mode_combo: ttk.Combobox = ttk.Combobox(map_frame, textvariable=self.mode_format,
-                                                values=["1", "5", "6", "7", "9"], state="readonly", width=10)
-        mode_combo.grid(row=5, column=1, sticky=tk.W, pady=2)
+        self.generate_pages = QCheckBox("Generate map in pages of 32x32 blocks")
+        map_layout.addWidget(self.generate_pages)
 
-    def create_palette_tab(self, notebook: ttk.Notebook) -> None:
+        self.no_tile_reduction = QCheckBox("No tile reduction (not advised)")
+        map_layout.addWidget(self.no_tile_reduction)
+
+        # Mode format
+        mode_layout = QHBoxLayout()
+        mode_layout.addWidget(QLabel("Output mode format:"))
+        self.mode_format_combo = QComboBox()
+        self.mode_format_combo.addItems(["1", "5", "6", "7", "9"])
+        self.mode_format_combo.setCurrentText("1")
+        mode_layout.addWidget(self.mode_format_combo)
+        mode_layout.addStretch()
+        map_layout.addLayout(mode_layout)
+
+        map_layout.addStretch()
+        self.notebook.addTab(map_widget, "Map Options")
+
+    def create_palette_tab(self) -> None:
         """Create palette options tab."""
+        palette_widget = QWidget()
+        palette_layout = QVBoxLayout(palette_widget)
 
-        palette_frame: ttk.Frame = ttk.Frame(notebook, padding="10")
-        notebook.add(palette_frame, text="Palette Options")
+        self.rearrange_palette = QCheckBox("Rearrange palette and preserve palette numbers in tilemap")
+        palette_layout.addWidget(self.rearrange_palette)
 
-        ttk.Checkbutton(palette_frame, text="Rearrange palette and preserve palette numbers in tilemap",
-                        variable=self.rearrange_palette).grid(row=0, column=0, sticky=tk.W, pady=2)
-        ttk.Checkbutton(palette_frame, text="Palette rounding (to maximum value of 63)",
-                        variable=self.palette_rounding).grid(row=1, column=0, sticky=tk.W, pady=2)
+        self.palette_rounding = QCheckBox("Palette rounding (to maximum value of 63)")
+        palette_layout.addWidget(self.palette_rounding)
 
-        ttk.Label(palette_frame, text="Palette entry to add to map tiles (0-15):").grid(
-            row=2, column=0, sticky=tk.W, pady=2)
-        ttk.Entry(palette_frame, textvariable=self.palette_entry,
-                  width=10).grid(row=2, column=1, sticky=tk.W, pady=2)
+        # Palette entry
+        entry_layout = QHBoxLayout()
+        entry_layout.addWidget(QLabel("Palette entry to add to map tiles (0-15):"))
+        self.palette_entry_edit = QLineEdit("0")
+        self.palette_entry_edit.setMaximumWidth(80)
+        entry_layout.addWidget(self.palette_entry_edit)
+        entry_layout.addStretch()
+        palette_layout.addLayout(entry_layout)
 
-        ttk.Label(palette_frame, text="Number of colors to output (0-256):").grid(
-            row=3, column=0, sticky=tk.W, pady=2)
-        ttk.Entry(palette_frame, textvariable=self.colors_output,
-                  width=10).grid(row=3, column=1, sticky=tk.W, pady=2)
+        # Colors output
+        colors_output_layout = QHBoxLayout()
+        colors_output_layout.addWidget(QLabel("Number of colors to output (0-256):"))
+        self.colors_output_edit = QLineEdit("16")
+        self.colors_output_edit.setMaximumWidth(80)
+        colors_output_layout.addWidget(self.colors_output_edit)
+        colors_output_layout.addStretch()
+        palette_layout.addLayout(colors_output_layout)
 
-        ttk.Checkbutton(palette_frame, text="Include palette for output",
-                        variable=self.include_palette).grid(row=4, column=0, sticky=tk.W, pady=2)
+        self.include_palette = QCheckBox("Include palette for output")
+        palette_layout.addWidget(self.include_palette)
 
-        ttk.Label(palette_frame, text="Number of colors to use:").grid(
-            row=5, column=0, sticky=tk.W, pady=2)
-        colors_combo: ttk.Combobox = ttk.Combobox(palette_frame, textvariable=self.colors_used,
-                                                  values=["4", "16", "128", "256"], state="readonly", width=10)
-        colors_combo.grid(row=5, column=1, sticky=tk.W, pady=2)
+        # Colors used
+        colors_used_layout = QHBoxLayout()
+        colors_used_layout.addWidget(QLabel("Number of colors to use:"))
+        self.colors_used_combo = QComboBox()
+        self.colors_used_combo.addItems(["4", "16", "128", "256"])
+        self.colors_used_combo.setCurrentText("16")
+        colors_used_layout.addWidget(self.colors_used_combo)
+        colors_used_layout.addStretch()
+        palette_layout.addLayout(colors_used_layout)
 
-    def create_misc_tab(self, notebook: ttk.Notebook) -> None:
+        palette_layout.addStretch()
+        self.notebook.addTab(palette_widget, "Palette Options")
+
+    def create_misc_tab(self) -> None:
         """Create miscellaneous options tab."""
+        misc_widget = QWidget()
+        misc_layout = QVBoxLayout(misc_widget)
 
-        misc_frame: ttk.Frame = ttk.Frame(notebook, padding="10")
-        notebook.add(misc_frame, text="Misc Options")
+        self.quiet_mode = QCheckBox("Quiet mode")
+        misc_layout.addWidget(self.quiet_mode)
 
-        ttk.Checkbutton(misc_frame, text="Quiet mode",
-                        variable=self.quiet_mode).grid(row=0, column=0, sticky=tk.W, pady=2)
+        version_btn = QPushButton("Display Version Information")
+        version_btn.clicked.connect(self.show_version)
+        misc_layout.addWidget(version_btn)
 
-        ttk.Button(misc_frame, text="Display Version Information",
-                   command=self.show_version).grid(row=1, column=0, sticky=tk.W, pady=10)
+        misc_layout.addStretch()
+        self.notebook.addTab(misc_widget, "Misc Options")
 
     def browse_file(self) -> None:
         """Open file dialog to select input file."""
-
-        file_types: List[Tuple[str, str]] = [
-            ("Bitmap files", "*.bmp"),
-            ("PNG files", "*.png"),
-            ("All files", "*.*")
-        ]
-
-        filename: str = filedialog.askopenfilename(
-            title="Select input file",
-            filetypes=file_types
+        file_types = "Bitmap files (*.bmp);;PNG files (*.png);;All files (*.*)"
+        
+        filename, _ = QFileDialog.getOpenFileName(
+            self,
+            "Select input file",
+            "",
+            file_types
         )
 
         if filename:
-            self.input_file.set(filename)
-            ext: str = os.path.splitext(filename)[1].lower()
+            self.file_entry.setText(filename)
+            ext = os.path.splitext(filename)[1].lower()
             if ext == '.bmp':
-                self.file_type.set('bmp')
+                self.file_type_combo.setCurrentText('bmp')
             elif ext == '.png':
-                self.file_type.set('png')
+                self.file_type_combo.setCurrentText('png')
 
     def show_version(self) -> None:
         """Display version information."""
-
-        showinfo("Version Information",
-                 "Tile Converter GUI v5.0\n"
-                 "GPL v3 License")
+        QMessageBox.information(
+            self,
+            "Version Information",
+            "Tile Converter GUI v5.0\nGPL v3 License"
+        )
 
     def validate_inputs(self) -> bool:
         """
@@ -249,30 +277,31 @@ class TileConverterGUI:
         Returns:
             bool: True if all inputs are valid, False otherwise
         """
-
-        if not self.input_file.get():
-            showerror("Error", "Please select an input file")
+        input_file = self.file_entry.text()
+        
+        if not input_file:
+            QMessageBox.critical(self, "Error", "Please select an input file")
             return False
 
-        if not os.path.exists(self.input_file.get()):
-            showerror("Error", "Input file does not exist")
+        if not os.path.exists(input_file):
+            QMessageBox.critical(self, "Error", "Input file does not exist")
             return False
 
         try:
-            tile_offset: int = int(self.tile_offset.get())
+            tile_offset = int(self.tile_offset_edit.text())
             if not (0 <= tile_offset <= 2047):
-                raise ValueError("Tile offset out of range")
+                raise ValueError("Tile offset must be between 0 and 2047")
 
-            palette_entry: int = int(self.palette_entry.get())
+            palette_entry = int(self.palette_entry_edit.text())
             if not (0 <= palette_entry <= 15):
-                raise ValueError("Palette entry out of range")
+                raise ValueError("Palette entry must be between 0 and 15")
 
-            colors_output: int = int(self.colors_output.get())
+            colors_output = int(self.colors_output_edit.text())
             if not (0 <= colors_output <= 256):
-                raise ValueError("Colors output out of range")
+                raise ValueError("Colors output must be between 0 and 256")
 
         except ValueError as e:
-            showerror("Error", f"Invalid numeric input: {e}")
+            QMessageBox.critical(self, "Error", f"Invalid numeric input: {e}")
             return False
 
         return True
@@ -282,148 +311,156 @@ class TileConverterGUI:
         Build command line arguments based on GUI selections.
 
         Returns:
-            str: The constructed command line string
+            List[str]: The constructed command line arguments
         """
-
         args: List[str] = []
 
-        if self.add_blank_tile.get():
+        if self.add_blank_tile.isChecked():
             args.append("-b")
 
-        if self.block_size.get() != "8":
-            args.append(f"-s {self.block_size.get()}")
+        block_size = self.block_size_combo.currentText()
+        if block_size != "8":
+            args.append(f"-s {block_size}")
 
-        if self.packed_format.get():
+        if self.packed_format.isChecked():
             args.append("-k")
 
-        if self.lz77_compressed.get():
+        if self.lz77_compressed.isChecked():
             args.append("-z")
 
-        if self.block_size.get() == "8":
-            if self.block_width.get() != "8":
-                args.append(f"-W {self.block_width.get()}")
-            if self.block_height.get() != "8":
-                args.append(f"-H {self.block_height.get()}")
+        if block_size == "8":
+            block_width = self.block_width_edit.text()
+            block_height = self.block_height_edit.text()
+            if block_width != "8":
+                args.append(f"-W {block_width}")
+            if block_height != "8":
+                args.append(f"-H {block_height}")
 
-        if self.tile_offset.get() != "0":
-            args.append(f"-f {self.tile_offset.get()}")
+        tile_offset = self.tile_offset_edit.text()
+        if tile_offset != "0":
+            args.append(f"-f {tile_offset}")
 
-        if self.include_map.get():
+        if self.include_map.isChecked():
             args.append("-m")
 
-        if self.high_priority_bit.get():
+        if self.high_priority_bit.isChecked():
             args.append("-g")
 
-        if self.generate_pages.get():
+        if self.generate_pages.isChecked():
             args.append("-y")
 
-        if self.no_tile_reduction.get():
+        if self.no_tile_reduction.isChecked():
             args.append("-R")
 
-        if self.mode_format.get() != "1":
-            args.append(f"-M {self.mode_format.get()}")
+        mode_format = self.mode_format_combo.currentText()
+        if mode_format != "1":
+            args.append(f"-M {mode_format}")
 
-        if self.rearrange_palette.get():
+        if self.rearrange_palette.isChecked():
             args.append("-a")
 
-        if self.palette_rounding.get():
+        if self.palette_rounding.isChecked():
             args.append("-d")
 
-        if self.palette_entry.get() != "0":
-            args.append(f"-e {self.palette_entry.get()}")
+        palette_entry = self.palette_entry_edit.text()
+        if palette_entry != "0":
+            args.append(f"-e {palette_entry}")
 
-        if self.colors_output.get() != "16":
-            args.append(f"-o {self.colors_output.get()}")
+        colors_output = self.colors_output_edit.text()
+        if colors_output != "16":
+            args.append(f"-o {colors_output}")
 
-        if self.include_palette.get():
+        if self.include_palette.isChecked():
             args.append("-p")
 
-        if self.colors_used.get() != "16":
-            args.append(f"-u {self.colors_used.get()}")
+        colors_used = self.colors_used_combo.currentText()
+        if colors_used != "16":
+            args.append(f"-u {colors_used}")
 
-        args.append(f"-i \"{self.input_file.get()}\"")
-        args.append(f"-t {self.file_type.get()}")
+        args.append(f"-i \"{self.file_entry.text()}\"")
+        args.append(f"-t {self.file_type_combo.currentText()}")
 
-        if self.quiet_mode.get():
+        if self.quiet_mode.isChecked():
             args.append("-q")
 
         return args
 
-    def convert(self) -> "None|NoReturn":
+    def convert(self) -> None:
         """Execute the conversion with selected parameters."""
-
         if not self.validate_inputs():
             return
-
-        gfx4snes: Path
 
         try:
             gfx4snes = (
                 Path(self.get_home_path()) / "bin" /
-                "pvsneslib" / "devkitsnes" / "tools"
-                / ("gfx4snes.exe" if os.name == "nt" else "gfx4snes")
+                "pvsneslib" / "devkitsnes" / "tools" /
+                ("gfx4snes.exe" if os.name == "nt" else "gfx4snes")
             )
         except CalledProcessError as e:
-            showerror(f"Failed to get snes-ide home path duel to: {e}")
-            exit(-1)
+            QMessageBox.critical(self, "Error", f"Failed to get snes-ide home path due to: {e}")
+            return
         except Exception as e:
-            showerror(
-                f"Unknown error ocurred when getting snes-ide home path duel to: {e}")
-            exit(-1)
+            QMessageBox.critical(self, "Error", f"Unknown error occurred when getting snes-ide home path due to: {e}")
+            return
 
-        command_line: List[str] = self.build_command_line()
+        if not gfx4snes.exists():
+            QMessageBox.critical(self, "Error", f"gfx4snes not found at: {gfx4snes}")
+            return
 
-        showinfo("Conversion started",
-                 f"Conversion started with parameters:\n{command_line}\n\n")
+        command_line = self.build_command_line()
+        full_command = [str(gfx4snes)] + command_line
 
-        try:
-            process: CompletedProcess[bytes] = subprocess.run([gfx4snes] + command_line, shell=True,
-                                                              cwd=Path(
-                                                                  self.input_file.get()).parent
-                                                              )
-        except Exception as e:
-            showerror(f"Failed to execute gfx4snes process: {e}")
-            exit(-1)
+        QMessageBox.information(
+            self,
+            "Conversion started",
+            f"Conversion started with parameters:\n{' '.join(full_command)}\n\n"
+        )
 
-        if process.returncode != 0:
-            try:
-                process.check_returncode()
+        # Run the process asynchronously
+        working_dir = Path(self.file_entry.text()).parent
+        self.process.setWorkingDirectory(str(working_dir))
+        self.process.start(str(gfx4snes), command_line)
 
-            except CalledProcessError as e:
-                showerror(
-                    f"Failed to convert image to SNES format duel to: {e}")
-
-            finally:
-                exit(-1)
-
-        showinfo("Conversion finished",
-                 "Conversion finished successfully!")
+    def on_process_finished(self, exit_code: int, exit_status: QProcess.ExitStatus) -> None:
+        """Handle process completion."""
+        if exit_code == 0:
+            QMessageBox.information(
+                self,
+                "Conversion finished",
+                "Conversion finished successfully!"
+            )
+        else:
+            error_output = self.process.readAllStandardError().data()
+            QMessageBox.critical(
+                self,
+                "Conversion failed",
+                f"Failed to convert image to SNES format.\nError: {error_output}"
+            )
 
     @staticmethod
     def get_executable_path() -> str:
         """
         Get Script Path, by using the path of the script itself.
         """
-
         return str(Path(__file__).resolve().parent)
 
     @classmethod
     def get_home_path(cls) -> str:
         """Get snes-ide home directory"""
-
         return str(Path(cls.get_executable_path()).parent)
-
-    def run(self) -> None:
-        """Start the GUI application."""
-
-        self.root.mainloop()
 
 
 def main() -> None:
     """Main function to launch the Tile Converter GUI."""
-
-    app: TileConverterGUI = TileConverterGUI()
-    app.run()
+    app = QApplication(sys.argv)
+    
+    app.setApplicationName("Tile Converter")
+    app.setApplicationVersion("5.0")
+    
+    window = TileConverterGUI()
+    window.show()
+    
+    sys.exit(app.exec())
 
 
 if __name__ == "__main__":

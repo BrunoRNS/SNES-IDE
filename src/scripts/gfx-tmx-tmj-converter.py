@@ -29,7 +29,7 @@ class MainWindow(QMainWindow):
     def __init__(self, web_app: "Path|str") -> None:
 
         super().__init__()
-        self.setWindowTitle("App PySide6 com HTML")
+        self.setWindowTitle("Tileset Extractor")
 
         html_path: Path = (
             Path(web_app) if isinstance(
