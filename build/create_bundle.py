@@ -1,4 +1,4 @@
-from typing import Dict, Set, Optional
+from typing import Dict, Set
 from pathlib import Path
 import subprocess
 import platform
@@ -16,8 +16,7 @@ class BundleCreator:
         plist_template: "str|None" = None,
         desktop_template: "str|None" = None,
         apprun_template: "str|None" = None,
-        windows_launcher_template: "str|None" = None,
-        linux_appimage_creator_path: "str|None" = None
+        windows_launcher_template: "str|None" = None
     ) -> None:
         """
         Initializes the BundleCreator object with the given parameters.
@@ -58,8 +57,6 @@ class BundleCreator:
             apprun_template) if apprun_template else None
         self.windows_launcher_template: "Path|None" = Path(
             windows_launcher_template) if windows_launcher_template else None
-        self.linux_appimage_creator_path: "Path|None" = Path(
-            linux_appimage_creator_path) if linux_appimage_creator_path else None
 
         self.platform_config: Dict[str, Dict[str, str]] = {
             'windows': {
@@ -76,7 +73,6 @@ class BundleCreator:
                 'launcher_name': 'SNES-IDE'
             },
             'linux': {
-                'appimage_name': 'SNES-IDE.AppImage',
                 'venv_dir': 'usr/venv',
                 'src_dir': 'usr/src',
                 'launcher_name': 'AppRun'
@@ -396,15 +392,12 @@ class BundleCreator:
 
             self._set_linux_permissions(appdir_path)
 
-            appimage_path = self._create_appimage(temp_path)
-
-            if appimage_path and appimage_path.exists():
+            if appdir_path and appdir_path.exists():
                 
-                final_path = self.output_dir / config['appimage_name']
-                shutil.move(str(appimage_path), str(final_path))
-                final_path.chmod(0o755)
+                final_path = self.output_dir
+                shutil.copytree(appdir_path, final_path)
                 
-                return final_path.exists()
+                return True
 
             return False
 
@@ -461,60 +454,3 @@ class BundleCreator:
             for file_path in venv_bin_path.iterdir():
                 if file_path.is_file():
                     file_path.chmod(0o755)
-
-    def _create_appimage(self, appdir_path: Path) -> Optional[Path]:
-        """
-        Creates an AppImage from the given application directory.
-
-        Parameters:
-            appdir_path (Path): The parent path to the application directory.
-
-        Returns:
-            Path: The path to the created AppImage, if successful; otherwise, None.
-        """
-
-        print("Creating AppImage...")
-
-        try:
-            
-            if self.linux_appimage_creator_path is None:
-                raise FileNotFoundError("linux_appimage_creator not found")
-            
-            linux_appimage_creator = Path(self.linux_appimage_creator_path)
-
-            linux_appimage_creator.chmod(0o755)
-            
-            shutil.copy(linux_appimage_creator, appdir_path)
-
-            print("Generating AppImage...")
-            
-            os.environ["ARCH"] = "x86_64"
-            os.environ["SOURCE"] = str(appdir_path.resolve() / 'SNES-IDE.AppDir')
-            
-            if (appdir_path / 'SNES-IDE.AppDir').resolve().exists():
-                for file in (appdir_path / 'SNES-IDE.AppDir').rglob("*"):
-                    print(file)
-            else:
-                raise FileNotFoundError("SNES-IDE.AppDir not found")
-            
-            print(subprocess.run([
-                linux_appimage_creator, '--verbose',
-                str(appdir_path.resolve() / 'SNES-IDE.AppDir')
-            ], cwd=appdir_path.resolve(), check=True, capture_output=True, text=True, env=os.environ).stderr)
-
-            for file in appdir_path.glob("*.AppImage"):
-
-                if file != linux_appimage_creator:
-                    return file
-
-        except subprocess.CalledProcessError as error:
-            print(f"subprocess CalledProcessError while creating AppImage: {error}")
-            
-            print(f"stdout: {error.stdout}")
-            print(f"stderr: {error.stderr}")
-            print(f"returncode: {error.returncode}")
-
-        except FileNotFoundError as error:
-            print(f"Error creating AppImage: linux appimage creator not found: {error}")
-
-        return None

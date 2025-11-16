@@ -529,9 +529,7 @@ def generate_bundle() -> None:
                              "bundle" / "snes-ide.desktop"),
         apprun_template=str(Path(get_executable_path()) / "bundle" / "AppRun"),
         windows_launcher_template=str(
-            Path(get_executable_path()) / "bundle" / "SNES-IDE.cpp"),
-        linux_appimage_creator_path=str(
-            Path(get_executable_path()) / "bundle" / "appimagetool-x86_64.AppImage"),
+            Path(get_executable_path()) / "bundle" / "SNES-IDE.cpp")
     )
 
     if bundleCreator.create_bundle():
