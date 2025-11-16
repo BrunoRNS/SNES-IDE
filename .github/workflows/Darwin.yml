@@ -102,12 +102,12 @@ jobs:
         run: |
           chmod +x SNES-IDE.app/Contents/MacOS/SNES-IDE
 
-          if ! SNES-IDE.app/Contents/MacOS/SNES-IDE --help 2>/dev/null; then
+          if ! timeout 10s SNES-IDE.app/Contents/MacOS/SNES-IDE 2>/dev/null; then
             echo "Launcher execution test inconclusive (expected for GUI apps)"
           else
-            echo "Launcher executed successfully (not expected for GUI apps)"
+            echo "Launcher executed successfully"
           fi
-
+          
   macos-tests-redlight:
     if: github.ref_name == 'macos/red'
     name: Tests (Red-Light)
