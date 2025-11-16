@@ -26,8 +26,6 @@ from typing_extensions import NoReturn
 from pathlib import Path
 import subprocess
 import sys
-import os
-
 
 class ScriptRunner(QObject):
 
@@ -67,11 +65,10 @@ class ScriptRunner(QObject):
         """Execute a Python script from the scripts directory"""
 
         try:
-            script_path: Path = self.scripts_dir / (Path(script_name).stem +
-                                                    (".exe" if os.name == "nt" else ""))
+            script_path: Path = self.scripts_dir / script_name
             if script_path.exists():
                 result: CompletedProcess[str] = subprocess.run(
-                    [sys.executable, str(script_path)],
+                    [sys.executable, '-s', str(script_path)],
                     capture_output=True,
                     text=True,
                     cwd=self.scripts_dir
