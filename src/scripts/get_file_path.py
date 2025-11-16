@@ -19,8 +19,9 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 from PySide6.QtWidgets import QApplication, QFileDialog
 from PySide6.QtCore import Qt
 
-from typing import Union, List, NoReturn, Tuple
+from typing import Union, List, NoReturn, Tuple, Optional
 
+from pathlib import Path
 import sys
 import os
 
@@ -61,14 +62,15 @@ def get_file_path(
         dialog.setWindowTitle(title)
         dialog.setWindowFlags(dialog.windowFlags() | Qt.WindowType.WindowStaysOnTopHint)
         
-        selected_path = None
+        selected_path: Union[Optional[str], List[str]] = None
         
         if directory:
             dialog.setFileMode(QFileDialog.FileMode.Directory)
             dialog.setOption(QFileDialog.Option.ShowDirsOnly, True)
             
             if dialog.exec() == QFileDialog.DialogCode.Accepted:
-                selected_path = dialog.selectedFiles()[0] if dialog.selectedFiles() else None
+                selected_path = dialog.selectedFiles()[0] if dialog.selectedFiles() else "None"
+                selected_path = selected_path if Path(selected_path).resolve().is_dir() and Path(selected_path).resolve().exists() else None
                 
         elif multiple:
             dialog.setFileMode(QFileDialog.FileMode.ExistingFiles)

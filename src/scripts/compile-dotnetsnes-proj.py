@@ -66,6 +66,7 @@ def main() -> NoReturn:
     os.environ["DNTC_HOME"] = str(dntc_home)
     os.environ["DOTNETSNES_HOME"] = str(dotnetsnes_home)
     os.environ["MAKEFILE_DEFAULTS"] = str(makefile_defaults)
+    os.environ["REPO_DEFAULT_RULES"] = str(makefile_defaults)
     os.environ["DOTNET"] = str(dotnet_home)
 
     dotsnes_proj_path: Path = Path(str(get_file_path(

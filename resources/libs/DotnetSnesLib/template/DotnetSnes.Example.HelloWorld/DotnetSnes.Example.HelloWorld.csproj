@@ -7,7 +7,7 @@
     </PropertyGroup>
 
     <ItemGroup>
-      <ProjectReference Include="..\DotnetSnes.Core\DotnetSnes.Core.csproj" />
+      <ProjectReference Include="$(DOTNETSNES_HOME)\DotnetSnes.Core\DotnetSnes.Core.csproj" />
     </ItemGroup>
 
     <ItemGroup>

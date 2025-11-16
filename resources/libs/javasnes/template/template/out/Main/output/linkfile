@@ -1,0 +1,8 @@
+[objects]
+main.obj
+data.obj
+hdr.obj
+/tmp/.mount_SNES-IAnicdB/usr/src/bin/pvsneslib/pvsneslib/lib/LoROM_SlowROM/crt0_snes.obj
+/tmp/.mount_SNES-IAnicdB/usr/src/bin/pvsneslib/pvsneslib/lib/LoROM_SlowROM/libc.obj
+/tmp/.mount_SNES-IAnicdB/usr/src/bin/pvsneslib/pvsneslib/lib/LoROM_SlowROM/libm.obj
+/tmp/.mount_SNES-IAnicdB/usr/src/bin/pvsneslib/pvsneslib/lib/LoROM_SlowROM/libtcc.obj
