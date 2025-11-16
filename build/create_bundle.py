@@ -395,7 +395,7 @@ class BundleCreator:
             if appdir_path and appdir_path.exists():
                 
                 final_path = self.output_dir
-                shutil.copytree(appdir_path, final_path)
+                shutil.copytree(appdir_path, final_path / "SNES-IDE.AppDir")
                 
                 return True
 

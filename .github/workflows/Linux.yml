@@ -36,39 +36,15 @@ jobs:
         run: |
           sudo python build/build.py
 
-      - name: Verify Bundle
+      - name: Compress dist folder
         run: |
-          if [ ! -d "dist" ]; then
-            echo "Bundle directory not found!"
-            exit 1
-          fi
-
-          if ! ls dist/*.AppImage 1> /dev/null 2>&1; then
-            echo "AppImage not found!"
-            exit 1
-          fi
-
-          APPIMAGE=$(ls dist/*.AppImage | head -1)
-          echo "Found AppImage: $APPIMAGE"
-
-          if [ ! -x "$APPIMAGE" ]; then
-            echo "AppImage is not executable!"
-            exit 1
-          fi
-
-          file "$APPIMAGE"
-
-          echo "Linux bundle verified successfully"
-
-      - name: Make AppImage Executable
-        run: |
-          chmod +x dist/*.AppImage
+          tar -czf sneside-ubuntu-x64.tar.gz dist
 
       - name: Upload Artifact
         uses: actions/upload-artifact@v4
         with:
           name: sneside-ubuntu-x64
-          path: dist/*.AppImage
+          path: sneside-ubuntu-x64.tar.gz
           retention-days: 7
 
   ubuntu-tests-greenlight:
@@ -82,30 +58,22 @@ jobs:
           name: sneside-ubuntu-x64
           path: .
 
-      - name: Verify AppImage
+      - name: Verify AppDir
         run: |
-          APPIMAGE=$(ls *.AppImage | head -1)
-          echo "Testing AppImage: $APPIMAGE"
-
-          if [ ! -f "$APPIMAGE" ]; then
-            echo "AppImage not found!"
+          tar -xzf sneside-ubuntu-x64.tar.gz
+          
+          if [ ! -d "dist/SNES-IDE.AppDir" ]; then
+            echo "AppDir not found!"
             exit 1
           fi
 
-          if [ ! -x "$APPIMAGE" ]; then
-            echo "AppImage is not executable!"
+          if [ ! -f "dist/SNES-IDE.AppDir/AppRun" ]; then
+            echo "AppDir launcher not found!"
             exit 1
           fi
 
-          file "$APPIMAGE"
-
-          if ! ./"$APPIMAGE" --help 2>/dev/null; then
-            echo "AppImage execution test inconclusive (expected for GUI apps)"
-          else
-            echo "AppImage executed successfully"
-          fi
-
-          echo "Linux AppImage verified"
+          echo "AppDir structure verified"
+          
 
   ubuntu-tests-redlight:
     if: github.ref_name == 'ubuntu/red'
