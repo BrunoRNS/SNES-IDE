@@ -1,0 +1,80 @@
+/**
+ * Default build configuration for generate JAR files from your code
+ * It works with gradle 4 or newer and Java 8 or newer
+ * It copies the output jar file to the out/ folder
+ * Move your assets to the out folder to be accessible by the JAR file
+ * Use:
+ * 
+ * gradle build
+ * cd out/ClassName # or cd out\ClassName on Windows
+ * java -jar ClassName.jar
+ *
+ * it runs with JRE1.8 normally if you dont have JDK installed
+ * 
+ */
+
+plugins {
+    id 'java'
+}
+
+repositories {
+    maven { url 'https://brunorns.github.io/javasnes/maven/' }
+}
+
+dependencies {
+    implementation 'javasnes:framework:1.0-rolling-+'
+}
+
+task buildAllJars {
+    dependsOn 'classes'
+    
+    doLast {
+        fileTree(dir: 'src/main/java').include('**/*.java').each { file ->
+            def content = file.text
+            if (content.contains('public static void main(String[] args)')) {
+                try {
+                    def classesDir = sourceSets.main.output.hasProperty('classesDir') ? sourceSets.main.output.classesDir : sourceSets.main.output.classesDirs.first()
+                    def srcMainJavaDir = new File(projectDir, 'src/main/java')
+                    def relativePath = file.parentFile.absolutePath - srcMainJavaDir.absolutePath
+                    def packagePath = relativePath.replace(File.separator, '.').replaceAll('^\\.', '')
+                    def className = packagePath ? "${packagePath}.${file.name - '.java'}" : file.name - '.java'
+                    
+                    def outputDir = "out/${file.name - '.java'}"
+                    new File(outputDir).mkdirs()
+                    
+                    def manifestFile = new File("${buildDir}/tempManifest.mf")
+                    manifestFile.parentFile.mkdirs()
+                    manifestFile.text = "Main-Class: ${className}\nClass-Path: .\n"
+                    
+                    ant.jar(destfile: "${outputDir}/${file.name - '.java'}.jar", manifest: manifestFile.absolutePath) {
+                        fileset(dir: classesDir)
+                        
+                        configurations.runtimeClasspath.each { dep ->
+                            if (dep.exists() && dep.name.endsWith('.jar')) {
+                                zipfileset(src: dep.absolutePath) {
+                                    exclude(name: 'META-INF/**')
+                                }
+                            }
+                        }
+                    }
+                    
+                    manifestFile.delete()
+                    
+                    println "${className} -> ${outputDir}/${file.name - '.java'}.jar"
+                    
+                } catch (Exception e) {
+                    println "Error in ${file.name}: ${e.message}"
+                    e.printStackTrace()
+                }
+            }
+        }
+        println "JARs generated: out/"
+    }
+}
+
+task cleanOutput(type: Delete) {
+    delete 'out'
+}
+
+clean.dependsOn cleanOutput
+build.dependsOn buildAllJars

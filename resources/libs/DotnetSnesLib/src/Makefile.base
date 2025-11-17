@@ -1,0 +1,35 @@
+# Makefile rules that invoke the majority of the DotnetSnes build pipeline. Should be
+# included in most DotnetSnes projects.
+
+THIS_MAKEFILE ?= $(abspath ./Makefile)
+ORIGINAL_PATH ?= $(abspath ./)
+DOTNET ?= dotnet
+GENERATED_C_FILE ?= $(SNES_NAME).c
+MANIFEST_NAME ?= manifest.json
+MANIFEST_PATH ?= $(ARTIFACTS_ROOT)/$(MANIFEST_NAME)
+DNTC_CLI_DIR ?= $(dir $(DNTC_TOOL_CSPROJ))
+# Export all variables for recursive makefile support
+export
+
+.phony: all
+
+all: $(GENERATED_C_FILE) $(ARTIFACTS_ROOT)/$(SNES_NAME).sfc
+
+$(GENERATED_C_FILE): $(SNES_DLL)
+	$(DOTNET) run --project $(DNTC_TOOL_CSPROJ) -- $(MANIFEST_PATH)
+
+$(SNES_DLL): $(shell find . $(DNSNES_CORE_DIR) $(DNTC_CLI_DIR) -type f -name "*.cs")
+	$(DOTNET) build -c Release $(ORIGINAL_PATH)
+
+# The actual rom needs to be built from inside the artifacts directory
+$(ARTIFACTS_ROOT)/$(SNES_NAME).sfc: build_game_assets
+	$(MAKE) -f $(THIS_MAKEFILE) -C $(ARTIFACTS_ROOT) $(SNES_NAME).sfc ROMNAME=$(SNES_NAME)
+
+clean:
+	rm -rf $(ARTIFACTS_ROOT)
+
+clean: cleanBuildRes cleanRom cleanGfx
+
+.phony: build_game_assets game_assets
+build_game_assets:
+	$(MAKE) -f $(THIS_MAKEFILE) -C $(ARTIFACTS_ROOT) game_assets

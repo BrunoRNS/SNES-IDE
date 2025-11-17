@@ -1,0 +1,3 @@
+rootProject.name = 'javasnes_examples'
+
+include 'snes-examples'

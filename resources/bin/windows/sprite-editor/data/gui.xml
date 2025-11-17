@@ -1,0 +1,1220 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- Aseprite    | Copyright (C) 2001-2016  David Capello -->
+<!-- LibreSprite | Copyright (C) 2017-2021  LibreSprite contributors -->
+<gui version="1.1-dev">
+  <!-- Keyboard shortcuts -->
+  <keyboard version="1">
+
+    <!-- Keyboard shortcuts for commands (menu options) -->
+    <commands>
+      <!-- File -->
+      <key command="NewFile" shortcut="Ctrl+N" mac="Cmd+N" />
+      <key command="OpenFile" shortcut="Ctrl+O" mac="Cmd+O" />
+      <key command="SaveFile" shortcut="Ctrl+S" mac="Cmd+S" />
+      <key command="SaveFileAs" shortcut="Ctrl+Shift+S" mac="Cmd+Shift+S" />
+      <key command="SaveFileCopyAs" shortcut="Ctrl+Alt+Shift+S" mac="Cmd+Alt+Shift+S" />
+      <key command="CloseFile" shortcut="Ctrl+W" mac="Cmd+W" />
+      <key command="CloseAllFiles" shortcut="Ctrl+Shift+W" mac="Cmd+Shift+W" />
+      <key command="ImportSpriteSheet" shortcut="Ctrl+Alt+I" mac="Cmd+Alt+I" />
+      <key command="ExportSpriteSheet" shortcut="Ctrl+Alt+E" mac="Cmd+Alt+E" />
+      <key command="RepeatLastExport" shortcut="Ctrl+Shift+X" mac="Cmd+Shift+X" />
+      <key command="AdvancedMode" shortcut="F11" />
+      <key command="DeveloperConsole" shortcut="F12" />
+      <key command="Exit" win="Ctrl+Q" linux="Ctrl+Q" mac="Cmd+Q" />
+      <key command="Exit" win="Alt+F4" />
+      <key command="Cancel" shortcut="Esc">
+        <param name="type" value="all" />
+      </key>
+      <!-- Edit -->
+      <key command="Undo" shortcut="Ctrl+Z" mac="Cmd+Z" label="UNDO"/>
+      <key command="Undo" shortcut="Ctrl+U" mac="Cmd+U" />
+      <key command="Redo" shortcut="Ctrl+Y" mac="Cmd+Y" />
+      <key command="Redo" shortcut="Ctrl+R" mac="Cmd+R" label="REDO"/>
+      <key command="Redo" shortcut="Ctrl+Shift+Z" mac="Cmd+Shift+Z" />
+      <key command="Cut" shortcut="Ctrl+X" mac="Cmd+X" />
+      <key command="Cut" shortcut="Shift+Del" />
+      <key command="Copy" shortcut="Ctrl+C" mac="Cmd+C"/>
+      <key command="Copy" shortcut="Ctrl+Ins" mac="Cmd+Ins" />
+      <key command="CopyMerged" shortcut="Ctrl+Shift+C" mac="Cmd+Shift+C" />
+      <key command="Paste" shortcut="Ctrl+V" mac="Cmd+V" />
+      <key command="Paste" shortcut="Shift+Ins" />
+      <key command="Clear" shortcut="Del" />
+      <key command="Clear" shortcut="Backspace" />
+      <key command="Flip" shortcut="Shift+H">
+        <param name="target" value="mask" />
+        <param name="orientation" value="horizontal" />
+      </key>
+      <key command="Flip" shortcut="Shift+V">
+        <param name="target" value="mask" />
+        <param name="orientation" value="vertical" />
+      </key>
+      <key command="ReplaceColor" shortcut="Shift+R" />
+      <key command="ConvolutionMatrix" shortcut="F9" />
+      <key command="ColorCurve" shortcut="Ctrl+M" mac="Cmd+M" />
+      <key command="ColorCurve" shortcut="F10" />
+      <key command="PasteText" shortcut="T" />
+      <key command="Options" shortcut="Ctrl+K" mac="Cmd+," />
+      <key command="Options" shortcut="Ctrl+Shift+O" mac="Cmd+Shift+O" /> <!-- TODO remove this shortcut in v1.1 -->
+      <key command="KeyboardShortcuts" shortcut="Ctrl+Alt+Shift+K" mac="Cmd+Alt+Shift+K" />
+      <!-- Sprite -->
+      <key command="SpriteProperties" shortcut="Ctrl+P" mac="Cmd+P" />
+      <key command="CanvasSize" shortcut="C" />
+      <!-- Layer -->
+      <key command="LayerProperties" shortcut="Shift+P" />
+      <key command="LayerVisibility" shortcut="Shift+X" />
+      <key command="NewLayer" shortcut="Ctrl+Shift+N" mac="Cmd+Shift+N" label="LYR+"/>
+      <key command="DuplicateLayer" shortcut="Ctrl+J" mac="Cmd+J" />
+      <key command="MergeDownLayer" shortcut="Ctrl+E" mac="Cmd+E" />
+      <key command="FlattenLayers" shortcut="Ctrl+Shift+E" mac="Cmd+Shift+E" />
+      <key command="GotoPreviousLayer" shortcut="Down" context="Normal" label="LYR&gt;"/>
+      <key command="GotoNextLayer" shortcut="Up" context="Normal" label="LYR&lt;"/>
+      <!-- Frame -->
+      <key command="NewFrame" shortcut="Alt+N" label="FRM+"/>
+      <key command="NewFrame" shortcut="Alt+B">
+        <param name="content" value="empty" />
+      </key>
+      <key command="NewFrame" shortcut="Alt+M">
+        <param name="content" value="cel" />
+      </key>
+      <key command="NewFrame" shortcut="Alt+D">
+        <param name="content" value="celblock" />
+      </key>
+      <key command="NewFrame" shortcut="Alt+Shift+D">
+        <param name="content" value="cel" />
+      </key>
+      <key command="RemoveFrame" shortcut="Alt+C" />
+      <key command="FrameProperties" shortcut="P">
+        <param name="frame" value="current" />
+      </key>
+      <key command="ReverseFrames" shortcut="Alt+I" />
+      <key command="GotoFirstFrame" shortcut="Home" />
+      <key command="GotoPreviousFrame" shortcut="Left" context="Normal" />
+      <key command="GotoNextFrame" shortcut="Right" context="Normal" />
+      <key command="GotoPreviousFrameWithSameTag" shortcut="," />
+      <key command="GotoNextFrameWithSameTag" shortcut="." />
+      <key command="GotoLastFrame" shortcut="End" />
+      <key command="GotoFrame" shortcut="Alt+G" />
+      <key command="PlayAnimation" shortcut="Enter" label="PLAY"/>
+      <!-- Select -->
+      <key command="MaskAll" shortcut="Ctrl+A" mac="Cmd+A" />
+      <key command="MaskContent" shortcut="Ctrl+T" mac="Cmd+T" />
+      <key command="DeselectMask" shortcut="Ctrl+D" mac="Cmd+D" />
+      <key command="ReselectMask" shortcut="Ctrl+Shift+D" mac="Cmd+Shift+D" />
+      <key command="InvertMask" shortcut="Ctrl+Shift+I" mac="Cmd+Shift+I" />
+      <!-- View -->
+      <key command="Refresh" shortcut="F5" />
+      <key command="TogglePreview" shortcut="F7" />
+      <key command="FullscreenPreview" shortcut="F8" />
+      <key command="ShowGrid" shortcut="Shift+G" />
+      <key command="ShowPixelGrid" shortcut="Alt+Shift+G" />
+      <key command="SnapToGrid" shortcut="Shift+S" />
+      <key command="SetLoopSection" shortcut="F2" />
+      <key command="ShowOnionSkin" shortcut="F3" />
+      <key command="Timeline" shortcut="Tab" label="TIME">
+        <param name="switch" value="true" />
+      </key>
+      <key command="PaletteEditor" shortcut="F4">
+        <param name="switch" value="true" />
+      </key>
+      <key command="ShowExtras" shortcut="Ctrl+H" mac="Cmd+H" />
+      <!-- Tabs -->
+      <key command="GotoNextTab" shortcut="Ctrl+Tab" />
+      <key command="GotoPreviousTab" shortcut="Ctrl+Shift+Tab" />
+      <key command="GotoNextTab" shortcut="Ctrl+PgDn" />
+      <key command="GotoPreviousTab" shortcut="Ctrl+PgUp" />
+      <!-- Others -->
+      <key command="SwitchColors" shortcut="X" />
+      <key command="ChangeColor" shortcut="9">
+        <param name="target" value="foreground" />
+        <param name="change" value="decrement-index" />
+      </key>
+      <key command="ChangeColor" shortcut="0">
+        <param name="target" value="foreground" />
+        <param name="change" value="increment-index" />
+      </key>
+      <key command="ChangeColor" shortcut="[">
+        <param name="target" value="foreground" />
+        <param name="change" value="decrement-index" />
+      </key>
+      <key command="ChangeColor" shortcut="]">
+        <param name="target" value="foreground" />
+        <param name="change" value="increment-index" />
+      </key>
+      <key command="ChangeColor" shortcut="Ctrl+9">
+        <param name="target" value="background" mac="Cmd+9" />
+        <param name="change" value="decrement-index" />
+      </key>
+      <key command="ChangeColor" shortcut="Ctrl+0">
+        <param name="target" value="background" mac="Cmd+0" />
+        <param name="change" value="increment-index" />
+      </key>
+
+      <!-- Modify brush size with +/- signs -->
+      <key command="ChangeBrush" shortcut="+">
+        <param name="change" value="increment-size" />
+      </key>
+      <key command="ChangeBrush" shortcut="="> <!-- As US keyboard layout needs Shift+'=' to do a '+' -->
+        <param name="change" value="increment-size" />
+      </key>
+      <key command="ChangeBrush" shortcut="-">
+        <param name="change" value="decrement-size" />
+      </key>
+      <key command="ChangeBrush" shortcut="Plus Pad">
+        <param name="change" value="increment-size" />
+      </key>
+      <key command="ChangeBrush" shortcut="Minus Pad">
+        <param name="change" value="decrement-size" />
+      </key>
+
+      <!-- Custom brushes -->
+      <key command="ChangeBrush" shortcut="Alt+1">
+        <param name="change" value="custom" />
+        <param name="slot" value="1" />
+      </key>
+      <key command="ChangeBrush" shortcut="Alt+2">
+        <param name="change" value="custom" />
+        <param name="slot" value="2" />
+      </key>
+      <key command="ChangeBrush" shortcut="Alt+3">
+        <param name="change" value="custom" />
+        <param name="slot" value="3" />
+      </key>
+      <key command="ChangeBrush" shortcut="Alt+4">
+        <param name="change" value="custom" />
+        <param name="slot" value="4" />
+      </key>
+      <key command="ChangeBrush" shortcut="Alt+5">
+        <param name="change" value="custom" />
+        <param name="slot" value="5" />
+      </key>
+      <key command="ChangeBrush" shortcut="Alt+6">
+        <param name="change" value="custom" />
+        <param name="slot" value="6" />
+      </key>
+      <key command="ChangeBrush" shortcut="Alt+7">
+        <param name="change" value="custom" />
+        <param name="slot" value="7" />
+      </key>
+      <key command="ChangeBrush" shortcut="Alt+8">
+        <param name="change" value="custom" />
+        <param name="slot" value="8" />
+      </key>
+      <key command="ChangeBrush" shortcut="Alt+9">
+        <param name="change" value="custom" />
+        <param name="slot" value="9" />
+      </key>
+
+      <!-- Zoom -->
+      <key command="Zoom" shortcut="~"><param name="percentage" value="50" /></key>
+      <key command="Zoom" shortcut="1"><param name="percentage" value="100" /></key>
+      <key command="Zoom" shortcut="2"><param name="percentage" value="200" /></key>
+      <key command="Zoom" shortcut="3"><param name="percentage" value="400" /></key>
+      <key command="Zoom" shortcut="4"><param name="percentage" value="800" /></key>
+      <key command="Zoom" shortcut="5"><param name="percentage" value="1600" /></key>
+      <key command="Zoom" shortcut="6"><param name="percentage" value="3200" /></key>
+      <key command="Zoom" shortcut="Ctrl++" mac="Cmd++">
+        <param name="action" value="in" />
+      </key>
+      <key command="Zoom" shortcut="Ctrl+-" mac="Cmd+-">
+        <param name="action" value="out" />
+      </key>
+      <!-- For English keyboard -->
+      <key command="Zoom" shortcut="Ctrl+=" mac="Cmd+=">
+        <param name="action" value="in" />
+      </key>
+      <key command="Zoom" shortcut="Ctrl+Shift+=" mac="Cmd+Shift+=">
+        <param name="action" value="in" />
+      </key>
+      <key command="ToggleFullScreen" shortcut="Shift+f"></key>
+      <!-- Scroll to center -->
+      <key command="ScrollCenter" shortcut="Shift+C" />
+
+      <!-- Scroll with arrows -->
+      <key command="Scroll" shortcut="Space+Left">
+        <param name="direction" value="left" />
+        <param name="units" value="zoomed-pixel" />
+        <param name="quantity" value="1" />
+      </key>
+      <key command="Scroll" shortcut="Space+Right">
+        <param name="direction" value="right" />
+        <param name="units" value="zoomed-pixel" />
+        <param name="quantity" value="1" />
+      </key>
+      <key command="Scroll" shortcut="Space+Up">
+        <param name="direction" value="up" />
+        <param name="units" value="zoomed-pixel" />
+        <param name="quantity" value="1" />
+      </key>
+      <key command="Scroll" shortcut="Space+Down">
+        <param name="direction" value="down" />
+        <param name="units" value="zoomed-pixel" />
+        <param name="quantity" value="1" />
+      </key>
+
+      <key command="Scroll" shortcut="Shift+Space+Left">
+        <param name="direction" value="left" />
+        <param name="units" value="zoomed-tile-width" />
+        <param name="quantity" value="1" />
+      </key>
+      <key command="Scroll" shortcut="Shift+Space+Right">
+        <param name="direction" value="right" />
+        <param name="units" value="zoomed-tile-width" />
+        <param name="quantity" value="1" />
+      </key>
+      <key command="Scroll" shortcut="Shift+Space+Up">
+        <param name="direction" value="up" />
+        <param name="units" value="zoomed-tile-height" />
+        <param name="quantity" value="1" />
+      </key>
+      <key command="Scroll" shortcut="Shift+Space+Down">
+        <param name="direction" value="down" />
+        <param name="units" value="zoomed-tile-height" />
+        <param name="quantity" value="1" />
+      </key>
+
+      <!-- Move selection with arrows -->
+      <key command="MoveMask" shortcut="Left" context="Selection">
+        <param name="target" value="content" />
+        <param name="direction" value="left" />
+        <param name="units" value="pixel" />
+        <param name="quantity" value="1" />
+      </key>
+      <key command="MoveMask" shortcut="Right" context="Selection">
+        <param name="target" value="content" />
+        <param name="direction" value="right" />
+        <param name="units" value="pixel" />
+        <param name="quantity" value="1" />
+      </key>
+      <key command="MoveMask" shortcut="Up" context="Selection">
+        <param name="target" value="content" />
+        <param name="direction" value="up" />
+        <param name="units" value="pixel" />
+        <param name="quantity" value="1" />
+      </key>
+      <key command="MoveMask" shortcut="Down" context="Selection">
+        <param name="target" value="content" />
+        <param name="direction" value="down" />
+        <param name="units" value="pixel" />
+        <param name="quantity" value="1" />
+      </key>
+
+      <key command="MoveMask" shortcut="Shift+Left" context="Selection">
+        <param name="target" value="content" />
+        <param name="direction" value="left" />
+        <param name="units" value="tile-width" />
+        <param name="quantity" value="1" />
+      </key>
+      <key command="MoveMask" shortcut="Shift+Right" context="Selection">
+        <param name="target" value="content" />
+        <param name="direction" value="right" />
+        <param name="units" value="tile-width" />
+        <param name="quantity" value="1" />
+      </key>
+      <key command="MoveMask" shortcut="Shift+Up" context="Selection">
+        <param name="target" value="content" />
+        <param name="direction" value="up" />
+        <param name="units" value="tile-height" />
+        <param name="quantity" value="1" />
+      </key>
+      <key command="MoveMask" shortcut="Shift+Down" context="Selection">
+        <param name="target" value="content" />
+        <param name="direction" value="down" />
+        <param name="units" value="tile-height" />
+        <param name="quantity" value="1" />
+      </key>
+
+      <!-- Move selection boundaries with Alt+arrows -->
+      <key command="MoveMask" shortcut="Alt+Left" context="Selection">
+        <param name="target" value="boundaries" />
+        <param name="direction" value="left" />
+        <param name="units" value="pixel" />
+        <param name="quantity" value="1" />
+      </key>
+      <key command="MoveMask" shortcut="Alt+Right" context="Selection">
+        <param name="target" value="boundaries" />
+        <param name="direction" value="right" />
+        <param name="units" value="pixel" />
+        <param name="quantity" value="1" />
+      </key>
+      <key command="MoveMask" shortcut="Alt+Up" context="Selection">
+        <param name="target" value="boundaries" />
+        <param name="direction" value="up" />
+        <param name="units" value="pixel" />
+        <param name="quantity" value="1" />
+      </key>
+      <key command="MoveMask" shortcut="Alt+Down" context="Selection">
+        <param name="target" value="boundaries" />
+        <param name="direction" value="down" />
+        <param name="units" value="pixel" />
+        <param name="quantity" value="1" />
+      </key>
+
+      <key command="MoveMask" shortcut="Alt+Shift+Left" context="Selection">
+        <param name="target" value="boundaries" />
+        <param name="direction" value="left" />
+        <param name="units" value="tile-width" />
+        <param name="quantity" value="1" />
+      </key>
+      <key command="MoveMask" shortcut="Alt+Shift+Right" context="Selection">
+        <param name="target" value="boundaries" />
+        <param name="direction" value="right" />
+        <param name="units" value="tile-width" />
+        <param name="quantity" value="1" />
+      </key>
+      <key command="MoveMask" shortcut="Alt+Shift+Up" context="Selection">
+        <param name="target" value="boundaries" />
+        <param name="direction" value="up" />
+        <param name="units" value="tile-height" />
+        <param name="quantity" value="1" />
+      </key>
+      <key command="MoveMask" shortcut="Alt+Shift+Down" context="Selection">
+        <param name="target" value="boundaries" />
+        <param name="direction" value="down" />
+        <param name="units" value="tile-height" />
+        <param name="quantity" value="1" />
+      </key>
+
+      <key command="NewBrush" shortcut="Ctrl+B" mac="Cmd+B" />
+      <key command="NewSpriteFromSelection" shortcut="Ctrl+Alt+N" mac="Cmd+Alt+N" />
+
+      <!-- Commands not associated to menu items and without shortcuts by default -->
+      <key command="PixelPerfectMode" />
+      <key command="SetInkType"><param name="type" value="simple" /></key>
+      <key command="SetInkType"><param name="type" value="alpha-compositing" /></key>
+      <key command="SetInkType"><param name="type" value="copy-color" /></key>
+      <key command="SetInkType"><param name="type" value="lock-alpha" /></key>
+      <key command="SetInkType"><param name="type" value="shading" /></key>
+      <key command="SetSameInk" />
+      <key command="SetColorSelector">
+        <param name="type" value="tint-shade-tone" />
+      </key>
+      <key command="SetColorSelector">
+        <param name="type" value="spectrum" />
+      </key>
+      <key command="SetColorSelector">
+        <param name="type" value="rgb-wheel" />
+      </key>
+      <key command="SetColorSelector">
+        <param name="type" value="ryb-wheel" />
+      </key>
+      <key command="LoadPalette" />
+      <key command="SavePalette" />
+      <key command="ColorQuantization" />
+      <key command="AddColor">
+        <param name="source" value="fg" />
+      </key>
+      <key command="AddColor">
+        <param name="source" value="bg" />
+      </key>
+      <key command="SelectTile" />
+      <key command="SelectTile">
+        <param name="mode" value="add" />
+      </key>
+      <key command="SelectTile">
+        <param name="mode" value="subtract" />
+      </key>
+    </commands>
+
+    <!-- Keyboard shortcuts to select tools -->
+    <tools>
+      <key tool="rectangular_marquee" shortcut="M" />
+      <key tool="elliptical_marquee" shortcut="Shift+M" />
+      <key tool="lasso" shortcut="Q" />
+      <key tool="polygonal_lasso" shortcut="Shift+Q" />
+      <key tool="magic_wand" shortcut="W" />
+
+      <key tool="pencil" shortcut="B" />
+      <key tool="spray" shortcut="Shift+B" />
+
+      <key tool="eraser" shortcut="E" />
+      <key tool="eyedropper" shortcut="I" />
+      <key tool="hand" shortcut="H" />
+      <key tool="move" shortcut="V" />
+      <key tool="zoom" shortcut="Z" />
+      <!-- key tool="slice" shortcut="K" /-->
+
+      <key tool="paint_bucket" shortcut="G" />
+
+      <key tool="line" shortcut="L" />
+      <key tool="curve" shortcut="Shift+L" />
+
+      <key tool="rectangle" shortcut="U" />
+      <key tool="filled_rectangle" shortcut="U" />
+      <key tool="ellipse" shortcut="Shift+U" />
+      <key tool="filled_ellipse" shortcut="Shift+U" />
+
+      <key tool="contour" shortcut="D" />
+      <key tool="polygon" shortcut="Shift+D" />
+
+      <key tool="blur" shortcut="R" />
+      <key tool="jumble" shortcut="R" />
+    </tools>
+
+    <!-- Editor Quicktools: these are modifiers to select quickly a
+         tool without changing the current one -->
+    <quicktools>
+      <key tool="eyedropper" shortcut="Alt" />
+      <key tool="move" shortcut="Ctrl" mac="Cmd" />
+      <key tool="hand" shortcut="Space" />
+    </quicktools>
+
+    <!-- Special keyboard shortcuts for specific actions -->
+    <actions>
+      <!-- When you drag-and-drop the selection, pressing this
+           keyboard shortcut you can copy instead of move -->
+      <key action="CopySelection" shortcut="Ctrl" />
+
+      <!-- When you move the selection, pressing this
+           keyboard shortcut you can snap to grid -->
+      <key action="SnapToGrid" shortcut="Alt" />
+
+      <!-- When you move the selection, pressing this keyboard
+           shortcut so you lock the movement to one axis -->
+      <key action="LockAxis" shortcut="Shift" />
+
+      <!-- When you rotate the selection, pressing this
+           keyboard shortcut you activate angle snap -->
+      <key action="AngleSnap" shortcut="Shift" />
+
+      <!-- When you scale the selection, pressing this
+           keyboard shortcut you maintain aspect ratio -->
+      <key action="MaintainAspectRatio" shortcut="Shift" />
+
+      <!-- When you scale the selection, pressing this key the
+           selectino will be scaled from the pivot point -->
+      <key action="ScaleFromCenter" shortcut="Alt" />
+
+      <!-- Modifiers for selection tool -->
+      <key action="AddSelection" shortcut="Shift" />
+      <key action="SubtractSelection" shortcut="Shift+Alt" />
+
+      <!-- Modifiers for move tool -->
+      <key action="AutoSelectLayer" shortcut="Ctrl" mac="Cmd" />
+
+      <!-- Modifiers for freehand tool controller  -->
+      <key action="StraightLineFromLastPoint" shortcut="Shift" />
+
+      <!-- Modifiers for two-points tool controller -->
+      <key action="SquareAspect" shortcut="Shift" />
+      <key action="DrawFromCenter" shortcut="Ctrl" />
+
+      <!-- Modifiers for two-or-more-points tools -->
+      <key action="MoveOrigin" shortcut="Space" />
+
+      <!-- Without default shortcuts -->
+      <key action="LeftMouseButton" />
+      <key action="RightMouseButton" />
+    </actions>
+
+  </keyboard>
+
+  <menus>
+    <!-- main bar menu -->
+    <menu id="main_menu">
+      <menu text="&amp;File">
+        <item command="NewFile" text="&amp;New..." />
+        <item command="OpenFile" text="&amp;Open..." />
+        <item id="recent_list" text="Open &amp;Recent" />
+        <separator />
+        <item command="SaveFile" text="&amp;Save" />
+        <item command="SaveFileAs" text="Save &amp;As..." />
+        <item command="SaveFileCopyAs" text="E&amp;xport..." />
+        <item command="Share" text="Share..." />
+        <item command="CloseFile" text="&amp;Close" />
+        <item command="CloseAllFiles" text="Close All" />
+        <separator />
+        <item command="ImportSpriteSheet" text="&amp;Import Sprite Sheet" />
+        <item command="ExportSpriteSheet" text="&amp;Export Sprite Sheet" />
+        <item command="RepeatLastExport" text="Repeat &amp;Last Export" />
+        <separator />
+        <item command="Exit" text="E&amp;xit" />
+      </menu>
+      <menu text="&amp;Edit">
+        <item command="KeyboardShortcuts" text="&amp;Keyboard Shortcuts..." />
+        <item command="Options" text="Pre&amp;ferences..." />
+        <separator />
+        <item command="Undo" text="&amp;Undo" />
+        <item command="Redo" text="&amp;Redo" />
+        <item command="UndoHistory" text="Undo Histor&amp;y" />
+        <separator />
+        <item command="Cut" text="Cu&amp;t" />
+        <item command="Copy" text="&amp;Copy" />
+        <item command="CopyMerged" text="Copy Mer&amp;ged" />
+        <item command="Paste" text="&amp;Paste" />
+        <item command="Clear" text="C&amp;lear" />
+        <separator />
+        <menu text="R&amp;otate">
+          <item command="Rotate" text="&amp;180">
+            <param name="target" value="mask" />
+            <param name="angle" value="180" />
+          </item>
+          <item command="Rotate" text="&amp;90 CW">
+            <param name="target" value="mask" />
+            <param name="angle" value="90" />
+          </item>
+          <item command="Rotate" text="90 &amp;CCW">
+            <param name="target" value="mask" />
+            <param name="angle" value="-90" />
+          </item>
+        </menu>
+        <item command="Flip" text="Flip &amp;Horizontal">
+          <param name="target" value="mask" />
+          <param name="orientation" value="horizontal" />
+        </item>
+        <item command="Flip" text="Flip &amp;Vertical">
+          <param name="target" value="mask" />
+          <param name="orientation" value="vertical" />
+        </item>
+        <item command="MaskContent" text="Transfor&amp;m" />
+        <menu text="&amp;Shift">
+          <item command="MoveMask" text="&amp;Left">
+            <param name="target" value="content" />
+            <param name="direction" value="left" />
+            <param name="units" value="pixel" />
+            <param name="quantity" value="1" />
+            <param name="wrap" value="1" />
+          </item>
+          <item command="MoveMask" text="&amp;Right">
+            <param name="target" value="content" />
+            <param name="direction" value="right" />
+            <param name="units" value="pixel" />
+            <param name="quantity" value="1" />
+            <param name="wrap" value="1" />
+          </item>
+          <item command="MoveMask" text="&amp;Up">
+            <param name="target" value="content" />
+            <param name="direction" value="up" />
+            <param name="units" value="pixel" />
+            <param name="quantity" value="1" />
+            <param name="wrap" value="1" />
+          </item>
+          <item command="MoveMask" text="&amp;Down">
+            <param name="target" value="content" />
+            <param name="direction" value="down" />
+            <param name="units" value="pixel" />
+            <param name="quantity" value="1" />
+            <param name="wrap" value="1" />
+          </item>
+        </menu>
+        <separator />
+        <item command="NewBrush" text="New &amp;Brush" />
+        <item command="NewSpriteFromSelection" text="&amp;New Sprite from Selection" />
+        <separator />
+        <item command="ReplaceColor" text="R&amp;eplace Color..." />
+        <item command="InvertColor" text="&amp;Invert" />
+        <menu text="F&amp;X" id="fx_popup">
+          <item command="ConvolutionMatrix" text="Convolution &amp;Matrix" />
+          <item command="ColorCurve" text="&amp;Color Curve" />
+          <separator />
+          <item command="Despeckle" text="&amp;Despeckle (median filter)" />
+        </menu>
+        <item command="PasteText" text="Insert Text" />
+      </menu>
+      <menu text="&amp;Sprite">
+        <item command="SpriteProperties" text="&amp;Properties..." />
+        <menu text="Color &amp;Mode">
+          <item command="ChangePixelFormat" text="&amp;RGB Color">
+            <param name="format" value="rgb" />
+          </item>
+          <item command="ChangePixelFormat" text="&amp;Grayscale">
+            <param name="format" value="grayscale" />
+          </item>
+          <item command="ChangePixelFormat" text="&amp;Indexed (No Dithering)">
+            <param name="format" value="indexed" />
+          </item>
+          <item command="ChangePixelFormat" text="Indexed (Ordered &amp;Dither)">
+            <param name="format" value="indexed" />
+            <param name="dithering" value="ordered" />
+          </item>
+        </menu>
+        <separator />
+        <item command="DuplicateSprite" text="&amp;Duplicate..." />
+        <separator />
+        <item command="SpriteSize" text="&amp;Sprite Size..." />
+        <item command="CanvasSize" text="&amp;Canvas Size..." />
+        <menu text="&amp;Rotate Canvas">
+          <item command="Rotate" text="180">
+            <param name="target" value="canvas" />
+            <param name="angle" value="180" />
+          </item>
+          <item command="Rotate" text="90 CW">
+            <param name="target" value="canvas" />
+            <param name="angle" value="90" />
+          </item>
+          <item command="Rotate" text="90 CCW">
+            <param name="target" value="canvas" />
+            <param name="angle" value="-90" />
+          </item>
+          <separator />
+          <item command="Flip" text="Flip Canvas &amp;Horizontal">
+            <param name="target" value="canvas" />
+            <param name="orientation" value="horizontal" />
+          </item>
+          <item command="Flip" text="Flip Canvas &amp;Vertical">
+            <param name="target" value="canvas" />
+            <param name="orientation" value="vertical" />
+          </item>
+        </menu>
+        <separator />
+        <item command="CropSprite" text="Cr&amp;op" />
+        <item command="AutocropSprite" text="&amp;Trim" />
+      </menu>
+      <menu text="&amp;Layer">
+        <item command="LayerProperties" text="&amp;Properties..." />
+        <item command="LayerVisibility" text="&amp;Visible" />
+        <separator />
+        <item command="NewLayer" text="&amp;New Layer" />
+        <item command="RemoveLayer" text="&amp;Remove Layer" />
+        <item command="BackgroundFromLayer" text="&amp;Background from Layer" />
+        <item command="LayerFromBackground" text="&amp;Layer from Background" />
+        <separator />
+        <item command="DuplicateLayer" text="&amp;Duplicate" />
+        <item command="MergeDownLayer" text="&amp;Merge Down" />
+        <item command="FlattenLayers" text="&amp;Flatten" />
+      </menu>
+      <menu text="F&amp;rame">
+        <item command="FrameProperties" text="Frame &amp;Properties...">
+          <param name="frame" value="current" />
+        </item>
+        <item command="CelProperties" text="&amp;Cel Properties..." />
+        <separator />
+        <item command="NewFrame" text="&amp;New Frame" />
+        <item command="NewFrame" text="New &amp;Empty Frame">
+          <param name="content" value="empty" />
+        </item>
+        <item command="NewFrame" text="&amp;Duplicate Cel(s)">
+          <param name="content" value="celblock" />
+        </item>
+        <item command="NewFrame" text="Duplicate &amp;Linked Cel(s)">
+          <param name="content" value="cel" />
+        </item>
+        <item command="RemoveFrame" text="&amp;Remove Frame" />
+        <separator />
+        <menu text="&amp;Tags">
+          <item command="FrameTagProperties" text="Tag &amp;Properties..." />
+          <separator />
+          <item command="NewFrameTag" text="New &amp;Tag" />
+          <item command="RemoveFrameTag" text="&amp;Remove Tag" />
+        </menu>
+        <menu text="&amp;Jump to">
+          <item command="GotoFirstFrame" text="&amp;First Frame" />
+          <item command="GotoPreviousFrame" text="&amp;Previous Frame" />
+          <item command="GotoNextFrame" text="&amp;Next Frame" />
+          <item command="GotoLastFrame" text="&amp;Last Frame" />
+          <separator />
+          <item command="GotoFrame" text="&amp;Go to Frame" />
+        </menu>
+        <item command="PlayAnimation" text="&amp;Play Animation" />
+        <separator />
+        <item command="FrameProperties" text="Constant Frame Rate">
+          <param name="frame" value="all" />
+        </item>
+        <item command="ReverseFrames" text="Re&amp;verse Frames" />
+      </menu>
+      <menu text="Selec&amp;t">
+        <item command="MaskAll" text="&amp;All" />
+        <item command="DeselectMask" text="&amp;Deselect" />
+        <item command="ReselectMask" text="&amp;Reselect" />
+        <item command="InvertMask" text="&amp;Inverse" />
+        <separator />
+        <item command="MaskByColor" text="&amp;Color Range" />
+        <menu text="&amp;Modify">
+          <item command="ModifySelection" text="&amp;Border">
+            <param name="modifier" value="border" />
+          </item>
+          <item command="ModifySelection" text="&amp;Expand">
+            <param name="modifier" value="expand" />
+          </item>
+          <item command="ModifySelection" text="&amp;Contract">
+            <param name="modifier" value="contract" />
+          </item>
+        </menu>
+        <separator />
+        <item command="LoadMask" text="&amp;Load from MSK file" />
+        <item command="SaveMask" text="&amp;Save to MSK file" />
+      </menu>
+      <menu text="&amp;View">
+        <item command="DuplicateView" text="Duplicate &amp;View" />
+        <separator />
+        <item command="ShowExtras" text="&amp;Extras" />
+        <menu text="&amp;Show">
+          <item command="ShowLayerEdges" text="&amp;Layer Edges" />
+          <item command="ShowSelectionEdges" text="&amp;Selection Edges" />
+          <item command="ShowGrid" text="&amp;Grid" />
+          <item command="ShowPixelGrid" text="&amp;Pixel Grid" />
+          <separator />
+          <item command="ShowBrushPreview" text="&amp;Brush Preview" />
+        </menu>
+        <separator />
+        <menu text="&amp;Grid">
+          <item command="GridSettings" text="Gri&amp;d Settings" />
+          <item command="SelectionAsGrid" text="Select&amp;ion as Grid" />
+          <item command="SnapToGrid" text="&amp;Snap to Grid" />
+        </menu>
+        <menu text="Tiled &amp;Mode">
+          <item command="TiledMode" text="&amp;None">
+            <param name="axis" value="none" />
+          </item>
+          <item command="TiledMode" text="Tiled in &amp;Both Axes">
+            <param name="axis" value="both" />
+          </item>
+          <item command="TiledMode" text="Tiled in &amp;X Axis">
+            <param name="axis" value="x" />
+          </item>
+          <item command="TiledMode" text="Tiled in &amp;Y Axis">
+            <param name="axis" value="y" />
+          </item>
+        </menu>
+        <item command="SymmetryMode" text="S&amp;ymmetry Options" />
+        <separator />
+        <item command="SetLoopSection" text="Set &amp;Loop Section" />
+        <item command="ShowOnionSkin" text="Show &amp;Onion Skin" />
+        <separator />
+        <item command="Timeline" text="&amp;Timeline">
+          <param name="switch" value="true" />
+        </item>
+        <item command="AlternateTimeline" text="Alternate Timeline" />
+        <item command="ToggleTouchbar" text="Touchbar" />
+        <item command="AlternateTouchbar" text="Alternate Touchbar" />
+        <item command="TogglePreview" text="Previe&amp;w" />
+        <item command="AlternateToolbar" text="Alternate Toolbar" />
+        <item command="FullscreenPreview" text="&amp;Fullscreen Preview" />
+        <item command="ToggleFullScreen" text="Toggle Fullscreen"/>
+        <item command="Home" text="&amp;Home" />
+        <separator />
+        <item command="Refresh" text="&amp;Refresh &amp;&amp; Reload Skin" />
+      </menu>
+      <menu id="script_list" text="S&amp;cripts">
+        <item command="DeveloperConsole" text="Scripting Console" />
+        <item command="OpenScriptsFolder" text="Open &amp;Folder" />
+        <item command="RescanScripts" text="Rescan scripts"/>
+        <separator />
+      </menu>
+      <menu text="&amp;Help">
+        <item command="Launch" text="Readme">
+          <param name="type" value="url" />
+          <param name="path" value="https://github.com/LibreSprite/LibreSprite#readme" />
+        </item>
+        <separator />
+        <item command="Launch" text="Quick &amp;Reference">
+          <param name="type" value="url" />
+          <param name="path" value="https://github.com/LibreSprite/libresprite.github.io/wiki/Know-your-workspace" />
+        </item>
+        <item command="Launch" text="Documentation">
+          <param name="type" value="url" />
+          <param name="path" value="https://github.com/LibreSprite/libresprite.github.io/wiki" />
+        </item>
+        <item command="Launch" text="Tutorial">
+          <param name="type" value="url" />
+          <param name="path" value="https://github.com/LibreSprite/libresprite.github.io/wiki" />
+        </item>
+        <separator />
+        <item command="Launch" text="Release Notes">
+          <param name="type" value="url" />
+          <param name="path" value="/releases/" />
+        </item>
+        <separator />
+        <item command="Launch" text="&amp;Donate">
+          <param name="type" value="url" />
+          <param name="path" value="https://liberapay.com/LibreSprite" />
+        </item>
+        <item command="About" text="&amp;About" />
+      </menu>
+    </menu>
+
+    <menu id="tab_popup">
+      <item command="CloseFile" text="&amp;Close" />
+    </menu>
+
+    <menu id="document_tab_popup">
+      <item command="CloseFile" text="&amp;Close" />
+      <item command="DuplicateView" text="Duplicate &amp;View" />
+      <separator />
+      <item command="OpenWithApp" text="&amp;Open with OS" />
+      <item command="OpenInFolder" text="Open in &amp;Folder" />
+    </menu>
+
+    <menu id="layer_popup">
+      <item command="LayerProperties" text="&amp;Properties..." />
+      <separator />
+      <item command="NewLayer" text="&amp;New" />
+      <item command="RemoveLayer" text="&amp;Remove" />
+      <item command="BackgroundFromLayer" text="&amp;Background from Layer" />
+      <item command="LayerFromBackground" text="&amp;Layer from Background" />
+      <separator />
+      <item command="DuplicateLayer" text="&amp;Duplicate" />
+      <item command="MergeDownLayer" text="&amp;Merge Down" />
+      <item command="FlattenLayers" text="&amp;Flatten" />
+    </menu>
+
+    <menu id="frame_popup">
+      <item command="FrameProperties" text="&amp;Properties...">
+        <param name="frame" value="current" />
+      </item>
+      <separator />
+      <item command="NewFrame" text="&amp;New" />
+      <item command="NewFrame" text="&amp;New Empty Frame">
+        <param name="content" value="empty" />
+      </item>
+      <item command="NewFrameTag" text="New &amp;Tag" />
+      <item command="RemoveFrame" text="&amp;Remove" />
+      <separator />
+      <item command="SetLoopSection" text="Set &amp;Loop Section" />
+    </menu>
+
+    <menu id="cel_popup">
+      <item command="CelProperties" text="&amp;Properties..." />
+      <separator />
+      <item command="ClearCel" text="&amp;Clear" />
+      <item command="UnlinkCel" text="&amp;Unlink" />
+      <item command="LinkCels" text="&amp;Link Cels" />
+      <separator />
+      <item command="NewFrame" text="&amp;Duplicate Cel(s)">
+        <param name="content" value="celblock" />
+      </item>
+      <item command="NewFrame" text="Duplicate L&amp;inked Cel(s)">
+        <param name="content" value="cel" />
+      </item>
+    </menu>
+
+    <menu id="cel_movement_popup">
+      <item command="MoveCel" text="&amp;Move" />
+      <item command="CopyCel" text="&amp;Copy" />
+      <separator />
+      <item command="Cancel" text="Cancel">
+        <param name="type" value="noop" />
+      </item>
+    </menu>
+
+    <menu id="frame_tag_popup">
+      <item command="FrameTagProperties" text="Tag &amp;Properties..." />
+      <item command="RemoveFrameTag" text="&amp;Remove Tag" />
+    </menu>
+
+    <menu id="palette_popup">
+      <item command="PaletteEditor" text="&amp;Palette Editor">
+        <param name="switch" value="true" />
+      </item>
+      <item command="PaletteSize" text="Palette Si&amp;ze" />
+      <separator />
+      <item command="SetPaletteEntrySize" text="&amp;Small Size">
+        <param name="size" value="7" />
+      </item>
+      <item command="SetPaletteEntrySize" text="&amp;Medium Size">
+        <param name="size" value="11" />
+      </item>
+      <item command="SetPaletteEntrySize" text="&amp;Large Size">
+        <param name="size" value="17" />
+      </item>
+      <separator />
+      <item command="SetColorSelector" text="Color Tint/Shade/Tone">
+        <param name="type" value="tint-shade-tone" />
+      </item>
+      <item command="SetColorSelector" text="Color Spectrum">
+        <param name="type" value="spectrum" />
+      </item>
+      <item command="SetColorSelector" text="RGB Color Wheel">
+        <param name="type" value="rgb-wheel" />
+      </item>
+      <item command="SetColorSelector" text="RYB Color Wheel">
+        <param name="type" value="ryb-wheel" />
+      </item>
+      <separator />
+      <item command="LoadPalette" text="L&amp;oad Palette" />
+      <item command="SavePalette" text="S&amp;ave Palette" />
+      <item command="LoadPalette" text="Load Default Palette">
+        <param name="preset" value="default" />
+      </item>
+      <item command="SavePalette" text="Save as Default Palette">
+        <param name="preset" value="default" />
+      </item>
+      <separator />
+      <item command="ColorQuantization" text="Create Palette from Current Sprite" />
+    </menu>
+
+    <menu id="ink_popup">
+      <item command="SetInkType" text="Simple Ink">
+	<param name="type" value="simple" />
+      </item>
+      <item command="SetInkType" text="Alpha Compositing">
+	<param name="type" value="alpha-compositing" />
+      </item>
+      <item command="SetInkType" text="Copy Alpha+Color">
+	<param name="type" value="copy-color" />
+      </item>
+      <item command="SetInkType" text="Lock Alpha">
+	<param name="type" value="lock-alpha" />
+      </item>
+      <item command="SetInkType" text="Shading">
+	<param name="type" value="shading" />
+      </item>
+      <separator />
+      <item command="SetSameInk" text="Same in all Tools" />
+    </menu>
+
+  </menus>
+
+  <!-- tools -->
+  <tools>
+
+    <group id="selection_tools" text="Selection Tools">
+
+      <tool id="rectangular_marquee"
+            text="Rectangular Marquee Tool"
+            fill="always"
+            ink="selection"
+            controller="two_points"
+            pointshape="pixel"
+            intertwine="as_rectangles"
+            tracepolicy="last">
+        <tooltip>*
+        Left-button: replace/add to current selection.&#10;*
+        Right-button: remove from current selection.
+        </tooltip>
+      </tool>
+
+      <tool id="elliptical_marquee"
+            text="Elliptical Marquee Tool"
+            fill="always"
+            ink="selection"
+            controller="two_points"
+            pointshape="pixel"
+            intertwine="as_ellipses"
+            tracepolicy="last">
+        <tooltip>*
+        Left-button: Replace/add to current selection.&#10;*
+        Right-button: Remove from current selection.
+        </tooltip>
+      </tool>
+
+      <tool id="lasso"
+            text="Lasso Tool"
+            fill="always"
+            ink="selection"
+            controller="freehand"
+            pointshape="pixel"
+            intertwine="as_lines"
+            tracepolicy="accumulate">
+        <tooltip>*
+        Left-button: Replace/add to current selection.&#10;*
+        Right-button: Remove from current selection.
+        </tooltip>
+      </tool>
+
+      <tool id="polygonal_lasso"
+            text="Polygonal Lasso Tool"
+            fill="always"
+            ink="selection"
+            controller="point_by_point"
+            pointshape="pixel"
+            intertwine="as_lines"
+            tracepolicy="last">
+        <tooltip>*
+        Left-button: Replace/add to current selection.&#10;*
+        Right-button: Remove from current selection.
+        </tooltip>
+      </tool>
+
+      <tool id="magic_wand"
+            text="Magic Wand Tool"
+            fill="always"
+            ink="selection"
+            controller="one_point"
+            pointshape="floodfill"
+            tracepolicy="accumulate">
+        <tooltip>*
+        Left-button: Replace/add to current selection.&#10;*
+        Right-button: Remove from current selection.
+        </tooltip>
+      </tool>
+    </group>
+
+    <group id="pencil_tools" text="Pencil Tools">
+      <tool id="pencil"
+            text="Pencil Tool"
+            ink="paint"
+            controller="freehand"
+            pointshape="brush"
+            intertwine="as_lines"
+            tracepolicy="accumulate"
+            />
+      <tool id="spray"
+            text="Spray Tool"
+            ink="paint"
+            controller="freehand"
+            pointshape="spray"
+            tracepolicy="overlap"
+            />
+    </group>
+
+    <group id="eraser_tools" text="Eraser Tools">
+      <tool id="eraser"
+            text="Eraser Tool"
+            ink_left="eraser"
+            ink_right="replace_fg_with_bg"
+            controller="freehand"
+            pointshape="brush"
+            intertwine="as_lines"
+            tracepolicy="accumulate"
+            default_brush_size="8">
+        <tooltip>*
+        Left-button: Erase with the background color in `Background' layer&#10;
+        or transparent color in any other layer.&#10;*
+        Right-button: Replace foreground with background color.
+        </tooltip>
+      </tool>
+    </group>
+
+    <group id="color_tools" text="Color Tools">
+      <tool id="eyedropper"
+            text="Eyedropper Tool"
+            ink_left="pick_fg"
+            ink_right="pick_bg"
+            controller="freehand"
+            pointshape="pixel"
+            />
+    </group>
+
+    <group id="view_tools" text="View Tools">
+      <tool id="zoom"
+            text="Zoom Tool"
+            ink="zoom"
+            controller="freehand"
+            />
+      <tool id="hand"
+            text="Hand Tool"
+            ink="scroll"
+            controller="freehand"
+            />
+    </group>
+
+    <group id="move_tools" text="Move Tools">
+      <tool id="move"
+            text="Move Tool"
+            ink="move"
+            controller="freehand"
+            />
+      <!-- tool id="slice"
+            text="Slice Tool"
+            fill="always"
+            ink="slice"
+            controller="two_points"
+            pointshape="pixel"
+            intertwine="as_rectangles"
+            tracepolicy="last"
+            /-->
+    </group>
+
+    <group id="paint_bucket" text="Paint Bucket Tool">
+      <tool id="paint_bucket"
+            text="Paint Bucket Tool"
+            ink="paint"
+            controller="one_point"
+            pointshape="floodfill"
+            tracepolicy="accumulate"
+            />
+    </group>
+
+    <group id="perfect_traces" text="Perfect Traces">
+      <tool id="line"
+            text="Line Tool"
+            ink="paint"
+            controller="two_points"
+            pointshape="brush"
+            intertwine="as_lines"
+            tracepolicy="last"
+            />
+      <tool id="curve"
+            text="Curve Tool"
+            ink="paint"
+            controller="four_points"
+            pointshape="brush"
+            intertwine="as_bezier"
+            tracepolicy="last"
+            />
+    </group>
+
+    <group id="shapes" text="Shapes">
+      <tool id="rectangle"
+            text="Rectangle Tool"
+            fill="optional"
+            ink="paint"
+            controller="two_points"
+            pointshape="brush"
+            intertwine="as_rectangles"
+            tracepolicy="last"
+            />
+      <tool id="filled_rectangle"
+            text="Filled Rectangle Tool"
+            fill="always"
+            ink="paint"
+            controller="two_points"
+            pointshape="brush"
+            intertwine="as_rectangles"
+            tracepolicy="last"
+            />
+      <tool id="ellipse"
+            text="Ellipse Tool"
+            fill="optional"
+            ink="paint"
+            controller="two_points"
+            pointshape="brush"
+            intertwine="as_ellipses"
+            tracepolicy="last"
+            />
+      <tool id="filled_ellipse"
+            text="Filled Ellipse Tool"
+            fill="always"
+            ink="paint"
+            controller="two_points"
+            pointshape="brush"
+            intertwine="as_ellipses"
+            tracepolicy="last"
+            />
+    </group>
+
+    <group id="contours" text="Contours">
+      <tool id="contour"
+            text="Contour Tool"
+            fill="always"
+            ink="paint"
+            controller="freehand"
+            pointshape="brush"
+            intertwine="as_lines"
+            tracepolicy="accumulate"
+            />
+      <tool id="polygon"
+            text="Polygon Tool"
+            fill="always"
+            ink="paint"
+            controller="point_by_point"
+            pointshape="brush"
+            intertwine="as_lines"
+            tracepolicy="last"
+            />
+    </group>
+
+    <group id="effects" text="Effects">
+      <tool id="blur"
+            text="Blur Tool"
+            ink="blur"
+            controller="freehand"
+            pointshape="brush"
+            intertwine="as_lines"
+            tracepolicy="accumulate"
+            default_brush_size="16"
+            />
+      <tool id="jumble"
+            text="Jumble Tool"
+            ink="jumble"
+            controller="freehand"
+            pointshape="brush"
+            intertwine="as_lines"
+            tracepolicy="overlap"
+            default_brush_size="16"
+            />
+    </group>
+
+  </tools>
+
+</gui>

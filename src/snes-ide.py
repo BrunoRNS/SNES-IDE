@@ -1,155 +1,229 @@
+"""
+SNES-IDE - snes-ide.py
+Copyright (C) 2025 BrunoRNS
+
+This program is free software: you can redistribute it and/or modify
+it under the terms of the GNU General Public License as published by
+the Free Software Foundation, either version 3 of the License, or
+(at your option) any later version.
+
+This program is distributed in the hope that it will be useful,
+but WITHOUT ANY WARRANTY; without even the implied warranty of
+MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+GNU General Public License for more details.
+
+You should have received a copy of the GNU General Public License
+along with this program.  If not, see <http://www.gnu.org/licenses/>.
+"""
+
+from PySide6.QtWidgets import QApplication, QMainWindow, QVBoxLayout, QWidget
+from PySide6.QtCore import QObject, Slot, Signal, QUrl, QProcess
+from PySide6.QtWebEngineWidgets import QWebEngineView
+from PySide6.QtWebChannel import QWebChannel
+
+from typing_extensions import NoReturn, Any
 from pathlib import Path
-from array import array
-import subprocess
 import sys
 
-class SnesIde(object):
 
-    def __init__(self, *args: object, **kwargs: object) -> None:
+class ScriptRunner(QObject):
+
+    scriptExecuted: Signal = Signal(str, str)
+
+    def __init__(self) -> None:
         """
-        Initializes the class instance.
+        Initializes the ScriptRunner object.
 
-        - Sets the executable path.
-        - Initializes the options array with values 0 through 6.
-        - Prompts the user to select an option.
-        - Executes a batch file based on the selected option and exits the program.
+        Sets the path of the scripts directory to the directory containing the
+        executable or script, depending on whether the script is frozen (PyInstaller)
+        or not.
 
-        Args:
-            *args: Variable length argument list.
-            **kwargs: Arbitrary keyword arguments.
-        """
-
-        self.path: Path = Path.home() / "Desktop" / "snes-ide"
-
-        self.options: array = array("B", (0, 1, 2, 3, 4, 5, 6))
-
-        option = self.give_options()
-
-        sys.exit(self.execute_bat(option))
-
-
-    @staticmethod
-    def run(file: Path):
-        """
-        Executes the specified file using the Windows command prompt.
-
-        Args:
-            file (Path): The path to the file to be executed.
-
-        Raises:
-            subprocess.CalledProcessError: If the command returns a non-zero exit status.
+        :return: None
         """
 
-        subprocess.run(["cmd", "/c", str(file)], check=True)
-
-
-    def execute_bat(self, option: int) -> int:
-        """
-        Executes a batch file corresponding to the given option.
-
-        Parameters:
-            option (int): An integer representing the batch file to execute.
-                0 - create-new-project.bat
-                1 - text-editor.bat
-                2 - audio-tools.bat
-                3 - graphic-tools.bat
-                4 - other-tools.bat
-                5 - compiler.bat
-                6 - emulator.bat
-
-        Returns:
-            int: 0 if the batch file executed successfully, -1 if an error occurred.
-
-        Raises:
-            subprocess.CalledProcessError: If the batch file execution fails.
-        """
-
-        match option:
-
-            case 0:   self.run(self.path / "create-new-project.bat"); return 0
-
-            case 1:   self.run(self.path / "text-editor.bat"); return 0
-
-            case 2:   self.run(self.path / "audio-tools.bat"); return 0
-
-            case 3:   self.run(self.path / "graphic-tools.bat"); return 0
-
-            case 4:   self.run(self.path / "other-tools.bat"); return 0
-
-            case 5:   self.run(self.path / "compiler.bat"); return 0
-
-            case 6:   self.run(self.path / "emulator.bat"); return 0
-
-            case _:   return -1
-    
-
-    def give_options(self) -> int:
-        """
-        Presents a menu of SNES project-related options to the user and prompts for a selection.
-        The available options include:
-
-            0 - Create a new SNES project
-            1 - Start Notepad++ text editor
-            2 - Start an audio framework for SNES
-            3 - Start a graphic framework for SNES
-            4 - Run an external framework for SNES
-            5 - Compile a SNES project
-            6 - Emulate a SNES project with bsnes
-
-        The method prints the options, reads user input, validates it against self.options,
-        and recursively prompts again if the input is invalid.
-
-        Returns:
-            int: The selected option as an integer.
-
-        """
-
-        txt: str = "\
-Create a new Snes project -> 0\n \
-Start notepad++ text editor -> 1\n \
-Start an audio framework for snes -> 2\n \
-Start a graphic framework for snes -> 3\n \
-Run an external framework for snes -> 4\n \
-Compile a Snes project -> 5\n \
-Emulate a Snes project with bsnes -> 6\n "
-
-        print("Choose an option from the ones below: ", txt, sep="\n\n")
-
-        option = int(input())
-
-        if option not in self.options:
-
-            print("\nINVALID ENTRY: try again\n")
-
-            return self.give_options()
-
-        return option
-
-
+        super().__init__()
+        self.scripts_dir: Path = self.get_executable_path() / "scripts"
 
     @staticmethod
     def get_executable_path() -> Path:
-        """
-        Returns the directory path where the current executable or script is located.
-        If the application is running as a PyInstaller bundle (frozen), it returns the directory containing the executable.
-        Otherwise, it returns the directory containing the current Python script file.
-        Returns:
-            Path: The directory path of the executable or script.
-        """
+        """Get the path of the executable or script based on whether the script is frozen 
+        (PyInstaller) or not."""
 
         if getattr(sys, 'frozen', False):
-            # PyInstaller executable
-            print("Executable path mode chosen")
 
-            return Path(sys.executable).parent
-    
+            print("executable path mode chosen")
+            return Path(sys.executable).resolve().parent
+
         else:
-            # Normal script
-            print("Python script path mode chosen")
 
-            return Path(__file__).absolute().parent
+            print("Python script path mode chosen")
+            return Path(__file__).resolve().parent
+
+    @Slot(str)
+    def run_script(self, script_name: str) -> None:
+        """
+        Execute a Python script from the scripts directory.
+
+        This slot is connected to the run_script method which takes a script name
+        as a parameter and executes it using the subprocess module.
+
+        :param script_name: The name of the script to execute.
+        :return: None
+        """
+
+        try:
+            script_path: Path = self.scripts_dir / script_name
+
+            if script_path.exists():
+                self.process = QProcess()
+
+                self.process.readyReadStandardOutput.connect(
+                    self.handle_stdout)
+                self.process.readyReadStandardError.connect(self.handle_stderr)
+                self.process.finished.connect(self.handle_finished)
+
+                self.process.setWorkingDirectory(str(self.scripts_dir))
+                self.process.start(sys.executable, ['-s', str(script_path)])
+                self.current_script = script_name
+
+            else:
+                self.scriptExecuted.emit(
+                    script_name, f"Script not found: {script_path}")
+
+        except Exception as e:
+            self.scriptExecuted.emit(script_name, f"Exception: {str(e)}")
+
+    @Slot(str)
+    def runScript(self, scriptName: str) -> None:
+        """
+        Execute a Python script from the scripts directory.
+
+        This slot is connected to the run_script method which takes a script name
+        as a parameter and executes it using the subprocess module.
+
+        :param scriptName: The name of the script to execute.
+        :return: None
+        """
+
+        self.run_script(scriptName)
+
+    def handle_stdout(self):
+        """
+        Handle standard output from the subprocess.
+
+        This slot is connected to the readyReadStandardOutput signal of the
+        QProcess object. It reads the standard output data and prints it to
+        the console.
+
+        :return: None
+        """
+        
+        data: "str|Any" = self.process.readAllStandardOutput().data()
+        print(f"STDOUT: {data}")
+
+
+    def handle_stderr(self):
+        """
+        Handle standard error from the subprocess.
+
+        This slot is connected to the readyReadStandardError signal of the
+        QProcess object. It reads the standard error data and prints it to
+        the console.
+
+        :return: None
+        """
+        
+        data: "str|Any" = self.process.readAllStandardError().data()
+        print(f"STDERR: {data}")
+
+
+    def handle_finished(self, exit_code: int, _: Any):
+        """
+        Handle the finished signal of the QProcess object.
+
+        This slot is connected to the finished signal of the QProcess object.
+        It reads the standard error data and prints it to the console.
+
+        :param exit_code: The exit code of the subprocess.
+        :param _: Unused parameter.
+        :return: None
+        """
+        
+        script_name = getattr(self, 'current_script', 'Unknown')
+
+        if exit_code == 0:
+            self.scriptExecuted.emit(script_name, "Script executed successfully!")
+            
+        else:
+            error_msg: "str|Any" = self.process.readAllStandardError().data()
+            
+            if isinstance(error_msg, str):
+                error_msg = f"Error: {error_msg}"
+                self.scriptExecuted.emit(script_name, error_msg)
+            
+            else:
+                error_msg = f"Error: {error_msg}"
+                self.scriptExecuted.emit(script_name, error_msg)
+
+
+class MainWindow(QMainWindow):
+
+    def __init__(self) -> None:
+        """
+        Initializes the main window of the SNES IDE.
+
+        Sets the window title to "SNES IDE - Super Nintendo Development Environment",
+        sets the window size to 1200x800, and sets the layout to a vertical box layout.
+        Creates a QWebEngineView and sets it as the central widget of the main window.
+        Creates a QWebChannel and registers a ScriptRunner object with it.
+        Loads the index.html file from the assets directory into the QWebEngineView.
+        """
+
+        super().__init__()
+        self.setWindowTitle(
+            "SNES IDE - Super Nintendo Development Environment")
+        self.setGeometry(100, 100, 1200, 800)
+
+        central_widget: QWidget = QWidget()
+        self.setCentralWidget(central_widget)
+        layout: QVBoxLayout = QVBoxLayout(central_widget)
+        layout.setContentsMargins(0, 0, 0, 0)
+
+        self.web_view: QWebEngineView = QWebEngineView()
+
+        self.channel: QWebChannel = QWebChannel()
+        self.script_runner: ScriptRunner = ScriptRunner()
+        self.channel.registerObject("scriptRunner", self.script_runner)
+        self.web_view.page().setWebChannel(self.channel)
+
+        html_path: Path = ScriptRunner.get_executable_path() / "assets" / "index.html"
+
+        url: QUrl = QUrl.fromLocalFile(str(html_path.resolve()))
+
+        self.web_view.load(url)
+
+        layout.addWidget(self.web_view)
+
+
+def main() -> NoReturn:
+    """
+    Main entry point of the application. Initializes QApplication,
+    sets the style to Fusion if possible, creates a MainWindow,
+    shows it and starts the application event loop.
+    """
+
+    app: QApplication = QApplication(sys.argv)
+
+    try:
+        app.setStyle('Fusion')  # type: ignore
+    except:
+        ...
+
+    window: MainWindow = MainWindow()
+    window.show()
+
+    sys.exit(app.exec())
 
 
 if __name__ == "__main__":
-
-    SnesIde()
+    main()

@@ -1,0 +1,92 @@
+name: Ubuntu (Build and Test)
+
+on:
+  push:
+    branches: [main, develop, ubuntu/**]
+    tags: ["v*"]
+  pull_request:
+    branches: [main, develop]
+
+jobs:
+  ubuntu-build:
+    name: Build (Green-Light)
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+
+      - name: Install Dependencies
+        run: |
+          python -m pip install --upgrade pip
+          pip install -r build/requirements.txt
+
+      - name: Install System Dependencies
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y binutils wget file
+
+      - name: Build
+        run: |
+          sudo python build/build.py
+
+      - name: Compress dist folder
+        run: |
+          tar -czf sneside-ubuntu-x64.tar.gz dist
+
+      - name: Upload Artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: sneside-ubuntu-x64
+          path: sneside-ubuntu-x64.tar.gz
+          retention-days: 7
+
+  ubuntu-tests-greenlight:
+    name: Tests (Green-Light)
+    runs-on: ubuntu-latest
+    needs: ubuntu-build
+    steps:
+      - name: Download build artifact
+        uses: actions/download-artifact@v4
+        with:
+          name: sneside-ubuntu-x64
+          path: .
+
+      - name: Verify AppDir
+        run: |
+          tar -xzf sneside-ubuntu-x64.tar.gz
+          
+          if [ ! -d "dist/SNES-IDE.AppDir" ]; then
+            echo "AppDir not found!"
+            exit 1
+          fi
+
+          if [ ! -f "dist/SNES-IDE.AppDir/AppRun" ]; then
+            echo "AppDir launcher not found!"
+            exit 1
+          fi
+
+          echo "AppDir structure verified"
+          
+
+  ubuntu-tests-redlight:
+    if: github.ref_name == 'ubuntu/red'
+    name: Tests (Red-Light)
+    runs-on: ubuntu-latest
+    needs: ubuntu-build
+    steps:
+      - name: Download build artifact
+        uses: actions/download-artifact@v4
+        with:
+          name: sneside-ubuntu-x64
+
+      - name: Deliberately failing test
+        run: |
+          echo "This is a deliberate failure for Red-Light testing."
+          exit 1
