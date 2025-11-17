@@ -93,3 +93,4 @@ tmp/
 temp/
 
 .gradle/
+docs/examples/JavaSnes.Examples/snes-examples/build/libs

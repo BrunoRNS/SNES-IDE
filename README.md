@@ -35,7 +35,7 @@ First, check the system requirements:
   - MacOS BigSur+ arm64.
   - Linux Ubuntu Noble 24.04+ (or based) x64.
 - **Free Disk Space**
-  - Minimum: 800 MiB
+  - Minimum: 960 MiB
   - Recommended: 5 GiB
 - **Memory**
   - Minimum: 1 GiB
@@ -43,7 +43,20 @@ First, check the system requirements:
 
 Download the latest release from [SNES-IDE releases](https://github.com/BrunoRNS/SNES-IDE/releases/latest) for your specific OS.
 
-Decompress the ZIP or TAR.GZ archive and run the SNES-IDE executable, as SNES-IDE now comes with a full precompiled version of its dependencies. Now you're ready to create your first game!
+### Windows
+
+- Download the Windows version from [SNES-IDE releases](https://github.com/BrunoRNS/SNES-IDE/releases/latest).
+- The Windows version is distributed as a zip file, which you can extract and run the `SNES-IDE.exe` file to start.
+
+### Linux
+
+- Download the Linux version from [SNES-IDE releases](https://github.com/BrunoRNS/SNES-IDE/releases/latest).
+- The Linux version is distributed as an AppImage, which you can run directly from the downloaded file.
+
+### macOS
+
+- Download the macOS version from [SNES-IDE releases](https://github.com/BrunoRNS/SNES-IDE/releases/latest).
+- The macOS version is distributed as a zip file, which you can extract and run the `SNES-IDE.app` executable to start.
 
 ## Tutorials and Documentation
 
